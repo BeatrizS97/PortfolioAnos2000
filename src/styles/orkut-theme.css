@@ -1,0 +1,786 @@
+/* src/styles/orkut-theme.css */
+.orkut-profile {
+  background: #E8EFF7;
+  height: 100%;
+  overflow-y: auto;
+  font-family: Verdana, Tahoma, sans-serif;
+}
+
+.orkut-topbar {
+  background: white;
+  border-bottom: 2px solid #6CB4EE;
+}
+
+.orkut-topbar-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 12px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.orkut-logo {
+  font-family: 'Comic Sans MS', 'Trebuchet MS', cursive;
+  font-weight: bold;
+  font-size: 18px;
+  color: #E91E8C;
+  letter-spacing: -0.5px;
+  flex-shrink: 0;
+}
+
+.orkut-tabs {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.orkut-tab {
+  background: #DCEBFB;
+  border: 1px solid #6CB4EE;
+  color: #1a5da0;
+  border-radius: 12px;
+  padding: 3px 12px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.orkut-tab:hover {
+  background: #C4E0FB;
+}
+
+.orkut-tab--active {
+  background: #6CB4EE;
+  color: white;
+}
+
+.orkut-search {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.orkut-search input {
+  border: 1px solid #6CB4EE;
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-size: 11px;
+  width: 140px;
+}
+
+.orkut-search button {
+  background: #6CB4EE;
+  border: none;
+  border-radius: 3px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+.orkut-columns {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  gap: 14px;
+  padding: 14px;
+  align-items: start;
+}
+
+.orkut-col {
+  min-width: 0;
+}
+
+.orkut-col-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1px solid #D6E4F5;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.profile-photo {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border: 3px solid #B8B8B8;
+  border-radius: 2px;
+}
+
+.profile-name {
+  margin: 4px 0 0;
+  font-size: 14px;
+  text-align: center;
+  color: #333;
+}
+
+.profile-status--online {
+  color: #2E8B47;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.quick-links {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  width: 100%;
+  font-size: 11px;
+}
+
+.quick-links li {
+  padding: 4px 0;
+  border-bottom: 1px dotted #ddd;
+}
+
+.quick-links button {
+  background: none;
+  border: none;
+  color: #1a5da0;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0;
+  text-align: left;
+}
+
+.quick-links button:hover {
+  text-decoration: underline;
+}
+
+.resume-download-link {
+  color: #1a5da0;
+  font-size: 11px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.resume-download-link:hover {
+  text-decoration: underline;
+}
+
+.quick-link-with-info {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+}
+
+.info-tooltip-wrapper {
+  position: relative;
+}
+
+.info-icon {
+  cursor: help;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.info-tooltip-text {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  width: 170px;
+  background: #333;
+  color: #fff;
+  font-size: 10px;
+  line-height: 1.4;
+  padding: 6px 8px;
+  border-radius: 3px;
+  text-align: left;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.info-tooltip-wrapper:hover .info-tooltip-text,
+.info-tooltip-wrapper:focus-within .info-tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.orkut-col-center {
+  background: white;
+  border: 1px solid #D6E4F5;
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.welcome-msg {
+  margin: 0 0 2px;
+  color: #E91E8C;
+  font-size: 16px;
+}
+
+.profile-role {
+  margin: 0 0 12px;
+  color: #666;
+  font-size: 12px;
+}
+
+.profile-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #F5F9FF;
+  border: 1px solid #D6E4F5;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 11px;
+  margin-bottom: 14px;
+}
+
+.lucky-message {
+  background: #FFF3D6;
+  border: 1px dashed #E0B84A;
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+}
+
+.lucky-message h4 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  color: #A87B00;
+}
+
+.lucky-message p {
+  margin: 0;
+  font-size: 12px;
+  color: #555;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid #ffd1a8;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.orkut-col-center h4,
+.orkut-col-right h4 {
+  color: #ff6600;
+  font-size: 13px;
+  margin: 0;
+}
+
+.see-all-link {
+  font-size: 10px;
+  color: #1a5da0;
+  text-decoration: none;
+}
+
+.orkut-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.friends-section,
+.communities-section {
+  background: white;
+  border: 1px solid #D6E4F5;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.friends-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.friend-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+  text-align: center;
+}
+
+.friend-card img {
+  width: 44px;
+  height: 44px;
+  border-radius: 2px;
+  border: 1px solid #ddd;
+}
+
+.communities-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.community-item {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.community-thumb {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  background: #F0F4FA;
+  border: 1px solid #D6E4F5;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.community-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.community-name {
+  font-size: 10.5px;
+  color: #1a5da0;
+  line-height: 1.3;
+}
+
+.community-members {
+  font-size: 9px;
+  color: #888;
+}
+
+.scraps-section {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  gap: 14px;
+  padding: 0 14px 14px;
+  margin: 0;
+}
+
+.scraps-section-inner {
+  grid-column: 2;
+  background: #FFFDE7;
+  border-top: 2px solid #FFD700;
+  border-radius: 4px;
+  padding: 14px;
+}
+
+.scraps-admin-toggle {
+  background: none;
+  border: none;
+  color: #1a5da0;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.scraps-admin-toggle:hover {
+  text-decoration: underline;
+}
+
+.scraps-list ul {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+}
+
+.scrap-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px dashed #E0C96A;
+}
+
+.scrap-item img {
+  width: 36px;
+  height: 36px;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+}
+
+.scrap-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.scrap-item strong {
+  font-size: 11px;
+  color: #333;
+}
+
+.scrap-item p {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: #444;
+}
+
+.scrap-delete-btn {
+  flex-shrink: 0;
+  align-self: flex-start;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0.55;
+  padding: 2px 4px;
+}
+
+.scrap-delete-btn:hover:not(:disabled) {
+  opacity: 1;
+}
+
+.scrap-delete-btn:disabled {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.scraps-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 4px 0 12px;
+  font-size: 11px;
+}
+
+.scraps-pagination button {
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 3px 10px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.scraps-pagination button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.scraps-pagination-page {
+  color: #777;
+  min-width: 16px;
+  text-align: center;
+}
+
+.scrap-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.scrap-form input,
+.scrap-form textarea {
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 6px;
+  font-family: inherit;
+  font-size: 12px;
+}
+
+.scrap-form textarea {
+  min-height: 50px;
+  resize: vertical;
+}
+
+.scrap-form button {
+  align-self: flex-end;
+  background: #FF6600;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.projects-section {
+  margin-bottom: 18px;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.project-card {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fafafa;
+}
+
+.project-card img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  background: #eee;
+}
+
+.project-card-body {
+  padding: 8px;
+}
+
+.project-card-body h4 {
+  margin: 0 0 4px;
+  font-size: 12px;
+  color: #333 !important;
+}
+
+.project-card-body p {
+  font-size: 11px;
+  color: #555;
+  margin: 0 0 6px;
+}
+
+.tech-stack {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0;
+  margin: 0 0 6px;
+}
+
+.tech-stack li {
+  background: #ffe4cc;
+  color: #a34700;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.project-links a {
+  font-size: 10px;
+  color: #0054e3;
+  margin-right: 8px;
+}
+
+.see-more {
+  margin-top: 10px;
+  background: none;
+  border: 1px solid #ff6600;
+  color: #ff6600;
+  border-radius: 3px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.testimonials ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.testimonials li {
+  border-left: 3px solid #ff6600;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  font-size: 11.5px;
+  color: #444;
+  background: #FFF8F2;
+}
+
+.testimonials li span {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: #888;
+}
+
+.orkut-compose-box {
+  background: white;
+  border: 1px solid #6CB4EE;
+  border-radius: 4px;
+  width: 600px; 
+  max-width: 95vw; 
+  font-family: Verdana, Tahoma, sans-serif;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.orkut-compose-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #DCEBFB;
+  border-bottom: 1px solid #6CB4EE;
+  padding: 8px 10px;
+}
+
+.orkut-compose-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #1a5da0;
+}
+
+.orkut-compose-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #555;
+}
+
+.orkut-compose-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.orkut-compose-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.orkut-compose-label {
+  color: #777;
+}
+
+.orkut-compose-to {
+  background: #F0F4FA;
+  border: 1px solid #D6E4F5;
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.orkut-compose-input {
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 8px;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.orkut-compose-toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 4px 2px;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+  color: #555;
+}
+
+.orkut-compose-toolbar button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+.orkut-compose-toolbar button:hover:not(:disabled) {
+  background: #eef3fb;
+}
+
+.orkut-compose-toolbar button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.orkut-toolbar-u {
+  text-decoration: underline;
+}
+
+.orkut-compose-textarea {
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 10px;
+  font-size: 12px;
+  font-family: inherit;
+  min-height: 250px; 
+  resize: vertical;
+}
+
+.orkut-compose-error {
+  color: crimson;
+  font-size: 11px;
+  margin: 0;
+}
+
+.orkut-compose-footer {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px 16px;
+}
+
+.orkut-post-btn {
+  background: #333;
+  color: white;
+  border: 1px solid #222;
+  border-radius: 3px;
+  padding: 6px 16px;
+  font-weight: bold;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.orkut-post-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.orkut-cancel-btn {
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 6px 16px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.profile-details p {
+  margin: 0 0 6px;
+  line-height: 1.55;
+  color: #444;
+}
+
+.profile-details .section-heading {
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+.profile-details ul.quick-links {
+  margin: 0 0 4px;
+}
+
+.profile-details ul.quick-links li {
+  padding: 2px 0;
+  line-height: 1.5;
+  border-bottom: 1px dotted #eee;
+}
+
+.profile-details ul.quick-links li:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 800px) {
+  .orkut-columns {
+    grid-template-columns: 1fr;
+  }
+  .scraps-section {
+    grid-template-columns: 1fr;
+  }
+  .scraps-section-inner {
+    grid-column: 1;
+  }
+}

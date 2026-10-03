@@ -1,0 +1,119 @@
+/* src/styles/global.css */
+@font-face {
+  font-family: 'Tahoma';
+  src: url('/assets/fonts/tahoma.ttf') format('truetype');
+  font-weight: normal;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: 'Tahoma', Verdana, sans-serif;
+  font-size: 11px;
+  color: #1a1a1a;
+}
+
+body.screen-vibrate {
+  animation: screen-vibrate 0.15s linear infinite;
+}
+
+@keyframes screen-vibrate {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-6px, -3px); }
+  20% { transform: translate(6px, 3px); }
+  30% { transform: translate(-6px, 3px); }
+  40% { transform: translate(6px, -3px); }
+  50% { transform: translate(-4px, 2px); }
+  60% { transform: translate(4px, -2px); }
+  70% { transform: translate(-4px, -2px); }
+  80% { transform: translate(4px, 2px); }
+  90% { transform: translate(-2px, 1px); }
+}
+
+button {
+  font-family: inherit;
+}
+
+.loading-screen,
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: #555;
+}
+
+.empty-state {
+  color: #777;
+  font-style: italic;
+  padding: 12px 0;
+}
+
+.xp-button {
+  background: linear-gradient(to bottom, #f5f5f5, #dcdcdc);
+  border: 1px solid #8a8a8a;
+  border-radius: 3px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.xp-button:hover {
+  background: linear-gradient(to bottom, #ffffff, #e6e6e6);
+}
+
+.xp-button--primary {
+  background: linear-gradient(to bottom, #3da35a, #2e8b47);
+  color: white;
+  border-color: #1f6b34;
+}
+
+.xp-input {
+  border: 1px solid #8a8a8a;
+  border-radius: 3px;
+  padding: 6px 8px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.modal-box {
+  background: #ece9d8;
+  border: 2px solid #0054e3;
+  border-radius: 6px;
+  min-width: 320px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: linear-gradient(to right, #0054e3, #3c9fff);
+  color: white;
+  border-radius: 4px 4px 0 0;
+}
+
+.modal-content {
+  padding: 16px;
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+}

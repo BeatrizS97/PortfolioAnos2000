@@ -1,0 +1,429 @@
+/* src/styles/msn-theme.css */
+.msn-classic {
+  background: #ffffff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: Tahoma, sans-serif;
+  overflow: hidden;
+}
+
+.msn-classic-toolbar {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  gap: 14px;
+  padding: 8px 12px;
+  background: linear-gradient(to bottom, #ffffff, #dbe6fa);
+  border-bottom: 1px solid #b9cced;
+}
+
+.msn-classic-toolbar::before {
+  content: '';
+  position: absolute;
+  top: -80%;
+  left: -10%;
+  width: 130%;
+  height: 220%;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.15) 30%, rgba(255, 255, 255, 0) 50%);
+  pointer-events: none;
+}
+
+.msn-classic-toolbar button {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #33475b;
+  cursor: not-allowed;
+  padding: 2px 4px;
+}
+
+.msn-classic-toolbar button span {
+  font-size: 10.5px;
+  font-weight: normal;
+  color: #1a1a1a;
+}
+
+.msn-classic-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  background: linear-gradient(135deg, #eaf1fc 0%, #dbe6fa 100%);
+  padding: 10px;
+}
+
+.msn-classic-chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.msn-row {
+  flex: 1 1 50%;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.msn-card {
+  background: #ffffff;
+  border: 1px solid #a9c3e8;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(60, 90, 140, 0.18);
+  overflow: hidden;
+}
+
+.msn-card--messages,
+.msn-card--compose {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.msn-card--avatar {
+  position: relative;
+  align-self: flex-start;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  padding: 3px;
+}
+
+.msn-card--avatar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.1) 40%, rgba(255, 255, 255, 0) 60%);
+  pointer-events: none;
+}
+
+.msn-card--avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2px;
+  display: block;
+}
+
+.msn-card--avatar::after {
+  content: '▾';
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 11px;
+  color: #6f89c9;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 2px;
+  line-height: 1;
+  padding: 0 1px;
+}
+
+.msn-to-line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px;
+  font-size: 11.5px;
+  color: #333;
+  border-bottom: 1px solid #e3e9f5;
+  background: #fafbff;
+}
+
+.msn-to-line strong {
+  font-weight: normal;
+  color: #555;
+}
+
+.msn-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  font-size: 12.5px;
+}
+
+.msn-tip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #666;
+  font-size: 11px;
+  font-style: italic;
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #ddd;
+}
+
+.msn-message {
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+.msn-message--bot strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #1a5da0;
+}
+
+.msn-message--user strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #333;
+}
+
+.msn-message--system {
+  border-top: 1px dashed #ccc;
+  border-bottom: 1px dashed #ccc;
+  padding: 6px 0;
+  font-weight: bold;
+  color: #333;
+  text-align: left;
+}
+
+.msn-toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-top: 1px solid #eee;
+  flex-wrap: wrap;
+  background: #f6f8fd;
+}
+
+.msn-toolbar-row button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(to bottom, #ffffff 0%, #eef3fb 50%, #dde8f8 100%);
+  border-top: 1px solid #ffffff;
+  border-left: 1px solid #ffffff;
+  border-right: 1px solid #7f93b8;
+  border-bottom: 1px solid #7f93b8;
+  border-radius: 14px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #1a3c6e;
+  cursor: pointer;
+  padding: 5px 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.msn-toolbar-row button:hover {
+  background: linear-gradient(to bottom, #ffffff 0%, #eaf2ff 50%, #cfe1fb 100%);
+}
+
+.msn-toolbar-row button:active {
+  border-top-color: #7f93b8;
+  border-left-color: #7f93b8;
+  border-right-color: #ffffff;
+  border-bottom-color: #ffffff;
+  background: linear-gradient(to bottom, #cfe1fb 0%, #eaf2ff 100%);
+}
+
+.msn-toolbar-divider {
+  width: 1px;
+  height: 18px;
+  background: #ccc;
+  box-shadow: 1px 0 0 #fff;
+  margin: 0 2px;
+}
+
+.nudge-button {
+  background: linear-gradient(to bottom, #fffbe8 0%, #ffe9ac 50%, #ffd670 100%) !important;
+  border-right-color: #c99a1c !important;
+  border-bottom-color: #c99a1c !important;
+  color: #7a5300 !important;
+}
+
+.msn-footer {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  border-top: 1px solid #ddd;
+  background: #fafbff;
+}
+
+.msn-compose-toolbar {
+  display: flex;
+  gap: 10px;
+  padding: 6px 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 10.5px;
+  color: #333;
+}
+
+.msn-compose-tool {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  cursor: not-allowed;
+  padding: 3px 4px;
+  border-radius: 50%;
+}
+
+.msn-compose-tool strong {
+  color: #1a3c6e;
+  font-size: 12px;
+}
+
+.msn-compose-tool-caret {
+  font-size: 8px;
+  color: #7f93b8;
+}
+
+.msn-compose-row {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+}
+
+.msn-compose-row input {
+  flex: 1;
+  border-top: 1px solid #6b7fa3;
+  border-left: 1px solid #6b7fa3;
+  border-right: 1px solid #ffffff;
+  border-bottom: 1px solid #ffffff;
+  outline: 1px solid #9fb3d6;
+  outline-offset: -2px;
+  border-radius: 0;
+  padding: 8px;
+  background: #ffffff;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.msn-compose-row button {
+  background: linear-gradient(to bottom, #ffffff 0%, #f2f2f2 55%, #e2e2e2 100%);
+  color: #222;
+  border-top: 1px solid #ffffff;
+  border-left: 1px solid #ffffff;
+  border-right: 1px solid #a3a3a3;
+  border-bottom: 1px solid #a3a3a3;
+  border-radius: 3px;
+  padding: 8px 18px;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.msn-compose-row button:hover {
+  background: linear-gradient(to bottom, #ffffff 0%, #f7f7f7 55%, #e9e9e9 100%);
+}
+
+.msn-compose-row button:active {
+  border-top-color: #a3a3a3;
+  border-left-color: #a3a3a3;
+  border-right-color: #ffffff;
+  border-bottom-color: #ffffff;
+  background: linear-gradient(to bottom, #e2e2e2 0%, #f2f2f2 100%);
+}
+
+.msn-status-bar {
+  margin-top: auto;
+  padding: 4px 10px;
+  font-size: 10px;
+  color: #8a8a8a;
+  background: #f6f6f6;
+  border-top: 1px solid #e2e2e2;
+}
+
+.wlm-toast {
+  position: fixed;
+  bottom: 42px;
+  right: 16px;
+  width: 300px;
+  background: #ffffff;
+  border: 1px solid #7f9db9;
+  border-radius: 4px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  z-index: 10001;
+  font-family: Tahoma, sans-serif;
+}
+
+.wlm-toast-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(to bottom, #fefefe 0%, #cfe3f7 45%, #a9cdf0 100%);
+  border-bottom: 1px solid #7f9db9;
+  padding: 4px 6px 4px 8px;
+  font-size: 11px;
+  color: #1a3c6e;
+}
+
+.wlm-toast-header span:nth-child(2) {
+  flex: 1;
+  font-weight: bold;
+}
+
+.wlm-toast-app-icon {
+  display: flex;
+  align-items: center;
+}
+
+.wlm-toast-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: #445;
+  line-height: 1;
+}
+
+.wlm-toast-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wlm-toast-body img {
+  width: 64px;
+  height: 64px;
+  border-radius: 2px;
+  border: 1px solid #a9bcd6;
+  flex-shrink: 0;
+  background: #f3f6fb;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.wlm-toast-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+  color: #333;
+  line-height: 1.4;
+}
+
+.wlm-toast-text strong {
+  font-size: 12.5px;
+  color: #1a3c6e;
+}
+
+.wlm-toast-footer {
+  padding: 4px 10px 8px;
+  text-align: right;
+  border-top: 1px solid #eef2fa;
+}
+
+.wlm-toast-footer span {
+  font-size: 10px;
+  color: #1a5da0;
+  cursor: default;
+}

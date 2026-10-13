@@ -1,6 +1,7 @@
 // api/education.ts
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabaseClient } from './_supabase';
+import { getPagination, logError } from './_utils';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
@@ -8,16 +9,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    const { limit, from, to } = getPagination(req);
     const supabase = getSupabaseClient();
-    const { data, error } = await supabase
+    const { data, error, count } = await supabase
       .from('education')
-      .select('*')
-      .order('order_index', { ascending: true });
+      .select('id, course_pt, course_en, course_es, order_index', { count: 'exact' })
+      .order('order_index', { ascending: true })
+      .range(from, to);
 
     if (error) throw error;
 
-    return res.status(200).json({ success: true, data: data ?? [] });
+    const total = count ?? 0;
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300');
+    return res.status(200).json({ success: true, data: data ?? [], hasMore: from + limit < total, total });
   } catch (error) {
+    logError('education', error);
     return res.status(500).json({ success: false, error: 'Failed to fetch education' });
   }
 }

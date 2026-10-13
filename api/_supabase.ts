@@ -2,6 +2,8 @@
 
 // Importa a função createClient para criar o cliente Supabase e o tipo SupabaseClient para tipagem.
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+// WebSocket para Node < 22: o Supabase cria um cliente Realtime ao iniciar e, sem WebSocket nativo, lança erro.
+import ws from 'ws';
 
 let client: SupabaseClient | null = null;
 /* Declara uma variável client que armazena a instância do Supabase, inicialmente nula. 
@@ -23,8 +25,8 @@ export function getSupabaseClient(): SupabaseClient {
     }
 
     // Cria o client Supabase com a URL e a chave fornecidas.
-    client = createClient(url, key);
+    // O "realtime.transport" entrega o WebSocket do pacote ws (o projeto não usa Realtime, só precisa que o client seja criado sem erro).
+    client = createClient(url, key, { realtime: { transport: ws as unknown as typeof WebSocket } });
   }
   return client;
 }
-

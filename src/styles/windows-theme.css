@@ -79,11 +79,11 @@
 
 .window {
   position: absolute;
-  background: #ECE9D8;
-  border: 1px solid #0054E3;
+  background: var(--xp-surface);
+  border: 1px solid var(--xp-blue-primary);
   border-radius: 8px 8px 3px 3px;
   box-shadow:
-    0 0 0 1px #ACA899,
+    0 0 0 1px var(--xp-border-gray),
     2px 2px 12px rgba(0, 0, 0, 0.4);
   min-width: 300px;
   min-height: 220px;
@@ -95,7 +95,7 @@
 
 .window--active {
   box-shadow:
-    0 0 0 1px #0054E3,
+    0 0 0 1px var(--xp-blue-primary),
     3px 3px 18px rgba(0, 0, 0, 0.5);
 }
 
@@ -105,6 +105,7 @@
 
 .window--ghosting {
   opacity: 0.5;
+  user-select: none;
 }
 
 .window--maximized {
@@ -130,7 +131,7 @@
 }
 
 .window-header {
-  background: linear-gradient(to right, #0054E3 0%, #2B8CE0 50%, #0054E3 100%);
+  background: linear-gradient(to right, var(--xp-blue-primary) 0%, #2B8CE0 50%, var(--xp-blue-primary) 100%);
   color: white;
   padding: 4px 4px 4px 8px;
   display: flex;
@@ -183,46 +184,48 @@
   flex: 1;
   overflow-y: auto;
   background: white;
-  border: 2px solid #ECE9D8;
+  border: 2px solid var(--xp-surface);
   border-top: none;
 }
 
-.window-body::-webkit-scrollbar {
-  width: 17px;
+/* Scrollbar moderna (navegadores atuais): cores e largura via scrollbar-color / scrollbar-width. */
+.window-body {
+  scrollbar-color: var(--xp-scrollbar) var(--xp-surface);
+  scrollbar-width: auto;
 }
 
-.window-body::-webkit-scrollbar-track {
-  background-image: url('/assets/icons/xp-controls/scroll-background.svg');
-  background-repeat: repeat-y;
-}
+/* Fallback para navegadores antigos, sem suporte a scrollbar-color: scrollbar estilo XP (setas e textura) via -webkit-scrollbar. */
+@supports not (scrollbar-color: auto) {
+  .window-body::-webkit-scrollbar {
+    width: 17px;
+  }
 
-.window-body::-webkit-scrollbar-thumb {
-  background-image: url('/assets/icons/xp-controls/scroll-thumb.svg');
-  background-repeat: repeat-y;
-  background-size: 100% 8px;
-  border: 1px solid #A2B0D6;
-}
+  .window-body::-webkit-scrollbar-track {
+    background-image: url('/assets/icons/xp-controls/scroll-background.svg');
+    background-repeat: repeat-y;
+  }
 
-.window-body::-webkit-scrollbar-button:single-button {
-  display: block;
-  width: 17px;
-  height: 17px;
-  background-repeat: no-repeat;
-  background-position: center;
-}
+  .window-body::-webkit-scrollbar-thumb {
+    background-image: url('/assets/icons/xp-controls/scroll-thumb.svg');
+    background-repeat: repeat-y;
+    background-size: 100% 8px;
+    border: 1px solid var(--xp-scrollbar);
+  }
 
-.window-body::-webkit-scrollbar-button:single-button:vertical:start {
-  background-image: url('/assets/icons/xp-controls/scroll-arrow-up.svg');
-}
+  .window-body::-webkit-scrollbar-button:single-button {
+    display: block;
+    width: 17px;
+    height: 17px;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
 
-.window-body::-webkit-scrollbar-button:single-button:vertical:end {
-  background-image: url('/assets/icons/xp-controls/scroll-arrow-down.svg');
-}
+  .window-body::-webkit-scrollbar-button:single-button:vertical:start {
+    background-image: url('/assets/icons/xp-controls/scroll-arrow-up.svg');
+  }
 
-@supports (scrollbar-color: auto) {
-  .window-body {
-    scrollbar-color: #A2B0D6 #ECE9D8;
-    scrollbar-width: auto;
+  .window-body::-webkit-scrollbar-button:single-button:vertical:end {
+    background-image: url('/assets/icons/xp-controls/scroll-arrow-down.svg');
   }
 }
 
@@ -289,8 +292,8 @@
   bottom: 42px;
   left: 4px;
   width: 340px;
-  background: #ECE9D8;
-  border: 1px solid #0054E3;
+  background: var(--xp-surface);
+  border: 1px solid var(--xp-blue-primary);
   border-radius: 8px 8px 0 0;
   box-shadow: 2px 2px 14px rgba(0, 0, 0, 0.45);
   overflow: hidden;
@@ -303,7 +306,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: linear-gradient(to right, #1349c7, #3c9fff);
+  background: linear-gradient(to right, #1349c7, var(--xp-blue-light));
   color: white;
 }
 
@@ -340,7 +343,7 @@
 
 .start-menu-col--right {
   flex: 1;
-  background: linear-gradient(to bottom, #1D5FDB, #123E9E);
+  background: linear-gradient(to bottom, var(--xp-taskbar-blue), var(--xp-taskbar-blue-dark));
   padding: 10px 0;
   display: flex;
   flex-direction: column;
@@ -430,8 +433,8 @@
   justify-content: flex-end;
   gap: 6px;
   padding: 6px 10px;
-  background: #ECE9D8;
-  border-top: 1px solid #ACA899;
+  background: var(--xp-surface);
+  border-top: 1px solid var(--xp-border-gray);
 }
 
 .start-menu-footer button {
@@ -462,9 +465,9 @@
 }
 
 .taskbar-item {
-  background: linear-gradient(to bottom, #3F87F5, #2C64D6);
+  background: linear-gradient(to bottom, #3F87F5, var(--xp-button-blue));
   color: white;
-  border: 1px solid #16409E;
+  border: 1px solid var(--xp-button-border);
   border-radius: 3px;
   padding: 4px 10px;
   font-size: 11px;
@@ -474,7 +477,7 @@
 }
 
 .taskbar-item--active {
-  background: linear-gradient(to bottom, #2C64D6, #163C8C);
+  background: linear-gradient(to bottom, var(--xp-button-blue), var(--xp-button-blue-dark));
   box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.4);
 }
 
@@ -482,7 +485,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(to bottom, #1D5FDB, #123E9E);
+  background: linear-gradient(to bottom, var(--xp-taskbar-blue), var(--xp-taskbar-blue-dark));
   border-left: 1px solid rgba(255, 255, 255, 0.3);
   padding: 2px 10px;
   border-radius: 6px 0 0 6px;
@@ -539,8 +542,8 @@
 
 .tray-language-btn--active {
   opacity: 1;
-  border-color: #16409E;
-  background: linear-gradient(to bottom, #2C64D6, #163C8C);
+  border-color: var(--xp-button-border);
+  background: linear-gradient(to bottom, var(--xp-button-blue), var(--xp-button-blue-dark));
   box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.4);
 }
 
@@ -643,6 +646,15 @@
   100% { left: 240px; }
 }
 
+/* Quem prefere menos movimento no sistema operacional não vê a barra do boot deslizando nem a janela encolhendo ao minimizar.
+   (Minimizar continua funcionando: a janela some depois do mesmo atraso, só sem a animação.) */
+@media (prefers-reduced-motion: reduce) {
+  .window--minimizing,
+  .boot-progress-block {
+    animation: none !important;
+  }
+}
+
 .boot-footer {
   position: absolute;
   bottom: 18px;
@@ -726,7 +738,7 @@
 
 .boot-language-btn--active {
   opacity: 1;
-  border-color: #3c9fff;
+  border-color: var(--xp-blue-light);
   background: rgba(60, 159, 255, 0.15);
   color: #fff;
 }
@@ -742,4 +754,13 @@
   object-fit: contain;
   margin-left: -100px;
   margin-top: -150px;
+}
+
+/* O contorno de foco azul padrão (global.css) sumiria sobre fundos azuis; nessas áreas o contorno fica branco. */
+.start-button:focus-visible,
+.taskbar-windows *:focus-visible,
+.taskbar-tray *:focus-visible,
+.start-menu-col--right *:focus-visible,
+.boot-screen *:focus-visible {
+  outline-color: #ffffff;
 }

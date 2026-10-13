@@ -8,7 +8,7 @@
 
 .orkut-topbar {
   background: white;
-  border-bottom: 2px solid #6CB4EE;
+  border-bottom: 2px solid var(--orkut-blue);
 }
 
 .orkut-topbar-row {
@@ -24,7 +24,7 @@
   font-family: 'Comic Sans MS', 'Trebuchet MS', cursive;
   font-weight: bold;
   font-size: 18px;
-  color: #E91E8C;
+  color: var(--orkut-pink);
   letter-spacing: -0.5px;
   flex-shrink: 0;
 }
@@ -36,9 +36,9 @@
 }
 
 .orkut-tab {
-  background: #DCEBFB;
-  border: 1px solid #6CB4EE;
-  color: #1a5da0;
+  background: var(--orkut-blue-light);
+  border: 1px solid var(--orkut-blue);
+  color: var(--orkut-link);
   border-radius: 12px;
   padding: 3px 12px;
   font-size: 11px;
@@ -52,7 +52,7 @@
 }
 
 .orkut-tab--active {
-  background: #6CB4EE;
+  background: var(--orkut-blue);
   color: white;
 }
 
@@ -64,7 +64,7 @@
 }
 
 .orkut-search input {
-  border: 1px solid #6CB4EE;
+  border: 1px solid var(--orkut-blue);
   border-radius: 3px;
   padding: 3px 8px;
   font-size: 11px;
@@ -72,7 +72,7 @@
 }
 
 .orkut-search button {
-  background: #6CB4EE;
+  background: var(--orkut-blue);
   border: none;
   border-radius: 3px;
   padding: 3px 8px;
@@ -97,7 +97,7 @@
   align-items: center;
   gap: 8px;
   background: white;
-  border: 1px solid #D6E4F5;
+  border: 1px solid var(--orkut-border);
   border-radius: 4px;
   padding: 12px;
 }
@@ -139,7 +139,7 @@
 .quick-links button {
   background: none;
   border: none;
-  color: #1a5da0;
+  color: var(--orkut-link);
   cursor: pointer;
   font-size: 11px;
   padding: 0;
@@ -151,7 +151,7 @@
 }
 
 .resume-download-link {
-  color: #1a5da0;
+  color: var(--orkut-link);
   font-size: 11px;
   text-decoration: none;
   cursor: pointer;
@@ -206,14 +206,14 @@
 
 .orkut-col-center {
   background: white;
-  border: 1px solid #D6E4F5;
+  border: 1px solid var(--orkut-border);
   border-radius: 4px;
   padding: 16px;
 }
 
 .welcome-msg {
   margin: 0 0 2px;
-  color: #E91E8C;
+  color: var(--orkut-pink);
   font-size: 16px;
 }
 
@@ -228,7 +228,7 @@
   flex-wrap: wrap;
   gap: 12px;
   background: #F5F9FF;
-  border: 1px solid #D6E4F5;
+  border: 1px solid var(--orkut-border);
   border-radius: 4px;
   padding: 8px 12px;
   font-size: 11px;
@@ -266,14 +266,14 @@
 
 .orkut-col-center h4,
 .orkut-col-right h4 {
-  color: #ff6600;
+  color: var(--orkut-orange);
   font-size: 13px;
   margin: 0;
 }
 
 .see-all-link {
   font-size: 10px;
-  color: #1a5da0;
+  color: var(--orkut-link);
   text-decoration: none;
 }
 
@@ -286,7 +286,7 @@
 .friends-section,
 .communities-section {
   background: white;
-  border: 1px solid #D6E4F5;
+  border: 1px solid var(--orkut-border);
   border-radius: 4px;
   padding: 10px;
 }
@@ -313,44 +313,66 @@
   border: 1px solid #ddd;
 }
 
+.communities-section {
+  border-radius: 6px;
+}
+
+.communities-section .section-heading {
+  border-bottom: 1px solid var(--orkut-border);
+}
+
+.communities-section h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: normal;
+  color: var(--orkut-link);
+}
+
 .communities-list {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
   gap: 8px;
 }
 
 .community-item {
   display: flex;
-  gap: 8px;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 4px;
+  background: #F2F6FB;
+  border: 1px solid var(--orkut-border);
+  border-radius: 4px;
+  text-align: center;
+}
+
+.community-item:hover {
+  background: var(--orkut-blue-light);
+  border-color: var(--orkut-blue);
 }
 
 .community-thumb {
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
-  background: #F0F4FA;
-  border: 1px solid #D6E4F5;
-  border-radius: 3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
+  display: block;
+  width: 64px;
+  height: 64px;
+  background: #ffffff;
+  border: 1px solid #B8C6D9;
+  image-rendering: pixelated;
 }
 
-.community-info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+.community-thumb svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .community-name {
-  font-size: 10.5px;
-  color: #1a5da0;
-  line-height: 1.3;
+  font-size: 10px;
+  color: var(--orkut-link);
+  line-height: 1.25;
 }
 
 .community-members {
@@ -377,7 +399,7 @@
 .scraps-admin-toggle {
   background: none;
   border: none;
-  color: #1a5da0;
+  color: var(--orkut-link);
   font-size: 10px;
   cursor: pointer;
   padding: 0;
@@ -496,7 +518,7 @@
 
 .scrap-form button {
   align-self: flex-end;
-  background: #FF6600;
+  background: var(--orkut-orange);
   color: white;
   border: none;
   border-radius: 3px;
@@ -533,10 +555,11 @@
   padding: 8px;
 }
 
-.project-card-body h4 {
+/* Seletor com 2 classes (mais específico que ".orkut-col-center h4"), então vence naturalmente, sem precisar de !important. */
+.project-card .project-card-body h4 {
   margin: 0 0 4px;
   font-size: 12px;
-  color: #333 !important;
+  color: #333;
 }
 
 .project-card-body p {
@@ -564,15 +587,15 @@
 
 .project-links a {
   font-size: 10px;
-  color: #0054e3;
+  color: var(--xp-blue-primary);
   margin-right: 8px;
 }
 
 .see-more {
   margin-top: 10px;
   background: none;
-  border: 1px solid #ff6600;
-  color: #ff6600;
+  border: 1px solid var(--orkut-orange);
+  color: var(--orkut-orange);
   border-radius: 3px;
   padding: 4px 10px;
   cursor: pointer;
@@ -586,7 +609,7 @@
 }
 
 .testimonials li {
-  border-left: 3px solid #ff6600;
+  border-left: 3px solid var(--orkut-orange);
   padding: 6px 10px;
   margin-bottom: 8px;
   font-size: 11.5px;
@@ -603,7 +626,7 @@
 
 .orkut-compose-box {
   background: white;
-  border: 1px solid #6CB4EE;
+  border: 1px solid var(--orkut-blue);
   border-radius: 4px;
   width: 600px; 
   max-width: 95vw; 
@@ -615,15 +638,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #DCEBFB;
-  border-bottom: 1px solid #6CB4EE;
+  background: var(--orkut-blue-light);
+  border-bottom: 1px solid var(--orkut-blue);
   padding: 8px 10px;
 }
 
 .orkut-compose-title {
   font-size: 12px;
   font-weight: bold;
-  color: #1a5da0;
+  color: var(--orkut-link);
 }
 
 .orkut-compose-close {
@@ -654,7 +677,7 @@
 
 .orkut-compose-to {
   background: #F0F4FA;
-  border: 1px solid #D6E4F5;
+  border: 1px solid var(--orkut-border);
   border-radius: 3px;
   padding: 2px 8px;
   font-size: 11px;

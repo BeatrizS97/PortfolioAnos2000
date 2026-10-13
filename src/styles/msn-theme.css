@@ -4,7 +4,8 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  font-family: Tahoma, sans-serif;
+  font-family: Tahoma, Verdana, sans-serif;
+  font-size: 11px;
   overflow: hidden;
 }
 
@@ -12,9 +13,9 @@
   position: relative;
   overflow: hidden;
   display: flex;
-  gap: 14px;
-  padding: 8px 12px;
-  background: linear-gradient(to bottom, #ffffff, #dbe6fa);
+  gap: 6px;
+  padding: 6px 10px;
+  background: linear-gradient(to bottom, #ffffff 0%, #f4f8fe 55%, #EAF1FC 100%);
   border-bottom: 1px solid #b9cced;
 }
 
@@ -40,11 +41,25 @@
   border: none;
   color: #33475b;
   cursor: not-allowed;
-  padding: 2px 4px;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+}
+
+.msn-classic-toolbar button:hover {
+  border-color: #a5b9dc;
+  background: linear-gradient(to bottom, #ffffff 0%, #e4ecfb 55%, #d3e0f7 100%);
+  box-shadow: inset 0 1px 0 #ffffff;
+}
+
+.msn-classic-toolbar button:active {
+  border-color: #7f93b8;
+  background: linear-gradient(to bottom, #d3e0f7 0%, #e4ecfb 100%);
+  box-shadow: inset 1px 1px 2px rgba(60, 90, 140, 0.35);
 }
 
 .msn-classic-toolbar button span {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: normal;
   color: #1a1a1a;
 }
@@ -53,7 +68,7 @@
   flex: 1;
   display: flex;
   min-height: 0;
-  background: linear-gradient(135deg, #eaf1fc 0%, #dbe6fa 100%);
+  background: linear-gradient(to bottom, #EAF1FC 0%, #d5e3f8 70%, #c9dbf5 100%);
   padding: 10px;
 }
 
@@ -75,9 +90,9 @@
 
 .msn-card {
   background: #ffffff;
-  border: 1px solid #a9c3e8;
-  border-radius: 6px;
-  box-shadow: 0 1px 4px rgba(60, 90, 140, 0.18);
+  border: 1px solid #9fb4d6;
+  border-radius: 4px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
   overflow: hidden;
 }
 
@@ -92,10 +107,10 @@
 .msn-card--avatar {
   position: relative;
   align-self: flex-start;
-  width: 72px;
-  height: 72px;
+  width: 96px;
+  height: 96px;
   flex-shrink: 0;
-  padding: 3px;
+  padding: 4px;
 }
 
 .msn-card--avatar::before {
@@ -131,11 +146,11 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 8px 10px;
-  font-size: 11.5px;
+  padding: 7px 10px;
+  font-size: 11px;
   color: #333;
   border-bottom: 1px solid #e3e9f5;
-  background: #fafbff;
+  background: #ffffff;
 }
 
 .msn-to-line strong {
@@ -147,7 +162,7 @@
   flex: 1;
   overflow-y: auto;
   padding: 10px;
-  font-size: 12.5px;
+  font-size: 11px;
 }
 
 .msn-tip {
@@ -156,10 +171,9 @@
   gap: 5px;
   color: #666;
   font-size: 11px;
-  font-style: italic;
   margin: 0 0 10px;
   padding-bottom: 8px;
-  border-bottom: 1px dashed #ddd;
+  border-bottom: 1px solid #e6e6e6;
 }
 
 .msn-message {
@@ -182,10 +196,10 @@
 }
 
 .msn-message--system {
-  border-top: 1px dashed #ccc;
-  border-bottom: 1px dashed #ccc;
-  padding: 6px 0;
-  font-weight: bold;
+  background: #FFFBD0;
+  border: 1px solid #E5D98A;
+  padding: 4px 8px;
+  font-weight: normal;
   color: #333;
   text-align: left;
 }
@@ -221,6 +235,7 @@
 
 .msn-toolbar-row button:hover {
   background: linear-gradient(to bottom, #ffffff 0%, #eaf2ff 50%, #cfe1fb 100%);
+  box-shadow: inset 0 1px 0 #ffffff, 0 0 3px rgba(108, 180, 238, 0.9);
 }
 
 .msn-toolbar-row button:active {
@@ -229,6 +244,7 @@
   border-right-color: #ffffff;
   border-bottom-color: #ffffff;
   background: linear-gradient(to bottom, #cfe1fb 0%, #eaf2ff 100%);
+  box-shadow: inset 1px 1px 3px rgba(60, 90, 140, 0.4);
 }
 
 .msn-toolbar-divider {
@@ -269,7 +285,13 @@
   gap: 2px;
   cursor: not-allowed;
   padding: 3px 4px;
-  border-radius: 50%;
+  border: 1px solid transparent;
+  border-radius: 3px;
+}
+
+.msn-compose-tool:hover {
+  border-color: #a5b9dc;
+  background: linear-gradient(to bottom, #ffffff 0%, #dbe6fa 100%);
 }
 
 .msn-compose-tool strong {
@@ -298,40 +320,43 @@
   outline-offset: -2px;
   border-radius: 0;
   padding: 8px;
+  font-family: inherit;
+  font-size: 11px;
   background: #ffffff;
   box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .msn-compose-row button {
-  background: linear-gradient(to bottom, #ffffff 0%, #f2f2f2 55%, #e2e2e2 100%);
+  background: linear-gradient(to bottom, #ffffff 0%, #f2f2f2 55%, #dcdcdc 100%);
   color: #222;
-  border-top: 1px solid #ffffff;
-  border-left: 1px solid #ffffff;
-  border-right: 1px solid #a3a3a3;
-  border-bottom: 1px solid #a3a3a3;
+  border: 1px solid #7b8aa6;
   border-radius: 3px;
-  padding: 8px 18px;
+  padding: 8px 20px;
+  font-size: 11px;
   font-weight: normal;
   cursor: pointer;
 }
 
-.msn-compose-row button:hover {
+.msn-compose-row button:hover:not(:disabled) {
   background: linear-gradient(to bottom, #ffffff 0%, #f7f7f7 55%, #e9e9e9 100%);
+  box-shadow: inset 0 0 0 1px #FFE2A0, inset 0 0 0 2px #F8B330;
 }
 
-.msn-compose-row button:active {
-  border-top-color: #a3a3a3;
-  border-left-color: #a3a3a3;
-  border-right-color: #ffffff;
-  border-bottom-color: #ffffff;
-  background: linear-gradient(to bottom, #e2e2e2 0%, #f2f2f2 100%);
+.msn-compose-row button:active:not(:disabled) {
+  background: linear-gradient(to bottom, #d6d6d6 0%, #ececec 100%);
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.msn-compose-row button:disabled {
+  color: #8a8a8a;
+  cursor: default;
 }
 
 .msn-status-bar {
   margin-top: auto;
   padding: 4px 10px;
-  font-size: 10px;
-  color: #8a8a8a;
+  font-size: 11px;
+  color: #666666;
   background: #f6f6f6;
   border-top: 1px solid #e2e2e2;
 }

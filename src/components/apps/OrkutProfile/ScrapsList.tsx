@@ -1,5 +1,5 @@
 // src/components/apps/OrkutProfile/ScrapsList.tsx
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import type { Scrap } from '../../../types/scrap';
 import { postScrap, deleteScrap } from '../../../services/scrapsService';
 import { ApiError } from '../../../services/api';
@@ -31,14 +31,18 @@ const ScrapsList: React.FC<ScrapsListProps> = ({
   const [message, setMessage] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [sending, setSending] = useState(false);
+  // Trava síncrona contra envio duplo: o estado "sending" só muda no próximo render, então dois submits quase simultâneos passariam por ele.
+  const sendingRef = useRef(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (sendingRef.current) return;
     if (!message.trim() || !authorName.trim()) return;
 
+    sendingRef.current = true;
     setSending(true);
     setErrorMessage(null);
     try {
@@ -48,6 +52,7 @@ const ScrapsList: React.FC<ScrapsListProps> = ({
     } catch (error) {
       setErrorMessage(error instanceof ApiError ? error.message : t.scraps.saveError);
     } finally {
+      sendingRef.current = false;
       setSending(false);
     }
   };

@@ -4,6 +4,21 @@ import { fetchFriends } from '../../../services/friendsService';
 import type { Friend } from '../../../types/friend';
 import { useLanguage } from '../../../hooks/useLanguage';
 
+interface FriendCardProps {
+  friend: Friend;
+  roleTitle?: string;
+}
+
+// Card de um amigo. O React.memo evita re-render quando o componente pai atualiza por outros motivos (ex.: digitar na busca).
+const FriendCard = React.memo(function FriendCard({ friend, roleTitle }: FriendCardProps) {
+  return (
+    <div className="friend-card" title={roleTitle}>
+      <img src={friend.avatar_url} alt={friend.name} />
+      <span>{friend.name}</span>
+    </div>
+  );
+});
+
 // Componente que exibe a seção de amigos no perfil do Orkut, incluindo título, link "ver todos" e grade de amigos.
 const FriendsGrid: React.FC = () => {
   const [friends, setFriends] = useState<Friend[]>([]);
@@ -26,10 +41,7 @@ const FriendsGrid: React.FC = () => {
       </div>
       <div className="friends-grid">
         {friends.map((friend) => (
-          <div key={friend.id} className="friend-card" title={friend.role ? tc(friend.role) : undefined}>
-            <img src={friend.avatar_url} alt={friend.name} />
-            <span>{friend.name}</span>
-          </div>
+          <FriendCard key={friend.id} friend={friend} roleTitle={friend.role ? tc(friend.role) : undefined} />
         ))}
       </div>
     </section>

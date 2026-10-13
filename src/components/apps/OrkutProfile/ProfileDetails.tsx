@@ -2,7 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { fetchProfile } from '../../../services/profileService';
 import type { ProfileData } from '../../../types/profile';
+import type { Language } from '../../../types/language';
 import { useLanguage } from '../../../hooks/useLanguage';
+import { getLocalizedField } from '../../../utils/getLocalizedField';
 import {
   useEducation,
   useLanguageSkills,
@@ -10,15 +12,23 @@ import {
   useExperience,
 } from '../../../hooks/useAcademicInfo';
 
+// Mensagem exibida no lugar de uma seção que não carregou (API fora do ar ou sem conexão), por idioma.
+const LOAD_ERROR_TEXT: Record<Language, string> = {
+  pt: 'Não foi possível carregar esta seção agora. Tente novamente mais tarde.',
+  en: "Couldn't load this section right now. Please try again later.",
+  es: 'No se pudo cargar esta sección ahora. Inténtalo de nuevo más tarde.',
+};
+
 const ProfileDetails: React.FC = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const { t, tc, language } = useLanguage();
   const d = t.profileDetails;
+  const errorText = LOAD_ERROR_TEXT[language];
 
-  const { data: education = [], isLoading: loadingEducation } = useEducation();
-  const { data: languageSkills = [], isLoading: loadingLanguages } = useLanguageSkills();
-  const { data: certifications = [], isLoading: loadingCertifications } = useCertifications();
-  const { data: experience = [], isLoading: loadingExperience } = useExperience();
+  const { data: education = [], isLoading: loadingEducation, isError: errorEducation } = useEducation();
+  const { data: languageSkills = [], isLoading: loadingLanguages, isError: errorLanguages } = useLanguageSkills();
+  const { data: certifications = [], isLoading: loadingCertifications, isError: errorCertifications } = useCertifications();
+  const { data: experience = [], isLoading: loadingExperience, isError: errorExperience } = useExperience();
 
   useEffect(() => {
     let mounted = true;
@@ -45,16 +55,12 @@ const ProfileDetails: React.FC = () => {
         <div className="section-heading"><h4>{d.educationTitle}</h4></div>
         {loadingEducation ? (
           <div className="loading-spinner">{t.orkut.loading}</div>
+        ) : errorEducation ? (
+          <p className="empty-state" role="alert">{errorText}</p>
         ) : (
           <ul className="quick-links">
             {education.map((item) => (
-              <li key={item.id}>
-                {language === 'en'
-                  ? item.course_en || item.course_pt
-                  : language === 'es'
-                    ? item.course_es || item.course_pt
-                    : item.course_pt}
-              </li>
+              <li key={item.id}>{getLocalizedField(item, 'course', language)}</li>
             ))}
           </ul>
         )}
@@ -62,16 +68,12 @@ const ProfileDetails: React.FC = () => {
         <div className="section-heading"><h4>{d.languagesTitle}</h4></div>
         {loadingLanguages ? (
           <div className="loading-spinner">{t.orkut.loading}</div>
+        ) : errorLanguages ? (
+          <p className="empty-state" role="alert">{errorText}</p>
         ) : (
           <ul className="quick-links">
             {languageSkills.map((item) => (
-              <li key={item.id}>
-                {language === 'en'
-                  ? item.language_en || item.language_pt
-                  : language === 'es'
-                    ? item.language_es || item.language_pt
-                    : item.language_pt}
-              </li>
+              <li key={item.id}>{getLocalizedField(item, 'language', language)}</li>
             ))}
           </ul>
         )}
@@ -82,16 +84,12 @@ const ProfileDetails: React.FC = () => {
         <div className="section-heading"><h4>{d.certificationsTitle}</h4></div>
         {loadingCertifications ? (
           <div className="loading-spinner">{t.orkut.loading}</div>
+        ) : errorCertifications ? (
+          <p className="empty-state" role="alert">{errorText}</p>
         ) : (
           <ul className="quick-links">
             {certifications.map((item) => (
-              <li key={item.id}>
-                {language === 'en'
-                  ? item.title_en || item.title_pt
-                  : language === 'es'
-                    ? item.title_es || item.title_pt
-                    : item.title_pt}
-              </li>
+              <li key={item.id}>{getLocalizedField(item, 'title', language)}</li>
             ))}
           </ul>
         )}
@@ -99,21 +97,14 @@ const ProfileDetails: React.FC = () => {
         <div className="section-heading"><h4>{d.experienceTitle}</h4></div>
         {loadingExperience ? (
           <div className="loading-spinner">{t.orkut.loading}</div>
+        ) : errorExperience ? (
+          <p className="empty-state" role="alert">{errorText}</p>
         ) : (
           <ul className="quick-links">
             {experience.map((item) => {
-              const title =
-                language === 'en' ? item.title_en || item.title_pt
-                : language === 'es' ? item.title_es || item.title_pt
-                : item.title_pt;
-              const period =
-                language === 'en' ? item.period_en || item.period_pt
-                : language === 'es' ? item.period_es || item.period_pt
-                : item.period_pt;
-              const description =
-                language === 'en' ? item.description_en || item.description_pt
-                : language === 'es' ? item.description_es || item.description_pt
-                : item.description_pt;
+              const title = getLocalizedField(item, 'title', language);
+              const period = getLocalizedField(item, 'period', language);
+              const description = getLocalizedField(item, 'description', language);
 
               return (
                 <li key={item.id}>

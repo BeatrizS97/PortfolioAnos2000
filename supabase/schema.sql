@@ -95,9 +95,11 @@ INSERT INTO communities (name, members_count, category) VALUES
   ('C# & .NET Não São Só Café', 341207, 'hard_skill'),
   ('Node.js em Aprendizado Contínuo', 512883, 'hard_skill'),
   ('Scrum Fundamentals Certified', 156732, 'hard_skill'),
+  ('Metodologias Ágeis: Daily Sem Drama', 143310, 'soft_skill'),
   ('Inovação Tecnológica e Inclusão', 98214, 'soft_skill'),
-  ('Adaptabilidade & Diversidade Cultural', 2034981, 'soft_skill'),
-  ('Liderei uma Equipe por 3 Anos e Sobrevivi', 87654, 'soft_skill');
+  ('Voluntariado: Fazer o Bem Não Dói', 91337, 'soft_skill'),
+  ('Adaptabilidade & Diversidade Cultural', 87654, 'soft_skill'),
+  ('Liderei uma Equipe por 3 Anos e Sobrevivi', 112480, 'soft_skill');
 
 INSERT INTO friends (name, avatar_url, role, order_index) VALUES
   ('Marcela Santiago', '/assets/images/icons/user-placeholder.png', 'Banco de Trocas de Conhecimento — Fullstack, Arquitetura', 1),
@@ -256,3 +258,119 @@ INSERT INTO experience (title_pt, title_en, title_es, period_pt, period_en, peri
    'led a volunteer team for 3 years and took part in strategic resource-allocation decisions alongside the board.',
    'liderazgo de un equipo voluntario durante 3 años y participación en decisiones estratégicas de asignación de recursos junto a la directiva.',
    2);
+
+-- ------------------------------------------------------------------
+-- 1) Soft delete em scraps: em vez de apagar a linha, marca a data da exclusão.
+--    (Só scraps, que é a única tabela com exclusão pelo painel admin.)
+-- ------------------------------------------------------------------
+ALTER TABLE scraps ADD COLUMN deleted_at TIMESTAMP WITH TIME ZONE;
+
+-- ------------------------------------------------------------------
+-- 2) Trigger genérico: atualiza updated_at sozinho a cada UPDATE.
+--    Só a tabela projects tem a coluna updated_at, então só ela recebe o trigger.
+--    O SET search_path = '' é uma boa prática do Supabase (NOW() é nativo e continua funcionando).
+-- ------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = ''
+AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_projects_updated_at
+  BEFORE UPDATE ON projects
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
+
+-- ------------------------------------------------------------------
+-- 3) CHECK de URLs. Aceita vazio/NULL porque o seed tem live_url = ''.
+--    Na foto do perfil também aceita caminho local (/assets/...), pois o seed usa /assets/images/icons/user.png.
+-- ------------------------------------------------------------------
+ALTER TABLE projects ADD CONSTRAINT chk_projects_github_url
+  CHECK (github_url IS NULL OR github_url = '' OR github_url LIKE 'https://%');
+
+ALTER TABLE projects ADD CONSTRAINT chk_projects_live_url
+  CHECK (live_url IS NULL OR live_url = '' OR live_url LIKE 'https://%');
+
+ALTER TABLE profile ADD CONSTRAINT chk_profile_photo_url
+  CHECK (photo_url IS NULL OR photo_url LIKE 'https://%' OR photo_url LIKE '/assets/%');
+
+-- ------------------------------------------------------------------
+-- 4) ENUM de categoria de projeto (mesmos valores do tipo Project['category'] no TypeScript).
+--    Obs.: com ENUM, /api/projects?category=valor-invalido passa a dar erro 500 em vez de lista vazia.
+-- ------------------------------------------------------------------
+CREATE TYPE project_category AS ENUM ('frontend', 'fullstack', 'ai', 'mobile', 'other');
+
+ALTER TABLE projects
+  ALTER COLUMN category TYPE project_category USING category::project_category;
+
+-- ------------------------------------------------------------------
+-- 5) UNIQUE: impede comunidade e idioma repetidos.
+-- ------------------------------------------------------------------
+ALTER TABLE communities ADD CONSTRAINT uq_communities_name UNIQUE (name);
+ALTER TABLE languages ADD CONSTRAINT uq_languages_language_pt UNIQUE (language_pt);
+
+-- ------------------------------------------------------------------
+-- 6) visitor_log: guarda o hash (sha256) do IP em vez do IP puro.
+--    Atenção: sha256 puro de IP ainda pode ser descoberto por força bruta (há poucos IPs possíveis).
+--    Serve como camada básica de privacidade, não como anonimização forte.
+-- ------------------------------------------------------------------
+ALTER TABLE visitor_log ADD COLUMN ip_hash TEXT;
+
+UPDATE visitor_log
+  SET ip_hash = encode(sha256(host(ip_address)::bytea), 'hex')
+  WHERE ip_address IS NOT NULL;
+
+ALTER TABLE visitor_log DROP COLUMN ip_address;
+
+-- Retenção de 90 dias: sem pg_cron, rode este comando manualmente de vez em quando
+-- (a tabela visitor_log nem é usada pelo site hoje):
+-- DELETE FROM visitor_log WHERE visited_at < NOW() - INTERVAL '90 days';
+
+-- ------------------------------------------------------------------
+-- 7) RLS (Row Level Security)
+--    Estas policies valem para a chave "anon". A chave "service_role" ignora o RLS.
+-- ------------------------------------------------------------------
+
+-- profile: leitura pública.
+ALTER TABLE profile ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "profile_select_public" ON profile
+  FOR SELECT TO anon
+  USING (true);
+
+-- scraps: lê só recado público e não excluído; cria só recado público.
+-- Não há policy de UPDATE/DELETE para anon: a exclusão (soft delete) exige a chave service_role no servidor.
+ALTER TABLE scraps ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "scraps_select_public" ON scraps
+  FOR SELECT TO anon
+  USING (is_public = true AND deleted_at IS NULL);
+
+CREATE POLICY "scraps_insert_public" ON scraps
+  FOR INSERT TO anon
+  WITH CHECK (is_public = true AND deleted_at IS NULL);
+
+-- testimonial_requests: só aceita INSERT. Sem policy de SELECT, ninguém lê os e-mails pela chave anon.
+ALTER TABLE testimonial_requests ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "testimonial_requests_insert_public" ON testimonial_requests
+  FOR INSERT TO anon
+  WITH CHECK (true);
+
+-- ------------------------------------------------------------------
+-- 8) Comunidades: ordem por relevância profissional (a API ordena por members_count, do maior para o menor).
+--    Serve para quem JÁ rodou o seed antigo: ajusta as contagens e acrescenta as 2 comunidades novas.
+--    Pode ser rodado mais de uma vez (UPDATE repete o mesmo valor; ON CONFLICT ignora nomes que já existem).
+-- ------------------------------------------------------------------
+UPDATE communities SET members_count = 112480 WHERE name = 'Liderei uma Equipe por 3 Anos e Sobrevivi';
+UPDATE communities SET members_count = 87654 WHERE name = 'Adaptabilidade & Diversidade Cultural';
+
+INSERT INTO communities (name, members_count, category) VALUES
+  ('Metodologias Ágeis: Daily Sem Drama', 143310, 'soft_skill'),
+  ('Voluntariado: Fazer o Bem Não Dói', 91337, 'soft_skill')
+ON CONFLICT (name) DO NOTHING;

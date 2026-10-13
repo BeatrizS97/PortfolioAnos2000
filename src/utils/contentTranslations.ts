@@ -115,6 +115,56 @@ const CONTENT_TRANSLATIONS: Record<string, ContentTranslation> = {
     en: 'I Led a Team for 3 Years and Survived',
     es: 'Lideré un Equipo por 3 Años y Sobreviví',
   },
+  'Metodologias Ágeis: Daily Sem Drama': {
+    en: 'Agile Methodologies: Drama-Free Daily',
+    es: 'Metodologías Ágiles: Daily Sin Drama',
+  },
+  'Voluntariado: Fazer o Bem Não Dói': {
+    en: "Volunteering: Doing Good Doesn't Hurt",
+    es: 'Voluntariado: Hacer el Bien No Duele',
+  },
+
+  // ---- Comunidades (descrições exibidas ao passar o mouse) ----
+  'Front-end com React.js e Next.js: site institucional da Hub Connect Eventos e projetos como Doe Vida e Banco de Trocas.': {
+    en: 'Front end with React.js and Next.js: the Hub Connect Eventos institutional website and projects such as Doe Vida and Banco de Trocas.',
+    es: 'Front-end con React.js y Next.js: el sitio institucional de Hub Connect Eventos y proyectos como Doe Vida y Banco de Trocas.',
+  },
+  'Tipagem estática no front-end e no back-end — este portfólio é feito em TypeScript.': {
+    en: 'Static typing on the front end and the back end — this portfolio is built with TypeScript.',
+    es: 'Tipado estático en el front-end y en el back-end — este portafolio está hecho con TypeScript.',
+  },
+  'APIs com Node.js, Express e Prisma: Banco de Trocas de Conhecimento e as funções serverless deste portfólio.': {
+    en: "APIs with Node.js, Express and Prisma: the Knowledge Exchange Bank and this portfolio's serverless functions.",
+    es: 'APIs con Node.js, Express y Prisma: el Banco de Intercambio de Conocimiento y las funciones serverless de este portafolio.',
+  },
+  'Back-end com C# e .NET, complementando a stack de React e Next.js.': {
+    en: 'Back end with C# and .NET, complementing the React and Next.js stack.',
+    es: 'Back-end con C# y .NET, complementando el stack de React y Next.js.',
+  },
+  'Certificação Scrum Fundamentals Certified (SFC™) — SCRUMstudy, jun/2025.': {
+    en: 'Scrum Fundamentals Certified (SFC™) certification — SCRUMstudy, Jun/2025.',
+    es: 'Certificación Scrum Fundamentals Certified (SFC™) — SCRUMstudy, jun/2025.',
+  },
+  'Metodologias ágeis na prática — curso de extensão universitária USP/ESALQ (Acelerando Projetos de Sucesso).': {
+    en: 'Agile methodologies in practice — USP/ESALQ university extension course (Accelerating Successful Projects).',
+    es: 'Metodologías ágiles en la práctica — curso de extensión universitaria USP/ESALQ (Acelerando Proyectos de Éxito).',
+  },
+  'Três anos liderando a equipe voluntária da Associação Pedra Que Canta.': {
+    en: 'Three years leading the volunteer team at the Pedra Que Canta Association.',
+    es: 'Tres años liderando al equipo voluntario de la Asociación Pedra Que Canta.',
+  },
+  'Artigo científico sobre inovação tecnológica e inclusão escolar — Revista Processando o Saber, FATEC PG (2025).': {
+    en: 'Scientific paper on technological innovation and school inclusion — Revista Processando o Saber, FATEC PG (2025).',
+    es: 'Artículo científico sobre innovación tecnológica e inclusión escolar — Revista Processando o Saber, FATEC PG (2025).',
+  },
+  'Vice-presidência da Associação Cultural e Comunitária Pedra Que Canta (2022 – dez/2025).': {
+    en: 'Vice presidency of the Pedra Que Canta Cultural and Community Association (2022 – Dec/2025).',
+    es: 'Vicepresidencia de la Asociación Cultural y Comunitaria Pedra Que Canta (2022 – dic/2025).',
+  },
+  'Intercâmbio em Dublin (ISI Dublin, 2025) e trabalho em equipes multidisciplinares.': {
+    en: 'Study abroad in Dublin (ISI Dublin, 2025) and work in multidisciplinary teams.',
+    es: 'Intercambio en Dublín (ISI Dublin, 2025) y trabajo en equipos multidisciplinarios.',
+  },
 };
 
 // Função que traduz um texto para o idioma especificado, usando o mapeamento de traduções.

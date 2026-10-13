@@ -11,6 +11,7 @@ interface StartMenuProps {
 
 const StartMenu: React.FC<StartMenuProps> = ({ onOpen, onClose }) => {
   const { t } = useLanguage();
+  const menu = t.shell.startMenu;
 
   const handleOpen = (type: WindowType) => {
     onOpen(type);
@@ -30,47 +31,47 @@ const StartMenu: React.FC<StartMenuProps> = ({ onOpen, onClose }) => {
             <span className="start-menu-icon" style={{ color: '#E91E8C' }}>◉</span>
             <span>
               <strong>Orkut</strong>
-              <small>Meu perfil e projetos</small>
+              <small>{menu.orkutSubtitle}</small>
             </span>
           </button>
           <button className="start-menu-pinned" onClick={() => handleOpen('msn')}>
             <span className="start-menu-icon" style={{ color: '#00BCD4' }}>💬</span>
             <span>
               <strong>MSN Messenger</strong>
-              <small>Conversar com a IA da Bia</small>
+              <small>{menu.msnSubtitle}</small>
             </span>
           </button>
 
           <div className="start-menu-divider" />
 
-          <div className="start-menu-recent-label">Documentos recentes</div>
-          <button className="start-menu-item" disabled title="Em breve">
-            📄 Currículo.pdf
+          <div className="start-menu-recent-label">{menu.recentDocuments}</div>
+          <button className="start-menu-item" disabled title={menu.comingSoon}>
+            📄 {menu.resumeFile}
           </button>
         </div>
 
         <div className="start-menu-col start-menu-col--right">
           <button className="start-menu-item start-menu-item--dark" onClick={() => handleOpen('about')}>
-            🖥️ Meu Computador
+            🖥️ {menu.myComputer}
           </button>
-          <button className="start-menu-item start-menu-item--dark" disabled title={t.shell.startMenu.comingSoon}>
-            🖼️ Minhas Imagens
+          <button className="start-menu-item start-menu-item--dark" disabled title={menu.comingSoon}>
+            🖼️ {menu.myPictures}
           </button>
-          <button className="start-menu-item start-menu-item--dark" disabled title={t.shell.startMenu.comingSoon}>
-            🗑️ Lixeira
+          <button className="start-menu-item start-menu-item--dark" disabled title={menu.comingSoon}>
+            🗑️ {menu.trash}
           </button>
-          <button className="start-menu-item start-menu-item--dark" disabled title={t.shell.startMenu.comingSoon}>
-            ⚙️ Painel de Controle
+          <button className="start-menu-item start-menu-item--dark" disabled title={menu.comingSoon}>
+            ⚙️ {menu.controlPanel}
           </button>
-          <button className="start-menu-item start-menu-item--dark" disabled title={t.shell.startMenu.comingSoon}>
-            ▶️ Executar...
+          <button className="start-menu-item start-menu-item--dark" disabled title={menu.comingSoon}>
+            ▶️ {menu.run}
           </button>
         </div>
       </div>
 
       <div className="start-menu-footer">
-        <button onClick={onClose}>🔒 Log Off</button>
-        <button onClick={onClose}>⏻ Desligar</button>
+        <button onClick={onClose}>🔒 {menu.logOff}</button>
+        <button onClick={onClose}>⏻ {menu.shutDown}</button>
       </div>
     </div>
   );

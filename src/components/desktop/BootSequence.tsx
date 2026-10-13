@@ -1,10 +1,10 @@
 // src/components/desktop/BootSequence.tsx
 import React, { useEffect } from 'react';
+import '../../styles/windows-theme.css';
 import { useSound } from '../../hooks/useSound';
 import { useLanguage } from '../../hooks/useLanguage';
 import { SOUND_PATHS } from '../../utils/constants';
-import { FlagBR, FlagUS, FlagES } from './icons';
-import type { Language } from '../../types/language';
+import { LANGUAGE_OPTIONS } from '../../constants/languages';
 
 interface BootSequenceProps {
   onFinish: () => void;
@@ -12,18 +12,17 @@ interface BootSequenceProps {
 
 const BOOT_DURATION_MS = 2600;
 
-const LANGUAGE_OPTIONS: { code: Language; label: string; Flag: React.FC }[] = [
-  { code: 'pt', label: 'Português', Flag: FlagBR },
-  { code: 'en', label: 'English', Flag: FlagUS },
-  { code: 'es', label: 'Español', Flag: FlagES },
-];
-
 const BootSequence: React.FC<BootSequenceProps> = ({ onFinish }) => {
   const { playSound } = useSound();
   const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
-    playSound(SOUND_PATHS.startup);
+    // O navegador pode bloquear o som antes da primeira interação do usuário; nesse caso o boot segue sem som.
+    try {
+      playSound(SOUND_PATHS.startup);
+    } catch {
+      // Sem som — não é motivo para quebrar o boot.
+    }
     const timer = window.setTimeout(onFinish, BOOT_DURATION_MS);
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps

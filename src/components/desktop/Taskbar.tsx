@@ -1,11 +1,10 @@
 // src/components/desktop/Taskbar.tsx
 import React, { useState } from 'react';
 import type { AppWindow, WindowType } from '../../types/window';
-import type { Language } from '../../types/language';
 import StartMenu from './StartMenu';
 import { useSound } from '../../hooks/useSound';
 import { useLanguage } from '../../hooks/useLanguage';
-import { FlagBR, FlagUS, FlagES } from './icons';
+import { LANGUAGE_OPTIONS } from '../../constants/languages';
 
 interface TaskbarProps {
   windows: AppWindow[];
@@ -15,23 +14,28 @@ interface TaskbarProps {
   onOpen: (type: WindowType) => void;
 }
 
-// Nomes dos idiomas ficam no próprio idioma, como em qualquer seletor de idioma.
-const LANGUAGE_OPTIONS: { code: Language; label: string; Flag: React.FC }[] = [
-  { code: 'pt', label: 'Português', Flag: FlagBR },
-  { code: 'en', label: 'English', Flag: FlagUS },
-  { code: 'es', label: 'Español', Flag: FlagES },
-];
-
-const Taskbar: React.FC<TaskbarProps> = ({ windows, activeWindowId, onFocus, onMinimize, onOpen }) => {
-  const [startOpen, setStartOpen] = useState(false);
+// Relógio isolado: o estado dele muda a cada 30s e, com isso, só este pedaço re-renderiza (e não a Taskbar inteira).
+// O formato da hora segue o idioma atual (t.locale), e ele também re-renderiza quando o idioma muda.
+const Clock = React.memo(function Clock() {
   const [clock, setClock] = useState(() => new Date());
-  const { muted, setMuted } = useSound();
-  const { language, setLanguage, t } = useLanguage();
+  const { t } = useLanguage();
 
   React.useEffect(() => {
     const interval = window.setInterval(() => setClock(new Date()), 30_000);
     return () => window.clearInterval(interval);
   }, []);
+
+  return (
+    <span className="taskbar-clock">
+      {clock.toLocaleTimeString(t.locale, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })}
+    </span>
+  );
+});
+
+const Taskbar: React.FC<TaskbarProps> = ({ windows, activeWindowId, onFocus, onMinimize, onOpen }) => {
+  const [startOpen, setStartOpen] = useState(false);
+  const { muted, setMuted } = useSound();
+  const { language, setLanguage, t } = useLanguage();
 
   // Função que decide o que fazer quando o usuário clica em um item da Taskbar:
   // - Se a janela estiver minimizada, restaura e foca ela.
@@ -99,9 +103,7 @@ const Taskbar: React.FC<TaskbarProps> = ({ windows, activeWindowId, onFocus, onM
           {muted ? '🔇' : '🔊'}
         </button>
         <span className="tray-icon tray-icon--static" title={t.shell.taskbar.network}>🖧</span>
-        <span className="taskbar-clock">
-          {clock.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false })}
-        </span>
+        <Clock />
       </div>
     </div>
   );

@@ -1,11 +1,9 @@
 // src/components/apps/MSNMessenger/msnIcons.tsx
-import React from 'react';
+import React, { useId } from 'react';
 
 interface IconProps {
   size?: number;
 }
-
-let sphereIdCounter = 0;
 
 function GlossySphere({
   size,
@@ -18,23 +16,37 @@ function GlossySphere({
   light: string;
   dark: string;
 }) {
-  const id = `msn-sphere-${++sphereIdCounter}`;
+  // useId gera um id único e estável por instância (seguro em renderizações múltiplas/SSR).
+  // Removemos os ":" para o id funcionar bem dentro de url(#...).
+  const reactId = useId();
+  const id = `msn-sphere-${reactId.replace(/:/g, '')}`;
   return (
-    <svg width={size} height={size} viewBox="0 0 28 28" aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 28 28"
+      aria-hidden="true"
+      style={{ filter: 'drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35))' }}
+    >
       <defs>
         <radialGradient id={id} cx="35%" cy="28%" r="75%">
           <stop offset="0" stopColor={light} />
           <stop offset="1" stopColor={dark} />
         </radialGradient>
+        <linearGradient id={`${id}-shine`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.85" />
+          <stop offset="1" stopColor="#ffffff" stopOpacity="0.05" />
+        </linearGradient>
       </defs>
       <circle cx="14" cy="14" r="12.5" fill={`url(#${id})`} stroke={dark} strokeWidth="1" />
-      <ellipse cx="10.5" cy="8.5" rx="5.5" ry="3" fill="#ffffff" opacity="0.35" />
+      <ellipse cx="14" cy="8" rx="8.5" ry="5.2" fill={`url(#${id}-shine)`} />
+      <ellipse cx="14" cy="22" rx="6.5" ry="2.6" fill={light} opacity="0.45" />
       {glyph}
     </svg>
   );
 }
 
-export const InviteIcon: React.FC<IconProps> = ({ size = 28 }) => (
+export const InviteIcon: React.FC<IconProps> = ({ size = 32 }) => (
   <GlossySphere
     size={size}
     light="#7ea8f7"
@@ -48,7 +60,7 @@ export const InviteIcon: React.FC<IconProps> = ({ size = 28 }) => (
   />
 );
 
-export const SendFileIcon: React.FC<IconProps> = ({ size = 28 }) => (
+export const SendFileIcon: React.FC<IconProps> = ({ size = 32 }) => (
   <GlossySphere
     size={size}
     light="#ffe08a"
@@ -59,7 +71,7 @@ export const SendFileIcon: React.FC<IconProps> = ({ size = 28 }) => (
   />
 );
 
-export const WebcamIcon: React.FC<IconProps> = ({ size = 28 }) => (
+export const WebcamIcon: React.FC<IconProps> = ({ size = 32 }) => (
   <GlossySphere
     size={size}
     light="#c9aefc"
@@ -74,7 +86,7 @@ export const WebcamIcon: React.FC<IconProps> = ({ size = 28 }) => (
   />
 );
 
-export const AudioIcon: React.FC<IconProps> = ({ size = 28 }) => (
+export const AudioIcon: React.FC<IconProps> = ({ size = 32 }) => (
   <GlossySphere
     size={size}
     light="#8fe3ee"
@@ -88,7 +100,7 @@ export const AudioIcon: React.FC<IconProps> = ({ size = 28 }) => (
   />
 );
 
-export const ActivitiesIcon: React.FC<IconProps> = ({ size = 28 }) => (
+export const ActivitiesIcon: React.FC<IconProps> = ({ size = 32 }) => (
   <GlossySphere
     size={size}
     light="#ffcf80"
@@ -99,7 +111,7 @@ export const ActivitiesIcon: React.FC<IconProps> = ({ size = 28 }) => (
   />
 );
 
-export const GamesIcon: React.FC<IconProps> = ({ size = 28 }) => (
+export const GamesIcon: React.FC<IconProps> = ({ size = 32 }) => (
   <GlossySphere
     size={size}
     light="#b3e69b"

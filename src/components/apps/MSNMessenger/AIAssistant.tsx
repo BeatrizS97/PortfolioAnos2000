@@ -2,8 +2,13 @@
 import React, { useState } from 'react';
 import { useWindowManager } from '../../../hooks/useWindowManager';
 import { useSound } from '../../../hooks/useSound';
+import { useLocalStorage } from '../../../hooks/useLocalStorage';
+import { useLanguage } from '../../../hooks/useLanguage';
 import { shakeScreen } from '../../../utils/animations';
 import { SOUND_PATHS } from '../../../utils/constants';
+import { findAnswer, formatLastMessageAt, TYPING_TEXT } from '../../../utils/msnHelpers';
+import { sendChatMessage } from '../../../services/geminiChatService';
+import type { ChatMessage } from '../../../types/chat';
 import {
   FolderMiniIcon,
   NudgeIcon,
@@ -17,49 +22,86 @@ import {
 
 interface Message { from: 'bot' | 'user' | 'system'; text: string; }
 
-// Base de conhecimento com palavras-chave e respostas.
-const KB: { keywords: string[]; answer: string }[] = [
-  { keywords: ['projeto', 'projetos'], answer: 'Você pode ver todos os projetos no perfil dela — já vou te levar lá!' },
-  { keywords: ['stack', 'tecnologia', 'tecnologias'], answer: 'Trabalho principalmente com React.js, Next.js, TypeScript, C# e .NET.' },
-  { keywords: ['contato', 'email', 'e-mail'], answer: 'Você pode entrar em contato pelo formulário do site ou pelo LinkedIn!' },
-  { keywords: ['disponível', 'disponibilidade', 'vaga'], answer: 'A Beatriz está aberta a oportunidades como Desenvolvedora Front-end/Full Stack Júnior!' },
-  { keywords: ['idioma', 'idiomas', 'inglês', 'espanhol'], answer: 'Fala português nativo, inglês nível B1 e espanhol nível A2.' },
-  { keywords: ['certificação', 'certificado', 'certificações'], answer: 'Tem certificações em Scrum Fundamentals, Formação Web Essencial (BIT) e Crescendo no Trabalho (JobRise), entre outras — veja na aba Perfil!' },
-];
+// Quem pode ser o autor de uma mensagem salva.
+const MESSAGE_SENDERS: string[] = ['bot', 'user', 'system'];
 
-// Formata a data/hora igual ao rodapé clássico do MSN: "dd/mm/aaaa às hh:mm". 
-function formatLastMessageAt(date: Date): string {
-  const dateText = date.toLocaleDateString('pt-BR');
-  const timeText = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  return `Última mensagem recebida em ${dateText} às ${timeText}.`;
+// Confere se o valor salvo no localStorage é uma lista de mensagens válidas ({ from, text }).
+// Se não for (ex.: editado à mão ou corrompido), o histórico começa vazio em vez de quebrar o chat.
+function isMessageList(value: unknown): value is Message[] {
+  return (
+    Array.isArray(value) &&
+    value.every((item) => {
+      if (typeof item !== 'object' || item === null) return false;
+      const { from, text } = item as Record<string, unknown>;
+      return typeof from === 'string' && MESSAGE_SENDERS.includes(from) && typeof text === 'string';
+    })
+  );
+}
+
+// Quantas mensagens recentes são enviadas para a API como contexto da conversa.
+const MAX_HISTORY_MESSAGES = 10;
+
+// Converte as mensagens da tela para o formato esperado pela API (ignora mensagens de sistema, como o nudge).
+function toChatHistory(messages: Message[]): ChatMessage[] {
+  const history = messages
+    .filter((m) => m.from !== 'system')
+    .map((m): ChatMessage => ({ role: m.from === 'bot' ? 'model' : 'user', text: m.text }))
+    .slice(-MAX_HISTORY_MESSAGES);
+
+  // O Gemini espera que o histórico comece com uma mensagem do usuário.
+  while (history.length > 0 && history[0].role === 'model') {
+    history.shift();
+  }
+  return history;
 }
 
 // Componente principal do assistente virtual no estilo MSN Messenger.
 const AIAssistant: React.FC = () => {
   const { openWindow, focusWindow, windows } = useWindowManager();
   const { playSound } = useSound();
-  const [messages, setMessages] = useState<Message[]>([
-    { from: 'bot', text: 'Oi! Eu sou a assistente virtual da Beatriz :) Pergunte sobre projetos, tecnologias ou carreira!' },
-  ]);
+  const { language, t } = useLanguage();
+  // O histórico fica salvo no localStorage para não se perder ao recarregar a página.
+  // A saudação não é salva: ela é exibida a cada render, já no idioma atual.
+  const [messages, setMessages] = useLocalStorage<Message[]>('portfolio:msnHistory', [], isMessageList);
   // Estado para o rascunho da mensagem que o usuário está digitando e para a data/hora da última mensagem recebida. 
   const [draft, setDraft] = useState('');
   const [lastMessageAt, setLastMessageAt] = useState<Date>(() => new Date());
+  // Indica que estamos aguardando a resposta da API ("Beatriz está digitando...").
+  const [isTyping, setIsTyping] = useState(false);
 
   // Função que lida com o envio de mensagens pelo usuário.
   // Ela normaliza a pergunta, busca uma resposta na base de conhecimento e atualiza o estado das mensagens.
-  const handleSend = (e: React.FormEvent) => {
+  // Se não houver palavra-chave local, consulta a API /api/gemini-chat (com fallback local se ela falhar).
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault(); // Impede o comportamento padrão do formulário (recarregar a página).
     const question = draft.trim(); // Remove espaços em branco do início e do fim da pergunta.
-    if (!question) return;
+    if (!question || isTyping) return;
 
-    const normalized = question.toLowerCase();
-    const match = KB.find((entry) => entry.keywords.some((k) => normalized.includes(k)));
-    const answer = match?.answer ?? 'Não tenho essa resposta ainda — que tal usar o formulário de contato?';
-    
     // Atualiza o estado das mensagens, adicionando a pergunta do usuário e a resposta do bot, e atualiza a data/hora da última mensagem recebida.
-    setMessages((prev) => [...prev, { from: 'user', text: question }, { from: 'bot', text: answer }]);
-    setLastMessageAt(new Date());
+    setMessages((prev) => [...prev, { from: 'user', text: question }]);
     setDraft('');
+
+    const localAnswer = findAnswer(question, t.msn.kb);
+    if (localAnswer) {
+      setMessages((prev) => [...prev, { from: 'bot', text: localAnswer }]);
+      setLastMessageAt(new Date());
+      return;
+    }
+
+    setIsTyping(true);
+    let answer: string;
+    try {
+      // `messages` ainda não contém a pergunta atual, que é enviada separadamente.
+      answer = await sendChatMessage(question, toChatHistory(messages), language);
+    } catch {
+      // API indisponível ou offline: usa a resposta padrão local (no idioma atual).
+      answer = t.msn.fallbackAnswer;
+    } finally {
+      setIsTyping(false);
+    }
+
+    setMessages((prev) => [...prev, { from: 'bot', text: answer }]);
+    setLastMessageAt(new Date());
   };
 
   // Função que lida com o clique no botão "Ver Projetos". Ela verifica se a janela do Orkut já está aberta; se estiver, foca nela, caso contrário, abre uma nova janela do Orkut.
@@ -76,41 +118,51 @@ const AIAssistant: React.FC = () => {
   const handleNudge = () => {
     shakeScreen();
     playSound(SOUND_PATHS.msnNotification);
-    setMessages((prev) => [...prev, { from: 'system', text: 'Você acabou de enviar um nudge!' }]);
+    setMessages((prev) => [...prev, { from: 'system', text: t.msn.nudgeSent }]);
   };
+
+  // Saudação sempre na frente da conversa salva, traduzida pelo idioma atual.
+  const displayMessages: Message[] = [{ from: 'bot', text: t.msn.greeting }, ...messages];
 
   return (
     <div className="msn-classic-chat">
       <div className="msn-row msn-row--top">
         <div className="msn-card msn-card--messages">
           <div className="msn-to-line">
-            <span>Para:</span> <strong>Suporte IA Beatriz</strong>
+            <span>{t.msn.to}</span> <strong>{t.msn.contactName}</strong>
           </div>
 
           <div className="msn-messages">
             <p className="msn-tip">
-              <LockIcon /> Nunca informe sua senha ou dados de cartão em uma conversa.
+              <LockIcon /> {t.msn.securityTip}
             </p>
 
-            {messages.map((m, i) =>
+            {displayMessages.map((m, i) =>
               m.from === 'system' ? (
-                <p key={i} className="msn-message msn-message--system">{m.text}</p>
+                // O texto do nudge é sempre exibido no idioma atual, mesmo em históricos salvos antes da troca de idioma.
+                <p key={i} className="msn-message msn-message--system">{t.msn.nudgeSent}</p>
               ) : (
                 <p key={i} className={`msn-message msn-message--${m.from}`}>
                   <strong>
                     {m.from === 'bot' ? <HeartEmblemIcon /> : <StarEmblemIcon />}{' '}
-                    {m.from === 'bot' ? 'Suporte IA Beatriz diz:' : 'Você diz:'}
+                    {m.from === 'bot' ? t.msn.botSays : t.msn.userSays}
                   </strong>
                   <br />
                   {m.text}
                 </p>
               )
             )}
+
+            {isTyping && (
+              <p className="msn-message" role="status" style={{ fontStyle: 'italic', color: '#666' }}>
+                {TYPING_TEXT[language]}
+              </p>
+            )}
           </div>
         </div>
 
         <div className="msn-card msn-card--avatar">
-          <img src="/assets/images/icons/user.png" alt="Suporte IA Beatriz" />
+          <img src="/assets/images/icons/user.png" alt={t.msn.contactName} />
         </div>
       </div>
 
@@ -118,48 +170,48 @@ const AIAssistant: React.FC = () => {
         <div className="msn-card msn-card--compose">
           <div className="msn-toolbar-row">
             <button type="button" onClick={handleShowProjects}>
-              <FolderMiniIcon /> Ver Projetos
+              <FolderMiniIcon /> {t.msn.viewProjects}
             </button>
             <span className="msn-toolbar-divider" />
             <button type="button" className="nudge-button" onClick={handleNudge}>
-              <NudgeIcon /> Nudge
+              <NudgeIcon /> {t.msn.nudge}
             </button>
           </div>
 
           <div className="msn-footer">
-            <div className="msn-compose-toolbar" aria-hidden="true">
-              <span className="msn-compose-tool" title="Fonte">
-                <strong>A</strong> <span className="msn-compose-tool-caret">▾</span>
+            <div className="msn-compose-toolbar">
+              <span className="msn-compose-tool" role="button" aria-disabled="true" aria-label={t.msn.tools.font} title={t.msn.tools.font}>
+                <strong>A</strong> <span className="msn-compose-tool-caret" role="presentation">▾</span>
               </span>
-              <span className="msn-compose-tool" title="Emoticons">
-                <SmileyIcon /> <span className="msn-compose-tool-caret">▾</span>
+              <span className="msn-compose-tool" role="button" aria-disabled="true" aria-label={t.msn.tools.emoticons} title={t.msn.tools.emoticons}>
+                <SmileyIcon /> <span className="msn-compose-tool-caret" role="presentation">▾</span>
               </span>
-              <span className="msn-compose-tool" title="Winks">
-                <WinkSmileyIcon /> <span className="msn-compose-tool-caret">▾</span>
+              <span className="msn-compose-tool" role="button" aria-disabled="true" aria-label={t.msn.tools.winks} title={t.msn.tools.winks}>
+                <WinkSmileyIcon /> <span className="msn-compose-tool-caret" role="presentation">▾</span>
               </span>
-              <span className="msn-compose-tool" title="Planos de fundo">
-                <BackgroundMiniIcon /> <span className="msn-compose-tool-caret">▾</span>
+              <span className="msn-compose-tool" role="button" aria-disabled="true" aria-label={t.msn.tools.backgrounds} title={t.msn.tools.backgrounds}>
+                <BackgroundMiniIcon /> <span className="msn-compose-tool-caret" role="presentation">▾</span>
               </span>
             </div>
 
             <form className="msn-compose-row" onSubmit={handleSend}>
               <input
                 type="text"
-                placeholder="Digite uma pergunta..."
+                placeholder={t.msn.inputPlaceholder}
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
               />
-              <button type="submit">Enviar</button>
+              <button type="submit" disabled={isTyping}>{t.msn.send}</button>
             </form>
 
             <div className="msn-status-bar">
-              {formatLastMessageAt(lastMessageAt)}
+              {formatLastMessageAt(lastMessageAt, t.locale, t.msn.lastMessage)}
             </div>
           </div>
         </div>
 
         <div className="msn-card msn-card--avatar">
-          <img src="/assets/images/icons/user-placeholder.png" alt="Você" />
+          <img src="/assets/images/icons/user-placeholder.png" alt={t.msn.you} />
         </div>
       </div>
     </div>

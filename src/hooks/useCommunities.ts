@@ -6,7 +6,7 @@ import { fetchCommunities } from '../services/communitiesService';
 export function useCommunities() {
   return useQuery({
     queryKey: ['communities'],
-    queryFn: fetchCommunities,
+    queryFn: ({ signal }) => fetchCommunities(signal),
     staleTime: 5 * 60 * 1000,
   });
 }

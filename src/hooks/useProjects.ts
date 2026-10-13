@@ -6,7 +6,7 @@ import type { ProjectFilters } from '../types/project';
 export function useProjects(filters?: ProjectFilters) {
   return useQuery({
     queryKey: ['projects', filters],
-    queryFn: () => fetchProjects(filters),
+    queryFn: ({ signal }) => fetchProjects(filters, signal),
     staleTime: 5 * 60 * 1000,
   });
 }

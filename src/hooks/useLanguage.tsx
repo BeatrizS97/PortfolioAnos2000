@@ -1,9 +1,11 @@
 // src/hooks/useLanguage.tsx  
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import type { Language } from '../types/language';
+import { isLanguage } from '../types/language';
 import { translations } from '../utils/translations';
 import type { Translations } from '../utils/translations';
 import { translateContent } from '../utils/contentTranslations';
+import { sanitizeDisplayText } from '../utils/sanitizeText';
 import { useLocalStorage } from './useLocalStorage';
 
 // Contexto para gerenciar o idioma da aplicação.
@@ -20,9 +22,17 @@ const LanguageContext = createContext<LanguageContextType | null>(null);
 
 // Provedor de contexto que encapsula a aplicação e fornece o idioma atual, função para alterar o idioma, textos fixos traduzidos e função para traduzir conteúdos dinâmicos.
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useLocalStorage<Language>('portfolio:language', 'pt');
+  // O valor salvo é validado: se não for estritamente 'pt', 'en' ou 'es' (ex.: editado à mão), volta para 'pt'.
+  const [language, setLanguage] = useLocalStorage<Language>('portfolio:language', 'pt', isLanguage);
 
-  const tc = (text: string) => translateContent(text, language);
+  // Mantém o título da aba e o atributo lang do <html> no idioma atual (o index.html traz apenas o padrão em português).
+  useEffect(() => {
+    document.title = translations[language].shell.documentTitle;
+    document.documentElement.lang = translations[language].locale;
+  }, [language]);
+
+  // Traduz e sanitiza o texto. Se não houver tradução (resultado vazio), usa o texto original em português.
+  const tc = (text: string) => sanitizeDisplayText(translateContent(text, language) || text);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t: translations[language], tc }}>

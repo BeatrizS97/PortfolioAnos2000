@@ -5,7 +5,7 @@ import { fetchProfile } from '../services/profileService';
 export function useProfile() {
   return useQuery({
     queryKey: ['profile'],
-    queryFn: fetchProfile,
+    queryFn: ({ signal }) => fetchProfile(signal),
     staleTime: 5 * 60 * 1000,
   });
 }

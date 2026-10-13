@@ -2,11 +2,16 @@
 import { useCallback, useState } from 'react';
 
 // Persiste um valor no localStorage, sincronizado com o estado do React. 
-export function useLocalStorage<T>(key: string, initialValue: T) {
+// O parâmetro opcional "validate" confere o formato do valor salvo: se estiver corrompido (ex.: editado à mão), usa o initialValue.
+export function useLocalStorage<T>(key: string, initialValue: T, validate?: (value: unknown) => value is T) {
   const [value, setValue] = useState<T>(() => {
     try {
       const stored = window.localStorage.getItem(key);
-      return stored ? (JSON.parse(stored) as T) : initialValue;
+      if (!stored) return initialValue;
+
+      const parsed: unknown = JSON.parse(stored);
+      if (validate && !validate(parsed)) return initialValue;
+      return parsed as T;
     } catch {
       return initialValue;
     }

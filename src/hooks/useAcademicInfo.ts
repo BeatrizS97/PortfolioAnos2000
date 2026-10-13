@@ -2,12 +2,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchEducation, fetchLanguages, fetchCertifications, fetchExperience } from '../services/academicService';
 
+// Tentativas extras quando a busca falha: mais insistente para o que é central no perfil (formação, experiência)
+// e nenhuma para certificações, que são complementares e podem falhar em silêncio.
+const RETRY_CRITICAL = 1;
+const RETRY_SILENT = 0;
+
 // Hook para buscar informações acadêmicas (educação, habilidades linguísticas, certificações e experiência) usando React Query.
+// O "signal" do React Query cancela a requisição quando o componente sai da tela.
 export function useEducation() {
   return useQuery({
     queryKey: ['education'],
-    queryFn: fetchEducation,
+    queryFn: ({ signal }) => fetchEducation(signal),
     staleTime: 5 * 60 * 1000,
+    retry: RETRY_CRITICAL,
   });
 }
 
@@ -15,7 +22,7 @@ export function useEducation() {
 export function useLanguageSkills() {
   return useQuery({
     queryKey: ['languageSkills'],
-    queryFn: fetchLanguages,
+    queryFn: ({ signal }) => fetchLanguages(signal),
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -24,8 +31,9 @@ export function useLanguageSkills() {
 export function useCertifications() {
   return useQuery({
     queryKey: ['certifications'],
-    queryFn: fetchCertifications,
+    queryFn: ({ signal }) => fetchCertifications(signal),
     staleTime: 5 * 60 * 1000,
+    retry: RETRY_SILENT,
   });
 }
 
@@ -33,7 +41,8 @@ export function useCertifications() {
 export function useExperience() {
   return useQuery({
     queryKey: ['experience'],
-    queryFn: fetchExperience,
+    queryFn: ({ signal }) => fetchExperience(signal),
     staleTime: 5 * 60 * 1000,
+    retry: RETRY_CRITICAL,
   });
 }

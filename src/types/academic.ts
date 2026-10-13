@@ -1,38 +1,26 @@
 // src/types/academic.ts
-export interface EducationItem {
-  id: string;
-  course_pt: string;
-  course_en?: string;
-  course_es?: string;
-  order_index: number;
-}
 
-export interface LanguageSkill {
-  id: string;
-  language_pt: string;
-  language_en?: string;
-  language_es?: string;
-  order_index: number;
-}
+// Campo traduzido: o português é obrigatório; inglês e espanhol são opcionais.
+// Ex.: LocalizedField<'course'> => { course_pt: string; course_en?: string; course_es?: string }
+export type LocalizedField<Base extends string> = {
+  [K in `${Base}_pt`]: string;
+} & {
+  [K in `${Base}_en` | `${Base}_es`]?: string;
+};
 
-export interface Certification {
+// Item acadêmico genérico: id, ordem e um campo traduzido (cujo nome-base é o parâmetro Base).
+export type AcademicItem<Base extends string> = {
   id: string;
-  title_pt: string;
-  title_en?: string;
-  title_es?: string;
   order_index: number;
-}
+} & LocalizedField<Base>;
 
-export interface ExperienceItem {
-  id: string;
-  title_pt: string;
-  title_en?: string;
-  title_es?: string;
-  period_pt: string;
-  period_en?: string;
-  period_es?: string;
-  description_pt: string;
-  description_en?: string;
-  description_es?: string;
-  order_index: number;
-}
+export type EducationItem = AcademicItem<'course'>;
+
+export type LanguageSkill = AcademicItem<'language'>;
+
+export type Certification = AcademicItem<'title'>;
+
+// Experiência tem três campos traduzidos: título (via AcademicItem), período e descrição.
+export type ExperienceItem = AcademicItem<'title'> &
+  LocalizedField<'period'> &
+  LocalizedField<'description'>;

@@ -1,44 +1,43 @@
 // src/components/windows/WindowContent.tsx
-import React, { lazy, Suspense } from 'react';
+import React, { Suspense } from 'react';
 import type { WindowType } from '../../types/window';
-
-const OrkutProfile = lazy(() => import('../apps/OrkutProfile/OrkutProfile'));
-const MSNChat = lazy(() => import('../apps/MSNMessenger/MSNChat'));
+import type { Language } from '../../types/language';
+import { WINDOW_COMPONENTS } from './windowComponents';
+import ErrorBoundary from '../shared/ErrorBoundary';
+import { useLanguage } from '../../hooks/useLanguage';
 
 interface WindowContentProps {
   type: WindowType;
 }
 
-const About: React.FC = () => (
-  <div className="about-content">
-    <h2>Sobre mim</h2>
-    <p>
-      Beatriz Silva Santos — Desenvolvedora Full Stack Júnior, formada em
-      Análise e Desenvolvimento de Sistemas (FATEC). Atuo com React.js,
-      Next.js, TypeScript no front-end e C#/.NET no back-end, com passagem
-      também por PHP e SQL.
-    </p>
-    <p>
-      Abra o Orkut para ver o perfil completo (projetos, skills e depoimentos)
-      ou espere o MSN chamar. 😉
-    </p>
-  </div>
-);
-
-const Trash: React.FC = () => (
-  <div className="trash-content">
-    <p>A lixeira está vazia... ou será que não? 👀</p>
-  </div>
-);
+// Textos da mensagem de erro de uma janela (ex.: o arquivo do app não baixou por falta de conexão), por idioma.
+const WINDOW_ERROR_TEXT: Record<Language, { message: string; reload: string }> = {
+  pt: { message: 'Não foi possível abrir esta janela. Verifique sua conexão e recarregue a página.', reload: 'Recarregar' },
+  en: { message: "Couldn't open this window. Check your connection and reload the page.", reload: 'Reload' },
+  es: { message: 'No se pudo abrir esta ventana. Verifica tu conexión y recarga la página.', reload: 'Recargar' },
+};
 
 const WindowContent: React.FC<WindowContentProps> = ({ type }) => {
+  const Component = WINDOW_COMPONENTS[type];
+  const { language, t } = useLanguage();
+  const errorText = WINDOW_ERROR_TEXT[language];
+
+  // O boundary fica por janela: se o conteúdo de uma falhar, as outras janelas e a barra de tarefas continuam funcionando.
   return (
-    <Suspense fallback={<div className="loading-screen">Carregando...</div>}>
-      {type === 'orkut' && <OrkutProfile />}
-      {type === 'msn' && <MSNChat />}
-      {type === 'about' && <About />}
-      {type === 'trash' && <Trash />}
-    </Suspense>
+    <ErrorBoundary
+      fallback={
+        <div className="loading-screen" role="alert" style={{ flexDirection: 'column', gap: 12 }}>
+          <p>{errorText.message}</p>
+          <button type="button" className="xp-button" onClick={() => window.location.reload()}>
+            {errorText.reload}
+          </button>
+        </div>
+      }
+    >
+      <Suspense fallback={<div className="loading-screen">{t.orkut.loading}</div>}>
+        <Component />
+      </Suspense>
+    </ErrorBoundary>
   );
 };
 

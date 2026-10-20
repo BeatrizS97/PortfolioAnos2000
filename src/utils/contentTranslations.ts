@@ -125,9 +125,9 @@ const CONTENT_TRANSLATIONS: Record<string, ContentTranslation> = {
   },
 
   // ---- Comunidades (descrições exibidas ao passar o mouse) ----
-  'Front-end com React.js e Next.js: site institucional da Hub Connect Eventos e projetos como Doe Vida e Banco de Trocas.': {
-    en: 'Front end with React.js and Next.js: the Hub Connect Eventos institutional website and projects such as Doe Vida and Banco de Trocas.',
-    es: 'Front-end con React.js y Next.js: el sitio institucional de Hub Connect Eventos y proyectos como Doe Vida y Banco de Trocas.',
+  'Front-end com React.js e Next.js: site institucional da Hub Connect Eventos e projetos como Doe Vida, ATSAdapta e Banco de Trocas.': {
+    en: 'Front end with React.js and Next.js: the Hub Connect Eventos institutional website and projects such as Doe Vida, ATSAdapta and Banco de Trocas.',
+    es: 'Front-end con React.js y Next.js: el sitio institucional de Hub Connect Eventos y proyectos como Doe Vida, ATSAdapta y Banco de Trocas.',
   },
   'Tipagem estática no front-end e no back-end — este portfólio é feito em TypeScript.': {
     en: 'Static typing on the front end and the back end — this portfolio is built with TypeScript.',
@@ -137,9 +137,9 @@ const CONTENT_TRANSLATIONS: Record<string, ContentTranslation> = {
     en: "APIs with Node.js, Express and Prisma: the Knowledge Exchange Bank and this portfolio's serverless functions.",
     es: 'APIs con Node.js, Express y Prisma: el Banco de Intercambio de Conocimiento y las funciones serverless de este portafolio.',
   },
-  'Back-end com C# e .NET, complementando a stack de React e Next.js.': {
-    en: 'Back end with C# and .NET, complementing the React and Next.js stack.',
-    es: 'Back-end con C# y .NET, complementando el stack de React y Next.js.',
+  'Back-end com C# e .NET, complementando a stack de React e Next.js — além de PHP e SQL no Form Generator.': {
+    en: 'Back end with C# and .NET, complementing the React and Next.js stack — plus PHP and SQL in Form Generator.',
+    es: 'Back-end con C# y .NET, complementando el stack de React y Next.js — además de PHP y SQL en Form Generator.',
   },
   'Certificação Scrum Fundamentals Certified (SFC™) — SCRUMstudy, jun/2025.': {
     en: 'Scrum Fundamentals Certified (SFC™) certification — SCRUMstudy, Jun/2025.',

@@ -14,11 +14,17 @@ export const TYPING_TEXT: Record<Language, string> = {
   es: 'Beatriz está escribiendo...',
 };
 
+// Remove acentos e passa para minúsculas, para "inglês" e "ingles" (ou "certificação" e "certificacao") valerem como a mesma palavra.
+function normalizeText(value: string): string {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
 // Normaliza a pergunta e busca uma resposta na base de conhecimento local.
 // Retorna null quando nenhuma palavra-chave é encontrada.
 export function findAnswer(question: string, kb: KnowledgeBase): string | null {
-  const normalized = question.toLowerCase();
-  const match = kb.find((entry) => entry.keywords.some((k) => normalized.includes(k)));
+  const normalized = normalizeText(question);
+  // A primeira entrada que casar vence: no translations.ts as mais específicas (um projeto) vêm antes das genéricas ("projetos").
+  const match = kb.find((entry) => entry.keywords.some((k) => normalized.includes(normalizeText(k))));
   return match?.answer ?? null;
 }
 

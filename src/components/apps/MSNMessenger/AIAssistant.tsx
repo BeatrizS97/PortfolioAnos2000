@@ -1,5 +1,5 @@
 // src/components/apps/MSNMessenger/AIAssistant.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useWindowManager } from '../../../hooks/useWindowManager';
 import { useSound } from '../../../hooks/useSound';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
@@ -7,7 +7,7 @@ import { useLanguage } from '../../../hooks/useLanguage';
 import { shakeScreen } from '../../../utils/animations';
 import { SOUND_PATHS } from '../../../utils/constants';
 import { findAnswer, formatLastMessageAt, TYPING_TEXT } from '../../../utils/msnHelpers';
-import { sendChatMessage } from '../../../services/geminiChatService';
+import { classifyChatError, sendChatMessage } from '../../../services/geminiChatService';
 import type { ChatMessage } from '../../../types/chat';
 import {
   FolderMiniIcon,
@@ -16,6 +16,7 @@ import {
   SmileyIcon,
   WinkSmileyIcon,
   BackgroundMiniIcon,
+  VoiceClipMiniIcon,
   HeartEmblemIcon,
   StarEmblemIcon,
 } from './MSNIcons';
@@ -40,6 +41,14 @@ function isMessageList(value: unknown): value is Message[] {
 
 // Quantas mensagens recentes são enviadas para a API como contexto da conversa.
 const MAX_HISTORY_MESSAGES = 10;
+
+// Quantas mensagens ficam salvas no localStorage. Passou disso, as mais antigas são descartadas (evita lentidão com o tempo).
+const MAX_SAVED_MESSAGES = 50;
+
+// Mantém só as últimas MAX_SAVED_MESSAGES mensagens da lista.
+function limitHistory(list: Message[]): Message[] {
+  return list.length > MAX_SAVED_MESSAGES ? list.slice(-MAX_SAVED_MESSAGES) : list;
+}
 
 // Converte as mensagens da tela para o formato esperado pela API (ignora mensagens de sistema, como o nudge).
 function toChatHistory(messages: Message[]): ChatMessage[] {
@@ -68,6 +77,14 @@ const AIAssistant: React.FC = () => {
   const [lastMessageAt, setLastMessageAt] = useState<Date>(() => new Date());
   // Indica que estamos aguardando a resposta da API ("Beatriz está digitando...").
   const [isTyping, setIsTyping] = useState(false);
+  // Elemento vazio no fim da lista de mensagens: é para ele que a rolagem automática desce.
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll: quando chega uma mensagem nova (ou o "digitando..." aparece/some), rola suavemente até o fim.
+  // block: 'nearest' rola só a caixa do chat, sem mexer na página inteira.
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [messages, isTyping]);
 
   // Função que lida com o envio de mensagens pelo usuário.
   // Ela normaliza a pergunta, busca uma resposta na base de conhecimento e atualiza o estado das mensagens.
@@ -78,29 +95,26 @@ const AIAssistant: React.FC = () => {
     if (!question || isTyping) return;
 
     // Atualiza o estado das mensagens, adicionando a pergunta do usuário e a resposta do bot, e atualiza a data/hora da última mensagem recebida.
-    setMessages((prev) => [...prev, { from: 'user', text: question }]);
+    setMessages((prev) => limitHistory([...prev, { from: 'user', text: question }]));
     setDraft('');
-
-    const localAnswer = findAnswer(question, t.msn.kb);
-    if (localAnswer) {
-      setMessages((prev) => [...prev, { from: 'bot', text: localAnswer }]);
-      setLastMessageAt(new Date());
-      return;
-    }
 
     setIsTyping(true);
     let answer: string;
     try {
       // `messages` ainda não contém a pergunta atual, que é enviada separadamente.
       answer = await sendChatMessage(question, toChatHistory(messages), language);
-    } catch {
+    } catch (error) {
       // API indisponível ou offline: usa a resposta padrão local (no idioma atual).
-      answer = t.msn.fallbackAnswer;
+      // Antes de cair nela, tenta a base local por palavra-chave (t.msn.kb).
+      // Sem resposta local, a mensagem depende do tipo do erro (conexão, limite de requisições ou genérico).
+      const kind = classifyChatError(error);
+      const errorText = kind === 'network' ? t.msn.errors.network : kind === 'rate-limit' ? t.msn.errors.rateLimit : t.msn.fallbackAnswer;
+      answer = findAnswer(question, t.msn.kb) ?? errorText;
     } finally {
       setIsTyping(false);
     }
 
-    setMessages((prev) => [...prev, { from: 'bot', text: answer }]);
+    setMessages((prev) => limitHistory([...prev, { from: 'bot', text: answer }]));
     setLastMessageAt(new Date());
   };
 
@@ -118,7 +132,7 @@ const AIAssistant: React.FC = () => {
   const handleNudge = () => {
     shakeScreen();
     playSound(SOUND_PATHS.msnNotification);
-    setMessages((prev) => [...prev, { from: 'system', text: t.msn.nudgeSent }]);
+    setMessages((prev) => limitHistory([...prev, { from: 'system', text: t.msn.nudgeSent }]));
   };
 
   // Saudação sempre na frente da conversa salva, traduzida pelo idioma atual.
@@ -158,6 +172,7 @@ const AIAssistant: React.FC = () => {
                 {TYPING_TEXT[language]}
               </p>
             )}
+            <div ref={messagesEndRef} />
           </div>
         </div>
 
@@ -185,6 +200,9 @@ const AIAssistant: React.FC = () => {
               </span>
               <span className="msn-compose-tool" role="button" aria-disabled="true" aria-label={t.msn.tools.emoticons} title={t.msn.tools.emoticons}>
                 <SmileyIcon /> <span className="msn-compose-tool-caret" role="presentation">▾</span>
+              </span>
+              <span className="msn-compose-tool" role="button" aria-disabled="true" aria-label={t.msn.tools.voiceClip} title={t.msn.tools.voiceClip}>
+                <VoiceClipMiniIcon /> <span className="msn-compose-tool-label">{t.msn.tools.voiceClip}</span> <span className="msn-compose-tool-caret" role="presentation">▾</span>
               </span>
               <span className="msn-compose-tool" role="button" aria-disabled="true" aria-label={t.msn.tools.winks} title={t.msn.tools.winks}>
                 <WinkSmileyIcon /> <span className="msn-compose-tool-caret" role="presentation">▾</span>

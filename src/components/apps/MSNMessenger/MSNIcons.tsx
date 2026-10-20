@@ -34,14 +34,20 @@ function GlossySphere({
           <stop offset="1" stopColor={dark} />
         </radialGradient>
         <linearGradient id={`${id}-shine`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#ffffff" stopOpacity="0.85" />
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
           <stop offset="1" stopColor="#ffffff" stopOpacity="0.05" />
         </linearGradient>
+        <radialGradient id={`${id}-edge`} cx="50%" cy="50%" r="50%">
+          <stop offset="0.68" stopColor="#000000" stopOpacity="0" />
+          <stop offset="1" stopColor="#000000" stopOpacity="0.3" />
+        </radialGradient>
       </defs>
       <circle cx="14" cy="14" r="12.5" fill={`url(#${id})`} stroke={dark} strokeWidth="1" />
-      <ellipse cx="14" cy="8" rx="8.5" ry="5.2" fill={`url(#${id}-shine)`} />
-      <ellipse cx="14" cy="22" rx="6.5" ry="2.6" fill={light} opacity="0.45" />
+      <circle cx="14" cy="14" r="12.5" fill={`url(#${id}-edge)`} />
+      <ellipse cx="14" cy="22" rx="6.5" ry="2.6" fill={light} opacity="0.55" />
       {glyph}
+      <ellipse cx="14" cy="7.6" rx="9" ry="5.4" fill={`url(#${id}-shine)`} />
+      <circle cx="14" cy="14" r="11.6" fill="none" stroke="#ffffff" strokeOpacity="0.4" strokeWidth="0.8" />
     </svg>
   );
 }
@@ -193,5 +199,13 @@ export const HeartEmblemIcon: React.FC<IconProps> = ({ size = 12 }) => (
 export const StarEmblemIcon: React.FC<IconProps> = ({ size = 12 }) => (
   <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden="true">
     <path d="M10 3.5l1.8 4.4 4.7.4-3.6 3.1 1.1 4.6L10 13.6l-4 2.4 1.1-4.6-3.6-3.1 4.7-.4L10 3.5z" fill="#FFC94D" stroke="#c98a12" strokeWidth="0.6" />
+  </svg>
+);
+
+export const VoiceClipMiniIcon: React.FC<IconProps> = ({ size = 14 }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden="true">
+    <circle cx="10" cy="10" r="8.5" fill="#8fe3ee" stroke="#1b8298" strokeWidth="1" />
+    <path d="M6.5 8.4v3.2h2l2.8 2.3V6.1L8.5 8.4h-2z" fill="#ffffff" />
+    <path d="M13 7.8a3.2 3.2 0 0 1 0 4.4" stroke="#ffffff" strokeWidth="1.3" strokeLinecap="round" fill="none" />
   </svg>
 );

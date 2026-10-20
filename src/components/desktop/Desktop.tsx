@@ -147,7 +147,7 @@ const DesktopInner: React.FC = () => {
 
   return (
     <div
-      className="desktop-container"
+      className="desktop-container fade-in"
       onClick={() => setSelectedIcon(null)}
       onMouseDown={handleBackgroundMouseDown}
       onDragOver={handleDragOver}

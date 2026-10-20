@@ -55,11 +55,11 @@ const App: React.FC = () => {
   }
 
   if (state.status === 'loading-data') {
-    return <div className="loading-screen">{t.orkut.loading}</div>;
+    return <div className="loading-screen loading-screen--boot">{t.orkut.loading}</div>;
   }
 
   return (
-    <Suspense fallback={<div className="loading-screen">{t.orkut.loading}</div>}>
+    <Suspense fallback={<div className="loading-screen loading-screen--boot">{t.orkut.loading}</div>}>
       <Desktop />
     </Suspense>
   );

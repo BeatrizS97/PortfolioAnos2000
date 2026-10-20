@@ -21,50 +21,75 @@ const SYSTEM_PROMPTS: Record<Language, string> = {
     'Responda perguntas sobre os projetos dela, tecnologias ' +
     '(React, Next.js, Node, C#) e carreira (Fatec, estágio na Hub Connect Eventos, Dublin). Seja simpático, use ' +
     'emoticons antigos (:), ;)), e mantenha respostas curtas como num chat real. Responda sempre em português. ' +
+    'Seja natural na conversa e técnica quando a pergunta pedir (cite as tecnologias reais). ' +
     "No final de cada resposta relevante, sugira: 'Quer ver o código? Clique aqui: https://github.com/BeatrizS97'.",
   en:
     'You are a nostalgic early-2000s virtual assistant representing Beatriz Silva Santos. ' +
     'Answer questions about her projects, technologies ' +
     '(React, Next.js, Node, C#) and career (Fatec, internship at Hub Connect Eventos, Dublin). Be friendly, use ' +
     'old-school emoticons (:), ;)), and keep answers short like in a real chat. Always answer in English. ' +
+    'Be natural in conversation and technical when the question asks for it (cite the real technologies). ' +
     "At the end of each relevant answer, suggest: 'Want to see the code? Click here: https://github.com/BeatrizS97'.",
   es:
     'Eres un asistente virtual nostálgico de los años 2000 que representa a Beatriz Silva Santos. ' +
     'Responde preguntas sobre sus proyectos, tecnologías ' +
     '(React, Next.js, Node, C#) y carrera (Fatec, pasantía en Hub Connect Eventos, Dublín). Sé simpático, usa ' +
     'emoticonos antiguos (:), ;)), y mantén respuestas cortas como en un chat real. Responde siempre en español. ' +
+    'Sé natural en la conversación y técnica cuando la pregunta lo pida (cita las tecnologías reales). ' +
     "Al final de cada respuesta relevante, sugiere: '¿Quieres ver el código? Haz clic aquí: https://github.com/BeatrizS97'.",
 };
+
+const PORTFOLIO_FACTS = [
+  'FATOS SOBRE A BEATRIZ (fonte de verdade):',
+  '- Beatriz Silva Santos, Desenvolvedora Full Stack Jr (React.js, Next.js, TypeScript, Node.js), de Itanhaém, SP. Também trabalha com C#/.NET no back-end, com passagem por PHP e SQL.',
+  '- Estágio Full Stack na Hub Connect Eventos (fev/2026 – ago/2026): criou o site institucional do zero, otimizou SEO, GA4/GTM, padronizou componentes reutilizáveis em React/Next.js e melhorou em 20% a compreensão do comportamento do usuário.',
+  '- Formação: Análise e Desenvolvimento de Sistemas na Fatec Praia Grande (fev/2023 – jul/2026); Licenciatura em Letras (Português e Inglês) na Universidade Cruzeiro do Sul (2015 – 2018).',
+  '- Idiomas: português nativo, inglês B1, espanhol A2.',
+  '- Certificações: Scrum Fundamentals Certified (SCRUMstudy, jun/2025); Formação Web Essencial (BIT); Crescendo no Trabalho – JobRise; extensão USP/ESALQ em metodologias ágeis; Trilha de IA com React (Santander Open Academy, em andamento).',
+  '- Intercâmbio: um mês em Dublin (ISI Dublin, jul–ago/2025). Voluntariado: vice-presidente da Associação Pedra Que Canta (2022 – dez/2025), liderou uma equipe voluntária por 3 anos.',
+  '- Publicação: artigo sobre inovação tecnológica e inclusão escolar (Revista Processando o Saber, FATEC PG, 2025).',
+  '- Aberta a vagas de Desenvolvedora Front-end ou Full Stack Júnior. LinkedIn: https://www.linkedin.com/in/beatrizsilvasantos-dev | GitHub: https://github.com/BeatrizS97',
+  '- PROJETOS:',
+  '  * Doe Vida: SPA mobile-first com React, Vite, Tailwind CSS e OpenStreetMap API; acha hemocentros próximos e calcula a distância. Código: https://github.com/BeatrizS97/Projeto-Doe-Vida',
+  '  * Form Generator: app full stack colaborativo (HTML, CSS, JavaScript, PHP, SQL) para criar formulários com lógica condicional. Código: https://github.com/tatcom23/Form-Generator',
+  '  * Portfólio Pessoal: HTML5, SCSS3 e JavaScript puro, sem framework. Online: https://beatrizs97.github.io/Portfolio/',
+  '  * ATSAdapta: React, Vite, Gemini API, pdfkit e docx; reescreve currículos no método STAR, adapta a vagas e checa compatibilidade ATS. Código: https://github.com/BeatrizS97/ATSAdapta',
+  '  * InspireFoto: galeria de paisagens em Vue 3, Vite e SCSS, com favoritos e filtros. Online: https://projeto-inspire-foto.vercel.app/ | Código: https://github.com/BeatrizS97/Projeto-Inspire-Foto',
+  '  * Banco de Trocas de Conhecimento: Node.js, Express, Prisma, PostgreSQL e React, com autenticação JWT. Online: https://projeto-banco-troca-de-conhecimento.vercel.app/ | Código: https://github.com/BeatrizS97/Projeto-Banco-Troca-de-Conhecimento',
+  '  * Cinema de Terror: HTML, SCSS e JavaScript puro (sem framework), com animações, jumpscare e modal; primeiro projeto com SCSS. Código: https://github.com/BeatrizS97/Cinema',
+  '  * Este site (portfólio retrô, estilo Windows XP/Orkut/MSN): React 18, Vite, TypeScript, CSS puro, TanStack Query, funções serverless da Vercel e Supabase (PostgreSQL); o chat usa a Gemini API. Código: https://github.com/BeatrizS97',
+  'Se a pergunta não puder ser respondida com estes fatos ou com a lista de repositórios, diga que não sabe e sugira o LinkedIn ou o GitHub.',
+].join('\n');
 
 // Regras para a IA falar de projetos SOMENTE com base nos dados reais do GitHub (evita alucinação).
 const GROUNDING_RULES: Record<Language, { withData: string; withoutData: string }> = {
   pt: {
     withData:
-      'Para falar dos projetos dela, use SOMENTE a lista de repositórios do GitHub abaixo. ' +
-      'Se algo não estiver na lista, diga que não sabe em vez de inventar. Não invente links, tecnologias nem funcionalidades.',
+      'Para falar dela e dos projetos, use SOMENTE os FATOS e a lista de repositórios do GitHub abaixo. ' +
+      'Se algo não estiver neles, diga que não sabe em vez de inventar. Não invente links, tecnologias nem funcionalidades.',
     withoutData:
-      'A lista de repositórios do GitHub não está disponível agora. Não cite detalhes de projetos específicos; ' +
-      'apenas indique o perfil https://github.com/BeatrizS97.',
+      'A lista de repositórios do GitHub não está disponível agora. Use SOMENTE os FATOS abaixo; ' +
+      'para mais detalhes, indique o perfil https://github.com/BeatrizS97.',
   },
   en: {
     withData:
-      'When talking about her projects, use ONLY the GitHub repository list below. ' +
-      "If something is not on the list, say you don't know instead of making it up. Never invent links, technologies or features.",
+      'When talking about her and her projects, use ONLY the FACTS and the GitHub repository list below. ' +
+      "If something is not in them, say you don't know instead of making it up. Never invent links, technologies or features.",
     withoutData:
-      'The GitHub repository list is not available right now. Do not mention details of specific projects; ' +
-      'just point to the profile https://github.com/BeatrizS97.',
+      'The GitHub repository list is not available right now. Use ONLY the FACTS below; ' +
+      'for more details, point to the profile https://github.com/BeatrizS97.',
   },
   es: {
     withData:
-      'Para hablar de sus proyectos, usa SOLO la lista de repositorios de GitHub de abajo. ' +
-      'Si algo no está en la lista, di que no lo sabes en lugar de inventar. No inventes enlaces, tecnologías ni funcionalidades.',
+      'Para hablar de ella y de sus proyectos, usa SOLO los HECHOS (FATOS) y la lista de repositorios de GitHub de abajo. ' +
+      'Si algo no está en ellos, di que no lo sabes en lugar de inventar. No inventes enlaces, tecnologías ni funcionalidades.',
     withoutData:
-      'La lista de repositorios de GitHub no está disponible ahora. No cites detalles de proyectos específicos; ' +
-      'solo indica el perfil https://github.com/BeatrizS97.',
+      'La lista de repositorios de GitHub no está disponible ahora. Usa SOLO los HECHOS (FATOS) de abajo; ' +
+      'para más detalles, indica el perfil https://github.com/BeatrizS97.',
   },
 };
 
-const MESSAGES: Record<Language, { empty: string; noKey: string; noAnswer: string; error: string }> = {
+const MESSAGES: Record<Language, { empty: string; noKey: string; noAnswer: string; error: string; rateLimit: string }> = {
   pt: {
     empty: 'Mensagem vazia.',
     noKey:
@@ -72,6 +97,7 @@ const MESSAGES: Record<Language, { empty: string; noKey: string; noAnswer: strin
       'servidor). Mas dá uma olhada nos meus projetos no GitHub: https://github.com/BeatrizS97 :)',
     noAnswer: 'Hmm, não consegui pensar em uma resposta agora :/ tenta reformular?',
     error: 'Deu erro por aqui ao falar com a IA :( tenta de novo daqui a pouco.',
+    rateLimit: 'Muitas mensagens ao mesmo tempo :( aguarda um instante e tenta de novo.',
   },
   en: {
     empty: 'Empty message.',
@@ -80,6 +106,7 @@ const MESSAGES: Record<Language, { empty: string; noKey: string; noAnswer: strin
       'server). But check out my projects on GitHub: https://github.com/BeatrizS97 :)',
     noAnswer: "Hmm, I couldn't think of an answer right now :/ try rephrasing?",
     error: 'Something went wrong talking to the AI :( please try again in a bit.',
+    rateLimit: 'Too many messages at once :( wait a moment and try again.',
   },
   es: {
     empty: 'Mensaje vacío.',
@@ -88,6 +115,7 @@ const MESSAGES: Record<Language, { empty: string; noKey: string; noAnswer: strin
       'servidor). Pero échale un vistazo a mis proyectos en GitHub: https://github.com/BeatrizS97 :)',
     noAnswer: 'Hmm, no pude pensar en una respuesta ahora :/ ¿intentas reformular?',
     error: 'Hubo un error al hablar con la IA :( inténtalo de nuevo en un momento.',
+    rateLimit: 'Demasiados mensajes a la vez :( espera un momento e inténtalo de nuevo.',
   },
 };
 
@@ -174,10 +202,11 @@ async function fetchGithubContext(): Promise<string | null> {
 // Monta o prompt final: personalidade + regra anti-alucinação + lista real de repositórios (quando disponível).
 function buildSystemPrompt(lang: Language, githubContext: string | null): string {
   const rules = GROUNDING_RULES[lang];
+  // Os fatos reais entram sempre; a lista de repositórios do GitHub só quando o GitHub respondeu.
   if (!githubContext) {
-    return `${SYSTEM_PROMPTS[lang]} ${rules.withoutData}`;
+    return `${SYSTEM_PROMPTS[lang]} ${rules.withoutData}\n\n${PORTFOLIO_FACTS}`;
   }
-  return `${SYSTEM_PROMPTS[lang]} ${rules.withData}\n\nGITHUB REPOSITORIES (${GITHUB_USER}):\n${githubContext}`;
+  return `${SYSTEM_PROMPTS[lang]} ${rules.withData}\n\n${PORTFOLIO_FACTS}\n\nGITHUB REPOSITORIES (${GITHUB_USER}):\n${githubContext}`;
 }
 
 // Limpa o histórico recebido: só aceita itens no formato { role, text }, guarda os mais recentes e corta textos longos.
@@ -232,7 +261,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!apiKey) {
     // Sem chave configurada — responde com um fallback simpático em vez de quebrar a UI,
     // no mesmo espírito de fallback-para-mock já usado pelos outros services do projeto.
-    return res.status(200).json({ success: true, reply: texts.noKey });
+    // Status 503 (e não 200): assim o front reconhece que a IA está indisponível e usa a base local de respostas.
+    return res.status(503).json({ success: false, reply: texts.noKey });
   }
 
   // Tenta enviar a mensagem para o modelo Gemini e obter uma resposta.
@@ -257,8 +287,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     // Se a resposta do Gemini não for OK, lança um erro com o status retornado.
+    // Limite de requisições do Gemini: devolve 429 de verdade ao front, que mostra "aguarde um instante".
+    if (geminiResponse.status === 429) {
+      console.error(
+        JSON.stringify({ level: 'error', context: 'gemini-chat:rate-limit', message: 'Gemini respondeu 429', timestamp: new Date().toISOString() })
+      );
+      return res.status(429).json({ success: false, reply: texts.rateLimit });
+    }
+
     if (!geminiResponse.ok) {
-      throw new Error(`Gemini respondeu ${geminiResponse.status}`);
+      // Guarda o começo do corpo do erro (ex.: chave inválida, modelo inexistente) para aparecer nos logs da Vercel.
+      const errorBody = await geminiResponse.text().catch(() => '');
+      throw new Error(`Gemini respondeu ${geminiResponse.status}: ${errorBody.slice(0, 300)}`);
     }
 
     // Extrai o texto da resposta do Gemini, ou usa uma mensagem de fallback caso não haja resposta.
@@ -267,6 +307,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({ success: true, reply });
   } catch (error) {
+    // Antes este erro era engolido em silêncio; agora fica registrado (JSON) nos logs da Vercel, como já é feito no contexto do GitHub.
+    console.error(
+      JSON.stringify({
+        level: 'error',
+        context: 'gemini-chat',
+        message: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString(),
+      })
+    );
     return res.status(500).json({ success: false, reply: texts.error });
   }
 }

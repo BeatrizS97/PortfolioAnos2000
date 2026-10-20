@@ -39,8 +39,7 @@ const ProfileDetails: React.FC = () => {
   }, []);
 
   return (
-    <div className="orkut-columns" style={{ gridTemplateColumns: '1fr' }}>
-      <div className="orkut-col-center profile-details">
+    <div className="orkut-col orkut-col-center profile-details">
         <h3 className="welcome-msg">{d.aboutTitle}</h3>
         {profile ? <p>{tc(profile.about_me)}</p> : <div className="loading-spinner">{t.orkut.loading}</div>}
         <p>{d.aboutExtra}</p>
@@ -124,7 +123,6 @@ const ProfileDetails: React.FC = () => {
             10.5281/zenodo.15477654
           </a>
         </p>
-      </div>
     </div>
   );
 };

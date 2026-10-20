@@ -11,6 +11,7 @@ import type { Language } from '../../../types/language';
 import ProfileHeader from './ProfileHeader';
 import type { OrkutTab } from './ProfileHeader';
 import ScrapsList from './ScrapsList';
+import ProfileSidebar from './ProfileSidebar';
 import FriendsGrid from './FriendsGrid';
 import Testimonials from './Testimonials';
 import Communities from './Communities';
@@ -178,6 +179,22 @@ const OrkutProfile: React.FC = () => {
     }
   };
 
+  // Sidebar esquerda reaproveitada nas abas Home, Perfil e Comunidades (só uma delas aparece por vez).
+  const sidebar = (
+    <ProfileSidebar
+      profile={profile}
+      scrapsTotal={scrapsTotal}
+      onTabChange={setActiveTab}
+      onOpenComments={handleOpenComments}
+      onWriteTestimonial={() => setShowTestimonialModal(true)}
+      resumeHref={RESUME_PATHS[language]}
+      resumeLabel={RESUME_TEXT[language].downloading}
+      resumeAriaLabel={RESUME_TEXT[language].ariaLabel}
+      isDownloading={isDownloading}
+      onDownloadResume={handleDownloadResume}
+    />
+  );
+
   return (
     <div className="orkut-profile">
       <ProfileHeader
@@ -188,51 +205,26 @@ const OrkutProfile: React.FC = () => {
         onSearchSubmit={handleSearchSubmit}
       />
 
-      {activeTab === 'perfil' && <ProfileDetails />}
+      {activeTab === 'perfil' && (
+        <div className="orkut-columns orkut-columns--two">
+          {sidebar}
+          <ProfileDetails />
+        </div>
+      )}
 
       {activeTab === 'comunidades' && (
-        <div className="orkut-columns" style={{ gridTemplateColumns: '1fr' }}>
-          <Communities />
+        <div className="orkut-columns orkut-columns--two">
+          {sidebar}
+          <main className="orkut-col orkut-col-center">
+            <Communities variant="full" />
+          </main>
         </div>
       )}
 
       {activeTab === 'home' && (
         <>
           <div className="orkut-columns">
-            <aside className="orkut-col orkut-col-left">
-              <img
-                src={profile?.photo_url ?? '/assets/images/icons/user.png'}
-                alt={profile?.full_name ?? 'Beatriz'}
-                className="profile-photo"
-              />
-              <h2 className="profile-name">{profile?.full_name ?? 'Beatriz Silva Santos'}</h2>
-              <span className="profile-status profile-status--online">{t.orkut.online}</span>
-
-              <ul className="quick-links">
-                <li><button onClick={() => setActiveTab('perfil')}>👤 {t.orkut.quickLinks.fullProfile}</button></li>
-                <li><button onClick={handleOpenComments}>📝 {t.orkut.commentsTitle(scrapsTotal)}</button></li>
-                <li><button onClick={() => setActiveTab('comunidades')}>👥 {t.orkut.tabs.comunidades}</button></li>
-                <li className="quick-link-with-info info-tooltip-wrapper">
-                  <button onClick={() => setShowTestimonialModal(true)}>💌 {t.orkut.quickLinks.writeTestimonial}</button>
-                  <span className="info-icon" aria-hidden="true">ℹ️</span>
-                  <span className="info-tooltip-text" role="tooltip">
-                    {t.orkut.quickLinks.testimonialTooltip}
-                  </span>
-                </li>
-                <li>
-                  <a
-                    className="resume-download-link"
-                    href={RESUME_PATHS[language]}
-                    download
-                    aria-label={RESUME_TEXT[language].ariaLabel}
-                    aria-busy={isDownloading}
-                    onClick={handleDownloadResume}
-                  >
-                    📄 {isDownloading ? RESUME_TEXT[language].downloading : t.orkut.quickLinks.downloadResume}
-                  </a>
-                </li>
-              </ul>
-            </aside>
+            {sidebar}
 
             <main className="orkut-col orkut-col-center">
               <h3 className="welcome-msg">{t.orkut.welcome(firstName)}</h3>
@@ -264,7 +256,7 @@ const OrkutProfile: React.FC = () => {
 
             <aside className="orkut-col orkut-col-right">
               <FriendsGrid />
-              <Communities />
+              <Communities variant="compact" />
             </aside>
           </div>
 

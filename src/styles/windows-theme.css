@@ -4,9 +4,18 @@
   height: 100vh;
   background: url('/assets/images/windows-xp-bg.png') no-repeat center center;
   background-size: cover;
-  background-color: #3a9630; 
+  background-color: #000000; 
   position: relative;
   overflow: hidden;
+}
+
+.fade-in {
+  animation: fade-in 0.3s ease forwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .desktop-icons {
@@ -246,6 +255,9 @@
 }
 
 .start-button {
+  align-self: stretch;
+  box-sizing: border-box;
+  margin: 0;
   background: linear-gradient(to bottom, #6FCF5C 0%, #4CAF3D 45%, #2E8B2A 55%, #3DA35A 100%);
   color: white;
   border: 1px solid #1F6B1F;
@@ -271,7 +283,7 @@
 }
 
 .start-button-icon {
-  height: 45px;
+  height: 40px;
   width: auto;
   display: block;
 }
@@ -650,6 +662,7 @@
    (Minimizar continua funcionando: a janela some depois do mesmo atraso, só sem a animação.) */
 @media (prefers-reduced-motion: reduce) {
   .window--minimizing,
+  .fade-in,
   .boot-progress-block {
     animation: none !important;
   }

@@ -15,8 +15,8 @@
   display: flex;
   gap: 6px;
   padding: 6px 10px;
-  background: linear-gradient(to bottom, #ffffff 0%, #f4f8fe 55%, #EAF1FC 100%);
-  border-bottom: 1px solid #b9cced;
+  background: linear-gradient(to bottom, #D6E9F8 0%, #FFFFFF 100%);
+  border-bottom: 1px solid #B8D4E8;
 }
 
 .msn-classic-toolbar::before {
@@ -39,7 +39,8 @@
   gap: 4px;
   background: none;
   border: none;
-  color: #33475b;
+  color: #333333;
+  font-family: Tahoma, Verdana, sans-serif;
   cursor: not-allowed;
   padding: 3px 6px;
   border: 1px solid transparent;
@@ -47,21 +48,23 @@
 }
 
 .msn-classic-toolbar button:hover {
-  border-color: #a5b9dc;
-  background: linear-gradient(to bottom, #ffffff 0%, #e4ecfb 55%, #d3e0f7 100%);
-  box-shadow: inset 0 1px 0 #ffffff;
+  border-color: #8FB4DA;
+  background: linear-gradient(to bottom, #ffffff 0%, #EAF4FD 50%, #CFE4F7 100%);
+  box-shadow: inset 0 1px 0 #ffffff, 0 1px 3px rgba(60, 110, 170, 0.45);
+  transform: translateY(-1px);
 }
 
 .msn-classic-toolbar button:active {
-  border-color: #7f93b8;
-  background: linear-gradient(to bottom, #d3e0f7 0%, #e4ecfb 100%);
-  box-shadow: inset 1px 1px 2px rgba(60, 90, 140, 0.35);
+  border-color: #6E93BC;
+  background: linear-gradient(to bottom, #CFE4F7 0%, #EAF4FD 100%);
+  box-shadow: inset 1px 1px 3px rgba(40, 80, 130, 0.45);
+  transform: translateY(0);
 }
 
 .msn-classic-toolbar button span {
   font-size: 11px;
   font-weight: normal;
-  color: #1a1a1a;
+  color: #333333;
 }
 
 .msn-classic-body {
@@ -150,7 +153,7 @@
   font-size: 11px;
   color: #333;
   border-bottom: 1px solid #e3e9f5;
-  background: #ffffff;
+  background: #F0F6FC;
 }
 
 .msn-to-line strong {
@@ -162,7 +165,9 @@
   flex: 1;
   overflow-y: auto;
   padding: 10px;
+  font-family: Verdana, Tahoma, sans-serif;
   font-size: 11px;
+  background: #FFFFFF;
 }
 
 .msn-tip {
@@ -211,7 +216,7 @@
   padding: 7px 10px;
   border-top: 1px solid #eee;
   flex-wrap: wrap;
-  background: #f6f8fd;
+  background: #F7FBFF;
 }
 
 .msn-toolbar-row button {
@@ -235,7 +240,8 @@
 
 .msn-toolbar-row button:hover {
   background: linear-gradient(to bottom, #ffffff 0%, #eaf2ff 50%, #cfe1fb 100%);
-  box-shadow: inset 0 1px 0 #ffffff, 0 0 3px rgba(108, 180, 238, 0.9);
+  box-shadow: inset 0 1px 0 #ffffff, 0 1px 4px rgba(108, 180, 238, 0.95);
+  transform: translateY(-1px);
 }
 
 .msn-toolbar-row button:active {
@@ -245,6 +251,7 @@
   border-bottom-color: #ffffff;
   background: linear-gradient(to bottom, #cfe1fb 0%, #eaf2ff 100%);
   box-shadow: inset 1px 1px 3px rgba(60, 90, 140, 0.4);
+  transform: translateY(0);
 }
 
 .msn-toolbar-divider {
@@ -267,7 +274,7 @@
   flex: 1;
   flex-direction: column;
   border-top: 1px solid #ddd;
-  background: #fafbff;
+  background: #F7FBFF;
 }
 
 .msn-compose-toolbar {
@@ -297,6 +304,12 @@
 .msn-compose-tool strong {
   color: #1a3c6e;
   font-size: 12px;
+}
+
+.msn-compose-tool-label {
+  font-family: Tahoma, Verdana, sans-serif;
+  font-size: 11px;
+  color: #333333;
 }
 
 .msn-compose-tool-caret {
@@ -355,40 +368,54 @@
 .msn-status-bar {
   margin-top: auto;
   padding: 4px 10px;
-  font-size: 11px;
-  color: #666666;
-  background: #f6f6f6;
+  font-family: Tahoma, Verdana, sans-serif;
+  font-size: 10px;
+  color: #999999;
+  background: #F0F0F0;
   border-top: 1px solid #e2e2e2;
 }
 
+/* Toast "janelinha subindo" do Windows Live Messenger 8.0 (imagens 8 e 9): ~280px, degradê azul claro→branco. */
 .wlm-toast {
   position: fixed;
-  bottom: 42px;
+  bottom: 43px;
   right: 16px;
-  width: 300px;
-  background: #ffffff;
-  border: 1px solid #7f9db9;
-  border-radius: 4px;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.35);
+  width: 280px;
+  box-sizing: border-box;
+  background: linear-gradient(to bottom, #E8F5FD 0%, #FFFFFF 100%);
+  border: 1px solid #E0E0E0;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   overflow: hidden;
-  z-index: 10001;
+  /* Fica logo abaixo da taskbar (z-index 9999): na animação a janelinha sobe de trás da barra. */
+  z-index: 9998;
   font-family: Tahoma, sans-serif;
+  animation: wlm-toast-slide-up 0.3s ease-out;
+}
+
+@keyframes wlm-toast-slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wlm-toast {
+    animation: none;
+  }
 }
 
 .wlm-toast-header {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(to bottom, #fefefe 0%, #cfe3f7 45%, #a9cdf0 100%);
-  border-bottom: 1px solid #7f9db9;
-  padding: 4px 6px 4px 8px;
+  padding: 6px 6px 0 10px;
   font-size: 11px;
-  color: #1a3c6e;
+  color: #333333;
 }
 
 .wlm-toast-header span:nth-child(2) {
   flex: 1;
-  font-weight: bold;
+  font-weight: normal;
 }
 
 .wlm-toast-app-icon {
@@ -396,20 +423,30 @@
   align-items: center;
 }
 
+/* Botão fechar discreto: sem fundo até o hover (vermelho claro). */
 .wlm-toast-header button {
+  width: 18px;
+  height: 18px;
+  padding: 0;
   background: none;
   border: none;
+  border-radius: 3px;
   cursor: pointer;
   font-size: 13px;
-  color: #445;
+  color: #666666;
   line-height: 1;
+}
+
+.wlm-toast-header button:hover {
+  background: #F4C7C3;
+  color: #7A1F1A;
 }
 
 .wlm-toast-body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px;
+  padding: 8px 10px;
   background: none;
   border: none;
   width: 100%;
@@ -417,11 +454,13 @@
   cursor: pointer;
 }
 
+/* Avatar 48x48 com cantos arredondados e moldura branca/azul, dando o relevo do WLM. */
 .wlm-toast-body img {
-  width: 64px;
-  height: 64px;
-  border-radius: 2px;
-  border: 1px solid #a9bcd6;
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 3px #A9BCD6, 0 1px 3px rgba(0, 0, 0, 0.25);
+  margin: 3px;
   flex-shrink: 0;
   background: #f3f6fb;
   object-fit: cover;
@@ -432,23 +471,44 @@
   display: flex;
   flex-direction: column;
   font-size: 11px;
-  color: #333;
+  color: #666666;
   line-height: 1.4;
 }
 
 .wlm-toast-text strong {
-  font-size: 12.5px;
-  color: #1a3c6e;
+  font-size: 11px;
+  font-weight: bold;
+  color: #003399;
 }
 
 .wlm-toast-footer {
-  padding: 4px 10px 8px;
+  padding: 0 8px 8px 10px;
   text-align: right;
-  border-top: 1px solid #eef2fa;
 }
 
 .wlm-toast-footer span {
   font-size: 10px;
-  color: #1a5da0;
-  cursor: default;
+  color: #0066CC;
+  cursor: pointer;
+}
+
+.wlm-toast-footer span:hover {
+  text-decoration: underline;
+}
+
+.msn-card--compose {
+  background: #F7FBFF;
+}
+
+/* Avatar do contato 96x96 (em cima) e do usuário menor, 48x48 + moldura (embaixo), como no MSN 7.x. */
+.msn-row--bottom .msn-card--avatar {
+  width: 56px;
+  height: 56px;
+}
+
+/* Botão Enviar focado: borda azul, como os botões do XP. */
+.msn-compose-row button:focus-visible {
+  border-color: #2B5EA7;
+  outline: none;
+  box-shadow: inset 0 0 0 1px #9CC0EB;
 }

@@ -4,87 +4,121 @@
   height: 100%;
   overflow-y: auto;
   font-family: Verdana, Tahoma, sans-serif;
+  font-size: 11px;
 }
 
+/* Links do Orkut 2008: azul #3366CC, sem sublinhado; só sublinham ao passar o mouse. */
+.orkut-profile a {
+  color: #3366CC;
+  text-decoration: none;
+}
+
+.orkut-profile a:hover {
+  text-decoration: underline;
+}
+
+/* Cabeçalho azul sólido, como na barra do Orkut 2008. */
+/* Atualização: agora segue a barra do Orkut 2004-2006 (imagem 3): degradê azul sutil e menu só de texto branco. */
 .orkut-topbar {
-  background: white;
-  border-bottom: 2px solid var(--orkut-blue);
+  background: linear-gradient(to bottom, #5C9ACE 0%, #4A8BC2 100%);
+  border-bottom: 1px solid #3F7AB3;
 }
 
 .orkut-topbar-row {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 6px 12px;
+  padding: 4px 12px;
   flex-wrap: nowrap;
   overflow-x: auto;
 }
 
+/* Logo textual no canto esquerdo, sobre uma aba branca→cinza claro (como o logo da barra original). */
 .orkut-logo {
-  font-family: 'Comic Sans MS', 'Trebuchet MS', cursive;
+  font-family: 'Trebuchet MS', Verdana, sans-serif;
   font-weight: bold;
-  font-size: 18px;
-  color: var(--orkut-pink);
-  letter-spacing: -0.5px;
+  font-size: 20px;
+  line-height: 1;
+  color: #E0107F;
+  letter-spacing: -1px;
   flex-shrink: 0;
+  background: linear-gradient(to bottom, #ffffff 0%, #E6ECF4 100%);
+  border-radius: 3px 3px 0 0;
+  padding: 3px 10px 2px;
 }
 
 .orkut-tabs {
   display: flex;
-  gap: 4px;
+  gap: 14px;
   flex-shrink: 0;
 }
 
+/* Menu: links de texto simples (Verdana 11px, branco), sem fundo de botão. */
 .orkut-tab {
-  background: var(--orkut-blue-light);
-  border: 1px solid var(--orkut-blue);
-  color: var(--orkut-link);
-  border-radius: 12px;
-  padding: 3px 12px;
+  background: none;
+  border: none;
+  padding: 0;
+  color: #FFFFFF;
+  font-family: Verdana, Tahoma, sans-serif;
   font-size: 11px;
-  font-weight: bold;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .orkut-tab:hover {
-  background: #C4E0FB;
+  color: #FFFFCC;
+  text-decoration: underline;
 }
 
+/* Só o negrito indica em qual página você está. */
 .orkut-tab--active {
-  background: var(--orkut-blue);
-  color: white;
+  font-weight: bold;
 }
 
+/* Busca à direita, centralizada na vertical dentro da barra. */
 .orkut-search {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 2px;
   margin-left: auto;
   flex-shrink: 0;
 }
 
 .orkut-search input {
-  border: 1px solid var(--orkut-blue);
-  border-radius: 3px;
-  padding: 3px 8px;
+  border: 1px solid #3F7AB3;
+  border-radius: 2px;
+  background: #ffffff;
+  padding: 3px 6px;
   font-size: 11px;
   width: 140px;
 }
 
 .orkut-search button {
-  background: var(--orkut-blue);
-  border: none;
-  border-radius: 3px;
-  padding: 3px 8px;
+  background: linear-gradient(to bottom, #9DB9D8 0%, #6E93BE 100%);
+  border: 1px solid #3F6EA3;
+  border-radius: 2px;
+  padding: 2px 8px;
   cursor: pointer;
+}
+
+/* Remove a faixa bege de 2px que a janela (.window-body) desenha em volta do Orkut e aparecia como um vão branco ao lado do cabeçalho. */
+.window-body:has(> .orkut-profile) {
+  border: none;
 }
 
 .orkut-columns {
   display: grid;
-  grid-template-columns: 200px 1fr 200px;
-  gap: 14px;
-  padding: 14px;
+  grid-template-columns: 180px 1fr 200px;
+  gap: 16px;
+  padding: 12px 8px;
   align-items: start;
+  max-width: 1020px;
+  margin: 0 auto;
+}
+
+/* Páginas Perfil e Comunidades: só a sidebar esquerda + o conteúdo (sem coluna da direita). */
+.orkut-columns--two {
+  grid-template-columns: 180px 1fr;
 }
 
 .orkut-col {
@@ -97,8 +131,8 @@
   align-items: center;
   gap: 8px;
   background: white;
-  border: 1px solid var(--orkut-border);
-  border-radius: 4px;
+  border: 1px solid #D4D4D4;
+  border-radius: 3px;
   padding: 12px;
 }
 
@@ -139,8 +173,9 @@
 .quick-links button {
   background: none;
   border: none;
-  color: var(--orkut-link);
+  color: #3366CC;
   cursor: pointer;
+  font-family: Verdana, Tahoma, sans-serif;
   font-size: 11px;
   padding: 0;
   text-align: left;
@@ -151,7 +186,7 @@
 }
 
 .resume-download-link {
-  color: var(--orkut-link);
+  color: #3366CC;
   font-size: 11px;
   text-decoration: none;
   cursor: pointer;
@@ -206,9 +241,9 @@
 
 .orkut-col-center {
   background: white;
-  border: 1px solid var(--orkut-border);
-  border-radius: 4px;
-  padding: 16px;
+  border: 1px solid #D4D4D4;
+  border-radius: 3px;
+  padding: 12px;
 }
 
 .welcome-msg {
@@ -228,17 +263,17 @@
   flex-wrap: wrap;
   gap: 12px;
   background: #F5F9FF;
-  border: 1px solid var(--orkut-border);
-  border-radius: 4px;
+  border: 1px solid #D4D4D4;
+  border-radius: 3px;
   padding: 8px 12px;
   font-size: 11px;
   margin-bottom: 14px;
 }
 
 .lucky-message {
-  background: #FFF3D6;
-  border: 1px dashed #E0B84A;
-  border-radius: 4px;
+  background: #FFF9E6;
+  border: 1px dashed #FF9933;
+  border-radius: 3px;
   padding: 8px 12px;
   margin-bottom: 16px;
 }
@@ -259,36 +294,39 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  border-bottom: 1px solid #ffd1a8;
+  border-bottom: 1px solid #D4D4D4;
   padding-bottom: 4px;
   margin-bottom: 8px;
 }
 
+/* Títulos de seção: Tahoma 11px negrito, escuros, como "amigos" e "comunidades" no Orkut 2008. */
 .orkut-col-center h4,
 .orkut-col-right h4 {
-  color: var(--orkut-orange);
-  font-size: 13px;
+  color: #333333;
+  font-family: Tahoma, Verdana, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
   margin: 0;
 }
 
 .see-all-link {
   font-size: 10px;
-  color: var(--orkut-link);
+  color: #3366CC;
   text-decoration: none;
 }
 
 .orkut-col-right {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .friends-section,
 .communities-section {
   background: white;
-  border: 1px solid var(--orkut-border);
-  border-radius: 4px;
-  padding: 10px;
+  border: 1px solid #D4D4D4;
+  border-radius: 3px;
+  padding: 12px;
 }
 
 .friends-grid {
@@ -313,40 +351,46 @@
   border: 1px solid #ddd;
 }
 
-.communities-section {
-  border-radius: 6px;
-}
-
 .communities-section .section-heading {
-  border-bottom: 1px solid var(--orkut-border);
+  border-bottom: 1px solid #D4D4D4;
 }
 
 .communities-section h3 {
   margin: 0;
-  font-size: 13px;
-  font-weight: normal;
-  color: var(--orkut-link);
+  font-family: Tahoma, Verdana, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  color: #333333;
 }
 
 .communities-list {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+
+/* Sidebar direita: lista vertical (miniatura 32x32 + nome + membros). */
+.communities-list--compact {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Aba Comunidades: cartões lado a lado, com miniatura 48x48, descrição e categoria. */
+.communities-list--full {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
 }
 
 .community-item {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 6px 4px;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px;
   background: #F2F6FB;
-  border: 1px solid var(--orkut-border);
-  border-radius: 4px;
-  text-align: center;
+  border: 1px solid #D4D4D4;
+  border-radius: 3px;
 }
 
 .community-item:hover {
@@ -354,13 +398,34 @@
   border-color: var(--orkut-blue);
 }
 
+.communities-list--compact .community-item {
+  align-items: center;
+  padding: 4px 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dotted #D4D4D4;
+  border-radius: 0;
+}
+
+.communities-list--compact .community-item:hover {
+  background: #E8EFF7;
+}
+
+/* Miniatura de pixel art (grade 16x16): 32px = 2px por pixel, 48px = 3px por pixel, sempre nítido. */
 .community-thumb {
   display: block;
-  width: 64px;
-  height: 64px;
+  flex-shrink: 0;
+  box-sizing: content-box;
+  width: 32px;
+  height: 32px;
   background: #ffffff;
   border: 1px solid #B8C6D9;
   image-rendering: pixelated;
+}
+
+.communities-list--full .community-thumb {
+  width: 48px;
+  height: 48px;
 }
 
 .community-thumb svg {
@@ -369,37 +434,60 @@
   height: 100%;
 }
 
+.community-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .community-name {
-  font-size: 10px;
-  color: var(--orkut-link);
+  font-size: 11px;
+  color: #3366CC;
   line-height: 1.25;
 }
 
+.community-item:hover .community-name {
+  text-decoration: underline;
+}
+
 .community-members {
-  font-size: 9px;
+  font-size: 10px;
+  color: #888;
+}
+
+.community-description {
+  font-size: 11px;
+  color: #444;
+  line-height: 1.4;
+}
+
+.community-category {
+  font-size: 10px;
   color: #888;
 }
 
 .scraps-section {
   display: grid;
-  grid-template-columns: 200px 1fr 200px;
-  gap: 14px;
-  padding: 0 14px 14px;
-  margin: 0;
+  grid-template-columns: 180px 1fr 200px;
+  gap: 16px;
+  padding: 0 8px 12px;
+  margin: 0 auto;
+  max-width: 1020px;
 }
 
 .scraps-section-inner {
   grid-column: 2;
   background: #FFFDE7;
   border-top: 2px solid #FFD700;
-  border-radius: 4px;
-  padding: 14px;
+  border-radius: 3px;
+  padding: 12px;
 }
 
 .scraps-admin-toggle {
   background: none;
   border: none;
-  color: var(--orkut-link);
+  color: #3366CC;
   font-size: 10px;
   cursor: pointer;
   padding: 0;
@@ -534,14 +622,14 @@
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 12px;
+  gap: 16px;
 }
 
 .project-card {
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid #D4D4D4;
+  border-radius: 3px;
   overflow: hidden;
-  background: #fafafa;
+  background: #ffffff;
 }
 
 .project-card img {
@@ -552,13 +640,15 @@
 }
 
 .project-card-body {
-  padding: 8px;
+  padding: 12px;
 }
 
 /* Seletor com 2 classes (mais específico que ".orkut-col-center h4"), então vence naturalmente, sem precisar de !important. */
 .project-card .project-card-body h4 {
   margin: 0 0 4px;
-  font-size: 12px;
+  font-family: Tahoma, Verdana, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
   color: #333;
 }
 
@@ -585,9 +675,25 @@
   border-radius: 8px;
 }
 
+/* Pills coloridas: as tags se alternam em laranja, azul, verde e rosa. */
+.tech-stack li:nth-child(4n + 2) {
+  background: #DCEBFB;
+  color: #1a5da0;
+}
+
+.tech-stack li:nth-child(4n + 3) {
+  background: #DDF3DD;
+  color: #2E6B2A;
+}
+
+.tech-stack li:nth-child(4n + 4) {
+  background: #F9DDEE;
+  color: #9c1362;
+}
+
 .project-links a {
   font-size: 10px;
-  color: var(--xp-blue-primary);
+  color: #3366CC;
   margin-right: 8px;
 }
 
@@ -797,7 +903,8 @@
 }
 
 @media (max-width: 800px) {
-  .orkut-columns {
+  .orkut-columns,
+  .orkut-columns--two {
     grid-template-columns: 1fr;
   }
   .scraps-section {

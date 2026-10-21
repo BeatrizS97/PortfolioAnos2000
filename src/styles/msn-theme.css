@@ -14,7 +14,10 @@
   overflow: hidden;
   display: flex;
   gap: 6px;
-  padding: 6px 10px;
+  align-items: center;
+  box-sizing: border-box;
+  height: 52px;
+  padding: 3px 8px;
   background: linear-gradient(to bottom, #D6E9F8 0%, #FFFFFF 100%);
   border-bottom: 1px solid #B8D4E8;
 }
@@ -36,13 +39,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   background: none;
   border: none;
   color: #333333;
   font-family: Tahoma, Verdana, sans-serif;
   cursor: not-allowed;
-  padding: 3px 6px;
+  padding: 2px 6px;
   border: 1px solid transparent;
   border-radius: 3px;
 }
@@ -61,6 +64,23 @@
   transform: translateY(0);
 }
 
+.msn-classic-toolbar button svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Separador vertical sutil entre os grupos de ícones (Convidar/Enviar | Webcam/Áudio | Atividades/Jogos). */
+.msn-classic-toolbar button:nth-child(odd):not(:first-child)::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: #B8D4E8;
+  box-shadow: 1px 0 0 #ffffff;
+}
+
 .msn-classic-toolbar button span {
   font-size: 11px;
   font-weight: normal;
@@ -72,14 +92,14 @@
   display: flex;
   min-height: 0;
   background: linear-gradient(to bottom, #EAF1FC 0%, #d5e3f8 70%, #c9dbf5 100%);
-  padding: 10px;
+  padding: 8px;
 }
 
 .msn-classic-chat {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -88,14 +108,13 @@
   min-height: 0;
   display: flex;
   align-items: stretch;
-  gap: 10px;
+  gap: 8px;
 }
 
 .msn-card {
   background: #ffffff;
-  border: 1px solid #9fb4d6;
+  border: 1px solid #AABAC9;
   border-radius: 4px;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
   overflow: hidden;
 }
 
@@ -130,6 +149,12 @@
   object-fit: cover;
   border-radius: 2px;
   display: block;
+  image-rendering: auto;
+}
+
+/* A foto do contato (em cima) é cortada pelo topo, para não cortar o rosto. */
+.msn-row--top .msn-card--avatar img {
+  object-position: center top;
 }
 
 .msn-card--avatar::after {
@@ -149,25 +174,68 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 7px 10px;
+  padding: 4px 8px;
+  font-family: Tahoma, Verdana, sans-serif;
   font-size: 11px;
+  font-weight: bold;
   color: #333;
-  border-bottom: 1px solid #e3e9f5;
+  border-bottom: 1px solid #D4D4D4;
   background: #F0F6FC;
 }
 
 .msn-to-line strong {
-  font-weight: normal;
-  color: #555;
+  font-weight: bold;
+  color: #333;
 }
 
 .msn-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 10px;
-  font-family: Verdana, Tahoma, sans-serif;
+  padding: 6px 8px;
+  font-family: Tahoma, Verdana, sans-serif;
   font-size: 11px;
   background: #FFFFFF;
+  /* A janela (.window-body) define scrollbar-color e isso é herdado; "auto" libera o estilo ::-webkit-scrollbar abaixo. */
+  scrollbar-color: auto;
+}
+
+/* Scrollbar estilo Windows XP: trilho #F0F0F0, thumb #C1C1C1 e setas azuis. */
+.msn-messages::-webkit-scrollbar {
+  width: 17px;
+}
+
+.msn-messages::-webkit-scrollbar-track {
+  background: #F0F0F0;
+}
+
+.msn-messages::-webkit-scrollbar-thumb {
+  background: #C1C1C1;
+  border: 1px solid #A0A0A0;
+  border-radius: 2px;
+}
+
+.msn-messages::-webkit-scrollbar-button:single-button {
+  display: block;
+  width: 17px;
+  height: 17px;
+  background-color: #F0F0F0;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.msn-messages::-webkit-scrollbar-button:single-button:vertical:start {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='17' height='17'><path d='M4 11l4.5-5 4.5 5z' fill='%233A6EA5'/></svg>");
+}
+
+.msn-messages::-webkit-scrollbar-button:single-button:vertical:end {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='17' height='17'><path d='M4 6l4.5 5 4.5-5z' fill='%233A6EA5'/></svg>");
+}
+
+/* Firefox não entende ::-webkit-scrollbar: usa as cores equivalentes. */
+@supports not selector(::-webkit-scrollbar) {
+  .msn-messages {
+    scrollbar-color: #C1C1C1 #F0F0F0;
+  }
 }
 
 .msn-tip {
@@ -176,13 +244,13 @@
   gap: 5px;
   color: #666;
   font-size: 11px;
-  margin: 0 0 10px;
-  padding-bottom: 8px;
+  margin: 0 0 6px;
+  padding-bottom: 6px;
   border-bottom: 1px solid #e6e6e6;
 }
 
 .msn-message {
-  margin: 0 0 10px;
+  margin: 0 0 6px;
   line-height: 1.4;
 }
 
@@ -213,7 +281,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 10px;
+  padding: 5px 8px;
   border-top: 1px solid #eee;
   flex-wrap: wrap;
   background: #F7FBFF;
@@ -280,8 +348,9 @@
 .msn-compose-toolbar {
   display: flex;
   gap: 10px;
-  padding: 6px 10px;
-  border-bottom: 1px solid #eee;
+  padding: 4px 8px;
+  background: #F0F5FA;
+  border-bottom: 1px solid #DCE6F2;
   font-size: 10.5px;
   color: #333;
 }
@@ -319,32 +388,38 @@
 
 .msn-compose-row {
   display: flex;
-  gap: 8px;
-  padding: 8px;
+  gap: 6px;
+  padding: 6px;
 }
 
-.msn-compose-row input {
+/* Área de digitação com 2 linhas, borda azul-acinzentada do XP (#7F9DB9). */
+.msn-compose-row textarea {
   flex: 1;
-  border-top: 1px solid #6b7fa3;
-  border-left: 1px solid #6b7fa3;
-  border-right: 1px solid #ffffff;
-  border-bottom: 1px solid #ffffff;
-  outline: 1px solid #9fb3d6;
-  outline-offset: -2px;
+  height: 52px;
+  resize: none;
+  border: 1px solid #7F9DB9;
   border-radius: 0;
-  padding: 8px;
-  font-family: inherit;
+  padding: 4px 6px;
+  font-family: Tahoma, Verdana, sans-serif;
   font-size: 11px;
   background: #ffffff;
-  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Send em cima e Search embaixo, lado direito do texto (como no MSN 7.x). */
+.msn-compose-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .msn-compose-row button {
-  background: linear-gradient(to bottom, #ffffff 0%, #f2f2f2 55%, #dcdcdc 100%);
+  background: linear-gradient(to bottom, #F0F0F0 0%, #D4D0C8 100%);
   color: #222;
-  border: 1px solid #7b8aa6;
-  border-radius: 3px;
-  padding: 8px 20px;
+  border: 1px solid #ACA899;
+  border-radius: 2px;
+  padding: 4px 14px;
+  min-width: 70px;
+  font-family: Tahoma, Verdana, sans-serif;
   font-size: 11px;
   font-weight: normal;
   cursor: pointer;
@@ -421,6 +496,13 @@
 .wlm-toast-app-icon {
   display: flex;
   align-items: center;
+}
+
+.wlm-toast-app-icon img {
+  display: block;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
 }
 
 /* Botão fechar discreto: sem fundo até o hover (vermelho claro). */
@@ -508,7 +590,7 @@
 
 /* Botão Enviar focado: borda azul, como os botões do XP. */
 .msn-compose-row button:focus-visible {
-  border-color: #2B5EA7;
+  border-color: #003C74;
   outline: none;
   box-shadow: inset 0 0 0 1px #9CC0EB;
 }

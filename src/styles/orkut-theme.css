@@ -27,30 +27,28 @@
 .orkut-topbar-row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 4px 12px;
+  justify-content: space-between;
+  padding: 4px 8px;
   flex-wrap: nowrap;
   overflow-x: auto;
+  max-width: 980px;
+  margin: 0 auto;
 }
 
-/* Logo textual no canto esquerdo, sobre uma aba branca→cinza claro (como o logo da barra original). */
+/* Logo oficial (imagem): altura fixa e largura automática, para manter a proporção. */
 .orkut-logo {
-  font-family: 'Trebuchet MS', Verdana, sans-serif;
-  font-weight: bold;
-  font-size: 20px;
-  line-height: 1;
-  color: #E0107F;
-  letter-spacing: -1px;
+  display: block;
+  height: 26px;
+  width: auto;
   flex-shrink: 0;
-  background: linear-gradient(to bottom, #ffffff 0%, #E6ECF4 100%);
-  border-radius: 3px 3px 0 0;
-  padding: 3px 10px 2px;
+  border-radius: 4px;
 }
 
 .orkut-tabs {
   display: flex;
   gap: 14px;
   flex-shrink: 0;
+  margin-left: 15px;
 }
 
 /* Menu: links de texto simples (Verdana 11px, branco), sem fundo de botão. */
@@ -112,7 +110,7 @@
   gap: 16px;
   padding: 12px 8px;
   align-items: start;
-  max-width: 1020px;
+  max-width: 980px;
   margin: 0 auto;
 }
 
@@ -473,7 +471,7 @@
   gap: 16px;
   padding: 0 8px 12px;
   margin: 0 auto;
-  max-width: 1020px;
+  max-width: 980px;
 }
 
 .scraps-section-inner {

@@ -26,7 +26,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   return (
     <div className="orkut-topbar">
       <div className="orkut-topbar-row">
-        <span className="orkut-logo">orkut</span>
+        <img src="/assets/images/orkut.png" alt="Orkut" className="orkut-logo" />
 
         <nav className="orkut-tabs">
           {TAB_IDS.map((id) => (
@@ -61,4 +61,4 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 };
 
 export default ProfileHeader;
-export type { OrkutTab }; 
+export type { OrkutTab };

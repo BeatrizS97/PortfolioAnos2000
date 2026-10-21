@@ -2,7 +2,6 @@
 import React, { useEffect } from 'react';
 import { shakeScreen } from '../../../utils/animations';
 import { useLanguage } from '../../../hooks/useLanguage';
-import { MessengerAppIcon } from './MSNIcons';
 
 // Componente que representa o popup de notificação do MSN Messenger, exibido quando um contato envia uma mensagem.
 interface NotificationPopupProps {
@@ -23,7 +22,9 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ contactName, onOp
   return (
     <div className="wlm-toast" role="alert">
       <div className="wlm-toast-header">
-        <span className="wlm-toast-app-icon" aria-hidden="true"><MessengerAppIcon size={16} /></span>
+        <span className="wlm-toast-app-icon" aria-hidden="true">
+          <img src="/assets/images/msn-icon.png" alt="MSN Icon" width={16} height={16} />
+        </span>
         <span>Windows Live Messenger</span>
         <button aria-label={t.msn.notification.close} onClick={onDismiss}>×</button>
       </div>

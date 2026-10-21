@@ -181,6 +181,7 @@ const pt = {
     tools: { font: 'Fonte', emoticons: 'Emoticons', voiceClip: 'Voice Clip', winks: 'Winks', backgrounds: 'Planos de fundo' },
     inputPlaceholder: 'Digite uma pergunta...',
     send: 'Enviar',
+    search: 'Pesquisar',
     lastMessage: (dateText: string, timeText: string) =>
       `Última mensagem recebida em ${dateText} às ${timeText}.`,
     errors: { network: 'Erro de conexão 📡 Verifique sua conexão e tente de novo.', rateLimit: 'Muitas mensagens ⏳ Aguarde um instante e tente de novo.' },
@@ -391,6 +392,7 @@ const en: Translations = {
     tools: { font: 'Font', emoticons: 'Emoticons', voiceClip: 'Voice Clip', winks: 'Winks', backgrounds: 'Backgrounds' },
     inputPlaceholder: 'Type a question...',
     send: 'Send',
+    search: 'Search',
     lastMessage: (dateText: string, timeText: string) =>
       `Last message received on ${dateText} at ${timeText}.`,
     errors: { network: 'Connection error 📡 Check your connection and try again.', rateLimit: 'Too many messages ⏳ Wait a moment and try again.' },
@@ -599,6 +601,7 @@ const es: Translations = {
     tools: { font: 'Fuente', emoticons: 'Emoticonos', voiceClip: 'Clip de voz', winks: 'Guiños', backgrounds: 'Fondos' },
     inputPlaceholder: 'Escribe una pregunta...',
     send: 'Enviar',
+    search: 'Buscar',
     lastMessage: (dateText: string, timeText: string) =>
       `Último mensaje recibido el ${dateText} a las ${timeText}.`,
     errors: { network: 'Error de conexión 📡 Verifica tu conexión e inténtalo de nuevo.', rateLimit: 'Demasiados mensajes ⏳ Espera un momento e inténtalo de nuevo.' },

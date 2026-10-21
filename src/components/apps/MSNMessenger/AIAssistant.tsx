@@ -98,6 +98,8 @@ const AIAssistant: React.FC = () => {
     setMessages((prev) => limitHistory([...prev, { from: 'user', text: question }]));
     setDraft('');
 
+    // A IA responde primeiro (ela conhece os dados pelo prompt do servidor), então perguntas livres como
+    // "quais frameworks ela usa no Cinema de Terror?" são respondidas de verdade, e não por uma palavra-chave.
     setIsTyping(true);
     let answer: string;
     try {
@@ -116,6 +118,14 @@ const AIAssistant: React.FC = () => {
 
     setMessages((prev) => limitHistory([...prev, { from: 'bot', text: answer }]));
     setLastMessageAt(new Date());
+  };
+
+  // No campo de texto de 2 linhas, Enter envia a mensagem (como antes) e Shift+Enter quebra a linha.
+  const handleDraftKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      e.currentTarget.form?.requestSubmit();
+    }
   };
 
   // Função que lida com o clique no botão "Ver Projetos". Ela verifica se a janela do Orkut já está aberta; se estiver, foca nela, caso contrário, abre uma nova janela do Orkut.
@@ -177,7 +187,7 @@ const AIAssistant: React.FC = () => {
         </div>
 
         <div className="msn-card msn-card--avatar">
-          <img src="/assets/images/icons/user.png" alt={t.msn.contactName} />
+          <img src="/assets/images/icons/user.png" alt={t.msn.contactName} loading="eager" />
         </div>
       </div>
 
@@ -213,13 +223,17 @@ const AIAssistant: React.FC = () => {
             </div>
 
             <form className="msn-compose-row" onSubmit={handleSend}>
-              <input
-                type="text"
+              <textarea
+                rows={2}
                 placeholder={t.msn.inputPlaceholder}
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={handleDraftKeyDown}
               />
-              <button type="submit" disabled={isTyping}>{t.msn.send}</button>
+              <div className="msn-compose-buttons">
+                <button type="submit" disabled={isTyping}>{t.msn.send}</button>
+                <button type="button" disabled title={t.msn.toolbar.comingSoon}>{t.msn.search}</button>
+              </div>
             </form>
 
             <div className="msn-status-bar">
@@ -229,7 +243,7 @@ const AIAssistant: React.FC = () => {
         </div>
 
         <div className="msn-card msn-card--avatar">
-          <img src="/assets/images/icons/user-placeholder.png" alt={t.msn.you} />
+          <img src="/assets/images/icons/user-placeholder.png" alt={t.msn.you} loading="eager" />
         </div>
       </div>
     </div>

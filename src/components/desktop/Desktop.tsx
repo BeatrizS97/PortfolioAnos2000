@@ -77,6 +77,17 @@ const DesktopInner: React.FC = () => {
     isIconPositions
   );
 
+  // Guarda o tamanho da janela do navegador só para o Desktop re-renderizar quando ele muda.
+  // O clampPosition lê window.innerWidth/innerHeight durante o render, então, sem isto, os ícones só voltavam para dentro da tela
+  // no próximo render (ex.: clicar num ícone). A posição salva no localStorage não é alterada, só a exibida.
+  const [, setViewportSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+  useEffect(() => {
+    const handleResize = () => setViewportSize({ width: window.innerWidth, height: window.innerHeight });
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Calculados fora do efeito: ele só roda quando o Orkut ou o MSN abrem/fecham, e não a cada foco ou arraste de janela.
   // (Antes dependia de "windows": qualquer clique dentro do Orkut nos 3 primeiros segundos cancelava o timer e a notificação nunca aparecia.)
   const orkutOpen = windows.some((w) => w.type === 'orkut');

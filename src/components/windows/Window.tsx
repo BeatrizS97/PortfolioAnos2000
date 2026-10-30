@@ -4,10 +4,16 @@ import type { AppWindow } from '../../types/window';
 import WindowHeader from './WindowHeader';
 import WindowContent from './WindowContent';
 import { clampWindowPosition, saveWindowGeometry } from '../../utils/windowGeometry';
+import { DEFAULT_WINDOW_SIZE, TASKBAR_HEIGHT_PX } from '../../utils/constants';
 
 // Elementos que podem receber foco do teclado dentro da janela.
 const FOCUSABLE_SELECTOR =
   'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+// Ícone pequeno à esquerda do título, por tipo de janela (por enquanto só o MSN tem).
+const WINDOW_ICONS: Partial<Record<AppWindow['type'], string>> = {
+  msn: '/assets/images/msn-icon.png',
+};
 
 interface WindowProps {
   win: AppWindow;
@@ -18,7 +24,15 @@ interface WindowProps {
 }
 
 const Window: React.FC<WindowProps> = ({ win, isActive, onClose, onMinimize, onFocus }) => {
-  const [position, setPosition] = useState({ x: win.x, y: win.y });
+  // Janelas que já abrem maximizadas (ex.: Orkut) guardam o tamanho/posição padrão para o botão "restaurar" voltar a eles.
+  const restoreSize = DEFAULT_WINDOW_SIZE[win.type];
+  const [maximized, setMaximized] = useState(win.maximized);
+  const [size, setSize] = useState(win.maximized ? restoreSize : { width: win.width, height: win.height });
+  const [position, setPosition] = useState(
+    win.maximized
+      ? clampWindowPosition({ x: 80, y: 60 }, restoreSize.width, restoreSize.height)
+      : { x: win.x, y: win.y }
+  );
   const [ghostPosition, setGhostPosition] = useState<{ x: number; y: number } | null>(null);
   const [minimizing, setMinimizing] = useState(false);
   const windowRef = useRef<HTMLDivElement>(null);
@@ -49,6 +63,8 @@ const Window: React.FC<WindowProps> = ({ win, isActive, onClose, onMinimize, onF
 
   // Função que inicia o arraste da janela, atualizando a posição do ghost conforme o mouse se move.
   const handleDragStart = useCallback((e: React.MouseEvent) => {
+    // Janela maximizada não é arrastada (como no Windows XP).
+    if (maximized) return;
     dragging.current = true;
     dragOffset.current = { x: e.clientX - position.x, y: e.clientY - position.y };
     onFocus(win.id);
@@ -58,8 +74,8 @@ const Window: React.FC<WindowProps> = ({ win, isActive, onClose, onMinimize, onF
     const toClampedPosition = (clientX: number, clientY: number) =>
       clampWindowPosition(
         { x: clientX - dragOffset.current.x, y: clientY - dragOffset.current.y },
-        win.width,
-        win.height
+        size.width,
+        size.height
       );
 
     // Função que atualiza a posição do ghost enquanto o mouse se move.
@@ -85,8 +101,8 @@ const Window: React.FC<WindowProps> = ({ win, isActive, onClose, onMinimize, onF
       setPosition(finalPosition);
       setGhostPosition(null);
       // Guarda a posição para reabrir a janela no mesmo lugar (janelas maximizadas não são salvas).
-      if (!win.maximized) {
-        saveWindowGeometry(win.type, { ...finalPosition, width: win.width, height: win.height });
+      if (!maximized) {
+        saveWindowGeometry(win.type, { ...finalPosition, width: size.width, height: size.height });
       }
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
@@ -94,12 +110,17 @@ const Window: React.FC<WindowProps> = ({ win, isActive, onClose, onMinimize, onF
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [position, win.id, win.type, win.width, win.height, win.maximized, onFocus]);
+  }, [maximized, position, size.width, size.height, win.id, win.type, onFocus]);
 
   const handleMinimize = useCallback(() => {
     setMinimizing(true);
     window.setTimeout(() => onMinimize(win.id), 180);
   }, [onMinimize, win.id]);
+
+  // Alterna entre maximizada (ocupa a tela inteira, menos a barra de tarefas) e o tamanho/posição anteriores.
+  const handleMaximize = useCallback(() => {
+    setMaximized((prev) => !prev);
+  }, []);
 
   if (win.minimized) return null;
 
@@ -108,21 +129,35 @@ const Window: React.FC<WindowProps> = ({ win, isActive, onClose, onMinimize, onF
       <div
         ref={windowRef}
         tabIndex={-1}
-        className={`window ${isActive ? 'window--active' : ''} ${ghostPosition ? 'window--ghosting' : ''} ${minimizing ? 'window--minimizing' : ''}`}
-        style={{
-          left: position.x,
-          top: position.y,
-          width: win.width,
-          height: win.height,
-          zIndex: win.zIndex,
-          outline: 'none',
-        }}
+        className={`window ${isActive ? 'window--active' : ''} ${ghostPosition ? 'window--ghosting' : ''} ${minimizing ? 'window--minimizing' : ''} ${maximized ? 'window--maximized' : ''}`}
+        style={
+          maximized
+            ? {
+                left: 0,
+                top: 0,
+                width: '100%',
+                height: `calc(100% - ${TASKBAR_HEIGHT_PX}px)`,
+                zIndex: win.zIndex,
+                outline: 'none',
+              }
+            : {
+                left: position.x,
+                top: position.y,
+                width: size.width,
+                height: size.height,
+                zIndex: win.zIndex,
+                outline: 'none',
+              }
+        }
         onMouseDown={() => onFocus(win.id)}
       >
         <WindowHeader
           title={win.title}
+          iconSrc={WINDOW_ICONS[win.type]}
           onClose={() => onClose(win.id)}
+          maximized={maximized}
           onMinimize={handleMinimize}
+          onMaximize={handleMaximize}
           onDragStart={handleDragStart}
         />
         <div className="window-body">
@@ -136,8 +171,8 @@ const Window: React.FC<WindowProps> = ({ win, isActive, onClose, onMinimize, onF
           style={{
             left: ghostPosition.x,
             top: ghostPosition.y,
-            width: win.width,
-            height: win.height,
+            width: size.width,
+            height: size.height,
             zIndex: win.zIndex + 1000,
           }}
         />

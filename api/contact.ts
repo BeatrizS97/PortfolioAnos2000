@@ -1,6 +1,6 @@
 // api/contact.ts
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { sendEmail } from './_email';
+import { sendEmail } from './_email.js';
 import {
   messageSchema,
   sanitizeText,
@@ -8,7 +8,7 @@ import {
   formatValidationErrors,
   applyRateLimit,
   logError,
-} from './_utils';
+} from './_utils.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {

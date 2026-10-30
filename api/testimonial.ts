@@ -1,7 +1,7 @@
 // api/testimonial.ts
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSupabaseClient } from './_supabase';
-import { sendEmail } from './_email';
+import { getSupabaseClient } from './_supabase.js';
+import { sendEmail } from './_email.js';
 import {
   messageSchema,
   sanitizeText,
@@ -9,7 +9,7 @@ import {
   formatValidationErrors,
   applyRateLimit,
   logError,
-} from './_utils';
+} from './_utils.js';
 
 // Converte os marcadores da barra de formatação do formulário em HTML:
 // **negrito** -> <strong>, __sublinhado__ -> <u>, _itálico_ -> <em>.

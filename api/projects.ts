@@ -1,7 +1,7 @@
 // api/projects.ts
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSupabaseClient } from './_supabase';
-import { logError } from './_utils';
+import { getSupabaseClient } from './_supabase.js';
+import { logError } from './_utils.js';
 
 // Colunas devolvidas ao front (as mesmas do tipo Project).
 const PROJECT_FIELDS =

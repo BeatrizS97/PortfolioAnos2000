@@ -1,7 +1,7 @@
 // api/scraps.ts
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSupabaseClient } from './_supabase';
-import { logError, applyRateLimit, sanitizeText } from './_utils';
+import { getSupabaseClient } from './_supabase.js';
+import { logError, applyRateLimit, sanitizeText } from './_utils.js';
 
 // Colunas devolvidas ao front (as mesmas do tipo Scrap).
 const SCRAP_FIELDS = 'id, author_name, author_avatar, message, is_public, created_at';

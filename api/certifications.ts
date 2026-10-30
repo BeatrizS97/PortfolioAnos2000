@@ -3,9 +3,9 @@
 // Importa os tipos VercelRequest e VercelResponse para tipagem das requisições e respostas.
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 // Importa a função getSupabaseClient para obter o cliente Supabase.
-import { getSupabaseClient } from './_supabase';
+import { getSupabaseClient } from './_supabase.js';
 // Importa o helper de paginação (mesmo padrão do scraps.ts) e o log estruturado de erros.
-import { getPagination, logError } from './_utils';
+import { getPagination, logError } from './_utils.js';
 
 // Função handler que lida com as requisições para a rota /api/certifications.
 export default async function handler(req: VercelRequest, res: VercelResponse) {

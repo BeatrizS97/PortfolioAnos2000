@@ -1,7 +1,7 @@
-// api/experience.ts
+// api/experience.ts.
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSupabaseClient } from './_supabase';
-import { getPagination, logError } from './_utils';
+import { getSupabaseClient } from './_supabase.js';
+import { getPagination, logError } from './_utils.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {

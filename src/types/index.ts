@@ -7,6 +7,7 @@ export type {
   Certification,
   ExperienceItem,
 } from './academic';
+export type { ApiResponse } from './apiResponse';
 export type { ChatRole, ChatMessage, MsnContactMode, MsnContactStatus, MsnContact } from './chat';
 export type { CommunityCategory, Community } from './community';
 export type { Friend } from './friend';

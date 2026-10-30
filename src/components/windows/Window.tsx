@@ -27,7 +27,7 @@ const Window: React.FC<WindowProps> = ({ win, isActive, onClose, onMinimize, onF
   // Janelas que já abrem maximizadas (ex.: Orkut) guardam o tamanho/posição padrão para o botão "restaurar" voltar a eles.
   const restoreSize = DEFAULT_WINDOW_SIZE[win.type];
   const [maximized, setMaximized] = useState(win.maximized);
-  const [size, setSize] = useState(win.maximized ? restoreSize : { width: win.width, height: win.height });
+  const [size] = useState(win.maximized ? restoreSize : { width: win.width, height: win.height }); // O tamanho da janela não muda enquanto ela está aberta (não há redimensionamento manual), então não precisa de setSize.
   const [position, setPosition] = useState(
     win.maximized
       ? clampWindowPosition({ x: 80, y: 60 }, restoreSize.width, restoreSize.height)

@@ -9,16 +9,46 @@
   overflow: hidden;
 }
 
+/* Ícone do MSN à esquerda do título da janela (aparece só na janela do MSN). */
+.window-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.window-title-icon {
+  display: block;
+  object-fit: contain;
+}
+
+/* Barra de menu decorativa (File Edit Actions Tools Help), como no MSN 7.0 (Imagem 1): Tahoma 11px, texto preto, sem função. */
+.msn-menubar {
+  display: flex;
+  align-items: center;
+  padding: 2px 5px;
+  background: #F5F5F5;
+  border-bottom: 1px solid #D4D0C8;
+  font-family: Tahoma, Verdana, sans-serif;
+  font-size: 11px;
+  color: #000000;
+  cursor: default;
+  user-select: none;
+}
+
+.msn-menubar > span {
+  padding: 1px 8px;
+}
+
 .msn-classic-toolbar {
   position: relative;
   overflow: hidden;
   display: flex;
-  gap: 6px;
+  gap: 4px;
   align-items: center;
   box-sizing: border-box;
-  height: 52px;
-  padding: 3px 8px;
-  background: linear-gradient(to bottom, #D6E9F8 0%, #FFFFFF 100%);
+  height: 58px;
+  padding: 3px 8px 3px 8px;
+  background: linear-gradient(to bottom, #FFFFFF 0%, #E6EEF9 100%);
   border-bottom: 1px solid #B8D4E8;
 }
 
@@ -29,35 +59,40 @@
   left: -10%;
   width: 130%;
   height: 220%;
-  background: linear-gradient(115deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.15) 30%, rgba(255, 255, 255, 0) 50%);
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.06) 30%, rgba(255, 255, 255, 0) 50%);
   pointer-events: none;
 }
 
+/* Botãozinho redondo com seta no canto esquerdo da barra de ícones (só decorativo, como no MSN 7.0). */
 .msn-classic-toolbar button {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
   background: none;
   border: none;
   color: #333333;
   font-family: Tahoma, Verdana, sans-serif;
-  cursor: not-allowed;
+  cursor: pointer;
   padding: 2px 6px;
   border: 1px solid transparent;
   border-radius: 3px;
 }
 
-.msn-classic-toolbar button:hover {
+.msn-classic-toolbar button:disabled {
+  cursor: not-allowed;
+}
+
+.msn-classic-toolbar button:not(:disabled):hover {
   border-color: #8FB4DA;
   background: linear-gradient(to bottom, #ffffff 0%, #EAF4FD 50%, #CFE4F7 100%);
   box-shadow: inset 0 1px 0 #ffffff, 0 1px 3px rgba(60, 110, 170, 0.45);
   transform: translateY(-1px);
 }
 
-.msn-classic-toolbar button:active {
+.msn-classic-toolbar button:not(:disabled):active {
   border-color: #6E93BC;
   background: linear-gradient(to bottom, #CFE4F7 0%, #EAF4FD 100%);
   box-shadow: inset 1px 1px 3px rgba(40, 80, 130, 0.45);
@@ -65,22 +100,37 @@
 }
 
 .msn-classic-toolbar button svg {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
 }
+
+/* Logo decorativo "msn" no canto direito da barra de ícones, como no MSN 7.0 (Imagem 2). */
+.msn-brand {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding-right: 10px;
+  font-family: Tahoma, Verdana, sans-serif;
+  font-size: 24px;
+  font-style: italic;
+  font-weight: bold;
+  color: #4A7AB8;
+  user-select: none;
+}
+
+.msn-brand img {
+  display: block;
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+}
+
 
 /* Separador vertical sutil entre os grupos de ícones (Convidar/Enviar | Webcam/Áudio | Atividades/Jogos). */
-.msn-classic-toolbar button:nth-child(odd):not(:first-child)::before {
-  content: '';
-  position: absolute;
-  left: -5px;
-  top: 6px;
-  bottom: 6px;
-  width: 1px;
-  background: #B8D4E8;
-  box-shadow: 1px 0 0 #ffffff;
-}
-
+/* Rótulos de 11px, centralizados logo abaixo do ícone. */
 .msn-classic-toolbar button span {
   font-size: 11px;
   font-weight: normal;
@@ -91,29 +141,39 @@
   flex: 1;
   display: flex;
   min-height: 0;
-  background: linear-gradient(to bottom, #EAF1FC 0%, #d5e3f8 70%, #c9dbf5 100%);
-  padding: 8px;
+  background: linear-gradient(to bottom, #EEF2FA 0%, #DFE7F5 100%);
+  padding: 6px;
 }
 
 .msn-classic-chat {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
 }
 
 .msn-row {
-  flex: 1 1 50%;
   min-height: 0;
   display: flex;
   align-items: stretch;
-  gap: 8px;
+  gap: 6px;
+}
+
+/* Área de mensagens: ocupa o espaço que sobra (~68% ou mais da altura). */
+.msn-row--top {
+  flex: 1 1 0;
+}
+
+/* Área de digitação: altura do próprio conteúdo, bem menor que a das mensagens. */
+.msn-row--bottom {
+  flex: 1 1 0;
+  flex: 0 0 auto;
 }
 
 .msn-card {
-  background: #ffffff;
-  border: 1px solid #AABAC9;
+  background: #EDF1F9;
+  border: 1px solid #8EA2C6;
   border-radius: 4px;
   overflow: hidden;
 }
@@ -126,48 +186,103 @@
   flex-direction: column;
 }
 
+/* Caixa branca do histórico (linha "Para:" + mensagens) dentro do container azul claro. */
+.msn-card--messages {
+  padding: 3px;
+}
+
+.msn-card-inner {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #8EA2C6;
+}
+
 .msn-card--avatar {
   position: relative;
+  display: flex;
+  flex-direction: column;
   align-self: flex-start;
-  width: 96px;
-  height: 96px;
+  width: 27%;
+  width: 22%;
+  width: 18%;
+  min-width: 96px;
   flex-shrink: 0;
-  padding: 4px;
+  padding: 4px 4px 0;
+  background: #F4F8FD;
+  /* A aba lateral ◂ sai pela borda direita, por isso o conteúdo não é cortado. */
+  overflow: visible;
 }
 
-.msn-card--avatar::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(115deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.1) 40%, rgba(255, 255, 255, 0) 60%);
-  pointer-events: none;
-}
-
-.msn-card--avatar img {
+/* Moldura fina cinza-azulada (1px), cantos de 4px e linha branca interna (padding de 2px), formando o biselado simples. */
+.msn-avatar-frame {
+  position: relative;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 2px;
+  aspect-ratio: 10 / 9;
+  aspect-ratio: 9 / 10;
+  box-sizing: border-box;
+  padding: 2px;
+  background: #ffffff;
+  border: 1px solid #8EA2C6;
+  border-radius: 4px;
+}
+
+/* A foto preenche todo o quadro interno, centralizada. */
+.msn-card--avatar img {
+  position: absolute;
+  inset: 6px 10px 6px 6px;
+  inset: 3px;
   display: block;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  box-sizing: border-box;
+  object-fit: contain;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 2px;
   image-rendering: auto;
 }
 
-/* A foto do contato (em cima) é cortada pelo topo, para não cortar o rosto. */
+/* A foto do contato (em cima) era cortada pelo topo para não cortar o rosto. */
 .msn-row--top .msn-card--avatar img {
-  object-position: center top;
+  object-position: center;
 }
 
-.msn-card--avatar::after {
-  content: '▾';
-  position: absolute;
-  bottom: 2px;
-  right: 4px;
-  font-size: 11px;
+/* Faixa fina abaixo da foto com a setinha ▾ centralizada, fora da imagem. */
+.msn-avatar-arrow {
+  display: block;
+  height: 14px;
+  font-size: 9px;
+  line-height: 14px;
+  text-align: center;
+  text-align: right;
+  padding-right: 6px;
   color: #6f89c9;
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 2px;
+  user-select: none;
+}
+
+/* Aba pequena e vertical com ◂, saindo na borda direita do frame, centralizada na altura da foto. */
+.msn-avatar-tab {
+  position: absolute;
+  top: 50%;
+  right: -11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 11px;
+  height: 24px;
+  box-sizing: border-box;
+  transform: translateY(-50%);
+  background: #EEF3FA;
+  border: 1px solid #8EA2C6;
+  border-left: none;
+  border-radius: 0 3px 3px 0;
+  font-size: 8px;
   line-height: 1;
-  padding: 0 1px;
+  color: #6f89c9;
+  user-select: none;
 }
 
 .msn-to-line {
@@ -177,10 +292,10 @@
   padding: 4px 8px;
   font-family: Tahoma, Verdana, sans-serif;
   font-size: 11px;
-  font-weight: bold;
-  color: #333;
-  border-bottom: 1px solid #D4D4D4;
-  background: #F0F6FC;
+  font-weight: normal;
+  color: #555;
+  border-bottom: 1px solid #B4C3DA;
+  background: #ffffff;
 }
 
 .msn-to-line strong {
@@ -195,6 +310,7 @@
   font-family: Tahoma, Verdana, sans-serif;
   font-size: 11px;
   background: #FFFFFF;
+  white-space: pre-wrap;
   /* A janela (.window-body) define scrollbar-color e isso é herdado; "auto" libera o estilo ::-webkit-scrollbar abaixo. */
   scrollbar-color: auto;
 }
@@ -277,81 +393,52 @@
   text-align: left;
 }
 
+/* Faixa inferior: botões do portfólio à esquerda e caneta / "A" à direita, sobre o fundo azul claro do container. */
 .msn-toolbar-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 8px;
-  border-top: 1px solid #eee;
-  flex-wrap: wrap;
-  background: #F7FBFF;
+  justify-content: flex-end;
+  margin: 0 6px 6px;
+  padding: 2px 6px;
+  background: #F4F8FD;
+  border: 1px solid #8EA2C6;
 }
 
-.msn-toolbar-row button {
-  position: relative;
+/* Grupo da direita (caneta / fonte), só visual e desabilitado, como a faixa de ícones da base na Imagem 2. */
+.msn-toolbar-row-right {
   display: flex;
   align-items: center;
-  gap: 5px;
-  background: linear-gradient(to bottom, #ffffff 0%, #eef3fb 50%, #dde8f8 100%);
-  border-top: 1px solid #ffffff;
-  border-left: 1px solid #ffffff;
-  border-right: 1px solid #7f93b8;
-  border-bottom: 1px solid #7f93b8;
-  border-radius: 14px;
-  font-size: 11px;
-  font-weight: bold;
-  color: #1a3c6e;
-  cursor: pointer;
-  padding: 5px 14px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  gap: 2px;
+  margin-left: auto;
 }
 
-.msn-toolbar-row button:hover {
-  background: linear-gradient(to bottom, #ffffff 0%, #eaf2ff 50%, #cfe1fb 100%);
-  box-shadow: inset 0 1px 0 #ffffff, 0 1px 4px rgba(108, 180, 238, 0.95);
-  transform: translateY(-1px);
+.msn-toolbar-row-right .msn-compose-tool svg {
+  width: 16px;
+  height: 16px;
 }
 
-.msn-toolbar-row button:active {
-  border-top-color: #7f93b8;
-  border-left-color: #7f93b8;
-  border-right-color: #ffffff;
-  border-bottom-color: #ffffff;
-  background: linear-gradient(to bottom, #cfe1fb 0%, #eaf2ff 100%);
-  box-shadow: inset 1px 1px 3px rgba(60, 90, 140, 0.4);
-  transform: translateY(0);
-}
-
-.msn-toolbar-divider {
-  width: 1px;
-  height: 18px;
-  background: #ccc;
-  box-shadow: 1px 0 0 #fff;
-  margin: 0 2px;
-}
-
-.nudge-button {
-  background: linear-gradient(to bottom, #fffbe8 0%, #ffe9ac 50%, #ffd670 100%) !important;
-  border-right-color: #c99a1c !important;
-  border-bottom-color: #c99a1c !important;
-  color: #7a5300 !important;
+.msn-toolbar-row-right .msn-compose-tool strong {
+  font-size: 14px;
 }
 
 .msn-footer {
   display: flex;
   flex: 1;
+  min-height: 0;
   flex-direction: column;
-  border-top: 1px solid #ddd;
-  background: #F7FBFF;
+  background: transparent;
 }
 
 .msn-compose-toolbar {
+  position: relative;
   display: flex;
-  gap: 10px;
-  padding: 4px 8px;
-  background: #F0F5FA;
-  border-bottom: 1px solid #DCE6F2;
-  font-size: 10.5px;
+  align-items: center;
+  gap: 2px;
+  margin: 3px 6px 0;
+  padding: 2px 6px;
+  background: #F4F8FD;
+  border: 1px solid #8EA2C6;
+  font-size: 11px;
   color: #333;
 }
 
@@ -359,20 +446,193 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  cursor: not-allowed;
-  padding: 3px 4px;
+  cursor: pointer;
+  padding: 1px 4px;
   border: 1px solid transparent;
   border-radius: 3px;
 }
 
-.msn-compose-tool:hover {
+.msn-compose-tool:not(:disabled):hover,
+.msn-compose-tool[aria-expanded='true'] {
   border-color: #a5b9dc;
   background: linear-gradient(to bottom, #ffffff 0%, #dbe6fa 100%);
 }
 
+.msn-compose-tool--active {
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.msn-tool-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.msn-compose-tool:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.msn-menu {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  z-index: 5;
+  padding: 4px;
+  background: #ffffff;
+  border: 1px solid #8EA2C6;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25);
+  font-family: Tahoma, Verdana, sans-serif;
+  font-size: 11px;
+  color: #222;
+}
+
+.msn-menu button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  padding: 3px 6px;
+  font-family: Tahoma, Verdana, sans-serif;
+  font-size: 11px;
+  color: #222;
+  text-align: left;
+  cursor: pointer;
+}
+
+.msn-menu button:hover {
+  border-color: #a5b9dc;
+  background: linear-gradient(to bottom, #ffffff 0%, #dbe6fa 100%);
+}
+
+.msn-menu button[aria-pressed='true'],
+.msn-menu button[aria-checked='true'] {
+  border-color: #6E93BC;
+  background: linear-gradient(to bottom, #CFE4F7 0%, #EAF4FD 100%);
+}
+
+/* Emoticons: grade de 6 colunas. */
+.msn-menu--grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 2px;
+}
+
+.msn-menu--grid button {
+  justify-content: center;
+  padding: 3px 5px;
+  font-size: 16px;
+}
+
+/* Voice clips, winks e planos de fundo: lista vertical. */
+.msn-menu--list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 170px;
+}
+
+.msn-menu-bg-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #8EA2C6;
+}
+
+/* Painel de fonte: família, tamanho, negrito/itálico/sublinhado e cor. */
+.msn-menu--font {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 200px;
+  padding: 8px;
+}
+
+.msn-menu-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.msn-menu-field select {
+  width: 120px;
+  border: 1px solid #A9BBD3;
+  background: #ffffff;
+  font-family: Tahoma, Verdana, sans-serif;
+  font-size: 11px;
+}
+
+.msn-menu-styles {
+  display: flex;
+  gap: 4px;
+}
+
+.msn-menu .msn-menu-styles button {
+  justify-content: center;
+  width: 28px;
+  padding: 2px 0;
+  border-color: #A9B8CC;
+}
+
+.msn-menu-colors {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.msn-menu .msn-color-swatch {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid #6f6f6f;
+  border-radius: 2px;
+}
+
+.msn-menu .msn-color-swatch[aria-pressed='true'] {
+  outline: 2px solid #003C74;
+  outline-offset: 1px;
+}
+
+.msn-menu .msn-menu-reset {
+  align-self: flex-end;
+  border-color: #A9B8CC;
+  background: linear-gradient(to bottom, #F7F9FC 0%, #DCE4F0 100%);
+}
+
+/* Wink enviado: o emoji "pula" na tela (some para quem prefere menos movimento). */
+.msn-message--system .msn-wink-emoji {
+  display: inline-block;
+  font-size: 22px;
+  line-height: 1;
+  vertical-align: middle;
+  animation: msn-wink-pop 0.6s ease-out;
+}
+
+@keyframes msn-wink-pop {
+  0% { transform: scale(0.2) rotate(-20deg); opacity: 0; }
+  60% { transform: scale(1.4) rotate(10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .msn-message--system .msn-wink-emoji {
+    animation: none;
+  }
+}
+
 .msn-compose-tool strong {
   color: #1a3c6e;
-  font-size: 12px;
+  font-size: 16px;
+}
+
+.msn-compose-tool svg {
+  width: 16px;
+  height: 16px;
 }
 
 .msn-compose-tool-label {
@@ -388,16 +648,19 @@
 
 .msn-compose-row {
   display: flex;
+  flex: 1;
+  min-height: 0;
   gap: 6px;
-  padding: 6px;
+  padding: 3px 6px 6px;
 }
 
-/* Área de digitação com 2 linhas, borda azul-acinzentada do XP (#7F9DB9). */
+/* Área de digitação com 2 linhas: caixa branca com borda fina azul-acinzentada (antes #7F9DB9). */
 .msn-compose-row textarea {
   flex: 1;
-  height: 52px;
+  height: auto;
+  min-height: 60px;
   resize: none;
-  border: 1px solid #7F9DB9;
+  border: 1px solid #A9BBD3;
   border-radius: 0;
   padding: 4px 6px;
   font-family: Tahoma, Verdana, sans-serif;
@@ -409,20 +672,32 @@
 .msn-compose-buttons {
   display: flex;
   flex-direction: column;
+  align-self: flex-start;
   gap: 4px;
+  width: 72px;
 }
 
 .msn-compose-row button {
-  background: linear-gradient(to bottom, #F0F0F0 0%, #D4D0C8 100%);
+  background: linear-gradient(to bottom, #F7F9FC 0%, #DCE4F0 100%);
   color: #222;
-  border: 1px solid #ACA899;
-  border-radius: 2px;
-  padding: 4px 14px;
-  min-width: 70px;
+  border: 1px solid #A9B8CC;
+  border-radius: 3px;
+  padding: 0 10px;
+  min-width: 64px;
   font-family: Tahoma, Verdana, sans-serif;
   font-size: 11px;
   font-weight: normal;
   cursor: pointer;
+}
+
+.msn-compose-buttons button:first-child {
+  flex: none;
+  height: 44px;
+}
+
+.msn-compose-buttons button:last-child {
+  flex: none;
+  height: 34px;
 }
 
 .msn-compose-row button:hover:not(:disabled) {
@@ -440,14 +715,28 @@
   cursor: default;
 }
 
+/* Estilo da faixa: Tahoma 11px, borda superior sutil e texto azul tipo link. */
+/* Os pontinhos de redimensionar ficam no canto direito (só visual), desenhados com um SVG embutido. */
 .msn-status-bar {
-  margin-top: auto;
-  padding: 4px 10px;
+  position: relative;
+  flex-shrink: 0;
+  margin: 0 -6px -6px;
+  padding: 4px 22px 4px 10px;
   font-family: Tahoma, Verdana, sans-serif;
-  font-size: 10px;
-  color: #999999;
-  background: #F0F0F0;
-  border-top: 1px solid #e2e2e2;
+  font-size: 11px;
+  color: #333333;
+  background: #EEF3FA;
+  border-top: 1px solid #B8C9E0;
+}
+
+.msn-status-bar::after {
+  content: '';
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  width: 12px;
+  height: 12px;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12'><g fill='%238FA3C2'><rect x='9' y='1' width='2' height='2'/><rect x='5' y='5' width='2' height='2'/><rect x='9' y='5' width='2' height='2'/><rect x='1' y='9' width='2' height='2'/><rect x='5' y='9' width='2' height='2'/><rect x='9' y='9' width='2' height='2'/></g></svg>") no-repeat;
 }
 
 /* Toast "janelinha subindo" do Windows Live Messenger 8.0 (imagens 8 e 9): ~280px, degradê azul claro→branco. */
@@ -578,14 +867,15 @@
   text-decoration: underline;
 }
 
+/* Container da digitação: azul bem claro ao redor da toolbar, do campo e da faixa de baixo. */
 .msn-card--compose {
-  background: #F7FBFF;
+  background: #EDF1F9;
+  overflow: visible;
 }
 
 /* Avatar do contato 96x96 (em cima) e do usuário menor, 48x48 + moldura (embaixo), como no MSN 7.x. */
 .msn-row--bottom .msn-card--avatar {
-  width: 56px;
-  height: 56px;
+  align-self: flex-start;
 }
 
 /* Botão Enviar focado: borda azul, como os botões do XP. */

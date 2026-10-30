@@ -182,6 +182,20 @@
   background-image: url('/assets/icons/xp-controls/minimize-hover.svg');
 }
 
+.win-btn--maximize {
+  background-image: url('/assets/icons/xp-controls/maximize.svg');
+}
+.win-btn--maximize:hover {
+  background-image: url('/assets/icons/xp-controls/maximize-hover.svg');
+}
+
+.win-btn--restore {
+  background-image: url('/assets/icons/xp-controls/restore.svg');
+}
+.win-btn--restore:hover {
+  background-image: url('/assets/icons/xp-controls/restore-hover.svg');
+}
+
 .win-btn--close {
   background-image: url('/assets/icons/xp-controls/close.svg');
 }

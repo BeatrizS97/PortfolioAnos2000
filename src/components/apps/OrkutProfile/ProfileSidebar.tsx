@@ -3,6 +3,7 @@ import React from 'react';
 import type { ProfileData } from '../../../types/profile';
 import type { OrkutTab } from './ProfileHeader';
 import { useLanguage } from '../../../hooks/useLanguage';
+import ExternalLink from '../../shared/ExternalLink';
 
 interface ProfileSidebarProps {
   profile: ProfileData | null;
@@ -14,6 +15,9 @@ interface ProfileSidebarProps {
   resumeLabel: string;
   resumeAriaLabel: string;
   isDownloading: boolean;
+  hasDownloadError: boolean;
+  resumeErrorText: string;
+  resumeOpenLinkText: string;
   onDownloadResume: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }
 
@@ -28,6 +32,9 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
   resumeLabel,
   resumeAriaLabel,
   isDownloading,
+  hasDownloadError,
+  resumeErrorText,
+  resumeOpenLinkText,
   onDownloadResume,
 }) => {
   const { t } = useLanguage();
@@ -65,6 +72,11 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
             📄 {isDownloading ? resumeLabel : t.orkut.quickLinks.downloadResume}
           </a>
         </li>
+        {hasDownloadError && (
+          <li className="resume-download-error" role="alert">
+            {resumeErrorText} <ExternalLink href={resumeHref}>{resumeOpenLinkText}</ExternalLink>
+          </li>
+        )}
       </ul>
     </aside>
   );

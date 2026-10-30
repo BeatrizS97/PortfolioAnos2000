@@ -22,6 +22,7 @@ const TOOLBAR_TEXT: Record<
     textColor: string;
     insertImage: string;
     insertLocation: string;
+    shortcutsHint: string;
   }
 > = {
   pt: {
@@ -35,6 +36,7 @@ const TOOLBAR_TEXT: Record<
     textColor: 'Cor do texto (em breve)',
     insertImage: 'Inserir imagem (em breve)',
     insertLocation: 'Inserir localização (em breve)',
+    shortcutsHint: 'Atalhos: Ctrl+B negrito, Ctrl+I itálico, Ctrl+U sublinhado.',
   },
   en: {
     toolbar: 'Text formatting',
@@ -47,6 +49,7 @@ const TOOLBAR_TEXT: Record<
     textColor: 'Text color (coming soon)',
     insertImage: 'Insert image (coming soon)',
     insertLocation: 'Insert location (coming soon)',
+    shortcutsHint: 'Shortcuts: Ctrl+B bold, Ctrl+I italic, Ctrl+U underline.',
   },
   es: {
     toolbar: 'Formato del texto',
@@ -59,6 +62,7 @@ const TOOLBAR_TEXT: Record<
     textColor: 'Color del texto (próximamente)',
     insertImage: 'Insertar imagen (próximamente)',
     insertLocation: 'Insertar ubicación (próximamente)',
+    shortcutsHint: 'Atajos: Ctrl+B negrita, Ctrl+I cursiva, Ctrl+U subrayado.',
   },
 };
 
@@ -216,8 +220,10 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ onClose }) => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
+                aria-describedby="testimonial-shortcuts-hint"
                 required
               />
+              <p id="testimonial-shortcuts-hint" className="orkut-compose-hint">{toolbarText.shortcutsHint}</p>
 
               {status === 'error' && (
                 <p className="orkut-compose-error">{errorMessage ?? t.testimonialForm.error}</p>

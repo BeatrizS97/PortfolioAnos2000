@@ -1,12 +1,6 @@
 // src/components/apps/OrkutProfile/OrkutProfile.tsx
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import '../../../styles/orkut-theme.css';
-import { fetchProjects } from '../../../services/projectsService';
-import { fetchScraps } from '../../../services/scrapsService';
-import { fetchProfile } from '../../../services/profileService';
-import type { Project } from '../../../types/project';
-import type { Scrap } from '../../../types/scrap';
-import type { ProfileData } from '../../../types/profile';
 import type { Language } from '../../../types/language';
 import ProfileHeader from './ProfileHeader';
 import type { OrkutTab } from './ProfileHeader';
@@ -22,107 +16,61 @@ import TestimonialForm from './TestimonialForm';
 import AdminKeyModal from './AdminKeyModal';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAdminKey } from '../../../hooks/useAdminKey';
-import { RESUME_PATHS, SCRAPS_PAGE_SIZE } from '../../../utils/constants';
+import { useOrkutProfileData } from '../../../hooks/useOrkutProfileData';
+import { RESUME_PATHS } from '../../../utils/constants';
 
 // Acima desse número de projetos, o botão "Ver mais" passa a aparecer.
 const PROJECTS_VISIBLE_LIMIT = 8;
 
 // Textos do download do currículo por idioma (o nome do idioma aparece no próprio idioma).
-const RESUME_TEXT: Record<Language, { downloading: string; ariaLabel: string }> = {
-  pt: { downloading: 'Baixando...', ariaLabel: 'Baixar currículo em Português (PDF)' },
-  en: { downloading: 'Downloading...', ariaLabel: 'Download resume in English (PDF)' },
-  es: { downloading: 'Descargando...', ariaLabel: 'Descargar currículum en Español (PDF)' },
+// Error e openLink são o aviso (e o texto do link) mostrados quando o download automático falha.
+const RESUME_TEXT: Record<Language, { downloading: string; ariaLabel: string; error: string; openLink: string }> = {
+  pt: {
+    downloading: 'Baixando...',
+    ariaLabel: 'Baixar currículo em Português (PDF)',
+    error: 'Não foi possível baixar o PDF automaticamente.',
+    openLink: 'Abrir o PDF',
+  },
+  en: {
+    downloading: 'Downloading...',
+    ariaLabel: 'Download resume in English (PDF)',
+    error: "Couldn't download the PDF automatically.",
+    openLink: 'Open the PDF',
+  },
+  es: {
+    downloading: 'Descargando...',
+    ariaLabel: 'Descargar currículum en Español (PDF)',
+    error: 'No se pudo descargar el PDF automáticamente.',
+    openLink: 'Abrir el PDF',
+  },
 };
 
 // Componente principal do perfil do Orkut, que exibe informações do usuário, projetos, recados, amigos e comunidades.
 const OrkutProfile: React.FC = () => {
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [activeTab, setActiveTab] = useState<OrkutTab>('home');
   const [showTestimonialModal, setShowTestimonialModal] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [appliedSearch, setAppliedSearch] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState(false);
   const { language, t, tc } = useLanguage();
   const { adminKey, isAdmin, isLoginOpen, openLogin, closeLogin, submitKey, logout } = useAdminKey();
-  const [scraps, setScraps] = useState<Scrap[]>([]);
-  const [scrapsPage, setScrapsPage] = useState(1);
-  const [scrapsHasMore, setScrapsHasMore] = useState(false);
-  const [scrapsTotal, setScrapsTotal] = useState(0);
-  const [scrapsLoading, setScrapsLoading] = useState(true);
-  // Número da última busca de recados. Respostas de buscas antigas (que chegaram fora de ordem) são descartadas.
-  const scrapsRequestId = useRef(0);
-
-  // Função que carrega os recados da página especificada, atualizando o estado do componente.
-  const loadScraps = useCallback(async (page: number) => {
-    // Cada chamada recebe um número; só a mais recente pode atualizar a tela.
-    const requestId = ++scrapsRequestId.current;
-    setScrapsLoading(true);
-    let currentPage = page;
-    let result = await fetchScraps(currentPage, SCRAPS_PAGE_SIZE);
-    if (requestId !== scrapsRequestId.current) return;
-    // Se a página atual ficou vazia (ex.: excluiu o último recado de uma
-    // página que não é a primeira), volta uma página em vez de mostrar uma
-    // lista vazia no meio da paginação.
-    if (result.data.length === 0 && currentPage > 1) {
-      currentPage -= 1;
-      setScrapsPage(currentPage);
-      result = await fetchScraps(currentPage, SCRAPS_PAGE_SIZE);
-      if (requestId !== scrapsRequestId.current) return;
-    }
-    setScraps(result.data); // Atualiza a lista de recados com os dados recebidos do serviço. 
-    setScrapsHasMore(result.hasMore); // Atualiza o estado indicando se há mais recados para carregar (para paginação).
-    setScrapsTotal(result.total); // Atualiza o estado com o número total de recados disponíveis (para exibição no título da seção).
-    setScrapsLoading(false); 
-  }, []);
-
-  // Função que é chamada ao trocar de página nos recados: atualiza a página atual e carrega os recados dela.
-  const handlePageChange = (page: number) => {
-    setScrapsPage(page);
-    void loadScraps(page);
-  };
-
-  // Função que é chamada quando um recado é postado, reiniciando a página de recados para a primeira e recarregando os recados.
-  const handleScrapPosted = () => {
-    setScrapsPage(1);
-    void loadScraps(1);
-  };
-
-  // Função que é chamada quando um recado é excluído, recarregando os recados da página atual.
-  const handleScrapDeleted = () => {
-    void loadScraps(scrapsPage);
-  };
-
-  useEffect(() => {
-    let mounted = true;
-
-    // Função assíncrona que carrega os dados do perfil, dos projetos e dos recados (página 1), atualizando o estado do componente.
-    // Tudo é buscado junto, então os spinners somem ao mesmo tempo.
-    async function load() {
-      const [profileData, projectsData, scrapsData] = await Promise.all([
-        fetchProfile(),
-        fetchProjects(),
-        fetchScraps(1, SCRAPS_PAGE_SIZE),
-      ]);
-      if (!mounted) return; // Se o componente foi desmontado antes da conclusão da requisição, não atualiza o estado.
-      setProfile(profileData);
-      setProjects(projectsData);
-      setScraps(scrapsData.data);
-      setScrapsHasMore(scrapsData.hasMore);
-      setScrapsTotal(scrapsData.total);
-      setScrapsLoading(false);
-      setLoading(false);
-    }
-
-    void load();
-    return () => {
-      mounted = false;
-      // Invalida qualquer busca de recados ainda em andamento (o componente saiu da tela).
-      scrapsRequestId.current += 1;
-    };
-  }, []);
+  // Perfil, projetos e recados (com paginação) agora vêm do hook useOrkutProfileData.
+  // A lógica de busca e a proteção contra resposta fora de ordem (scrapsRequestId) foram para lá.
+  const {
+    profile,
+    projects,
+    loading,
+    scraps,
+    scrapsPage,
+    scrapsHasMore,
+    scrapsTotal,
+    scrapsLoading,
+    handlePageChange,
+    handleScrapPosted,
+    handleScrapDeleted,
+  } = useOrkutProfileData();
 
   // Busca simples por título, descrição ou tecnologia do projeto.
   const filteredProjects = appliedSearch
@@ -157,6 +105,7 @@ const OrkutProfile: React.FC = () => {
     if (isDownloading) return;
 
     const resumePath = RESUME_PATHS[language];
+    setDownloadError(false);
     setIsDownloading(true);
     try {
       const response = await fetch(resumePath);
@@ -173,7 +122,7 @@ const OrkutProfile: React.FC = () => {
       link.click();
       window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
     } catch {
-      window.open(resumePath, '_blank', 'noopener');
+      setDownloadError(true);
     } finally {
       setIsDownloading(false);
     }
@@ -191,6 +140,9 @@ const OrkutProfile: React.FC = () => {
       resumeLabel={RESUME_TEXT[language].downloading}
       resumeAriaLabel={RESUME_TEXT[language].ariaLabel}
       isDownloading={isDownloading}
+      hasDownloadError={downloadError}
+      resumeErrorText={RESUME_TEXT[language].error}
+      resumeOpenLinkText={RESUME_TEXT[language].openLink}
       onDownloadResume={handleDownloadResume}
     />
   );

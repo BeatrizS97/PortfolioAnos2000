@@ -2,6 +2,7 @@
 import { api, isAbortError } from './api';
 import type { NewScrapPayload, Scrap, ScrapsApiResponse } from '../types/scrap';
 import { scrapSchema } from '../types/scrap';
+import type { ApiResponse } from '../types/apiResponse';
 
 const MOCK_SCRAPS: Scrap[] = [
   {
@@ -68,7 +69,7 @@ export async function fetchScraps(
  */
 // Cria um novo recado na API e retorna o recado criado. Se a API falhar, lança um erro.
 export async function postScrap(payload: NewScrapPayload, signal?: AbortSignal): Promise<Scrap> {
-  const response = await api.post<{ success: boolean; data: Scrap }>('/scraps', payload, signal);
+  const response = await api.post<ApiResponse<Scrap>>('/scraps', payload, signal);
   return response.data;
 }
 

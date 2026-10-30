@@ -1,6 +1,7 @@
 // src/services/academicService.ts
 import { api, isAbortError } from './api';
 import type { EducationItem, LanguageSkill, Certification, ExperienceItem } from '../types/academic';
+import type { ApiResponse } from '../types/apiResponse';
 
 // Tipo do módulo de dados de exemplo (que só existe em desenvolvimento).
 type AcademicMocks = typeof import('./__mocks__/academic.mocks');
@@ -22,7 +23,7 @@ async function fetchAcademicList<T>(
   signal?: AbortSignal
 ): Promise<T[]> {
   try {
-    const response = await api.get<{ success: boolean; data: T[] }>(path, signal);
+    const response = await api.get<ApiResponse<T[]>>(path, signal);
     if (response.data.length > 0) return response.data;
   } catch (error) {
     // Requisição cancelada (componente saiu da tela): não é falha, então não usa mock.

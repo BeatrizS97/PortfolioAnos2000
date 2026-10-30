@@ -1,6 +1,7 @@
 // src/services/communitiesService.ts
 import { api, isAbortError } from './api';
 import type { Community } from '../types/community';
+import type { ApiResponse } from '../types/apiResponse';
 
 const MOCK_COMMUNITIES: Community[] = [
   { id: '1', name: 'React.js & Next.js Lovers', members_count: 1518382, category: 'hard_skill' },
@@ -22,7 +23,7 @@ const MOCK_COMMUNITIES: Community[] = [
  */
 export async function fetchCommunities(signal?: AbortSignal): Promise<Community[]> {
   try {
-    const response = await api.get<{ success: boolean; data: Community[] }>('/communities', signal);
+    const response = await api.get<ApiResponse<Community[]>>('/communities', signal);
     return response.data.length > 0 ? response.data : MOCK_COMMUNITIES;
   } catch (error) {
     // Requisição cancelada (componente saiu da tela): não é falha, então não usa mock.

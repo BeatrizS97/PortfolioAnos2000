@@ -1,6 +1,7 @@
 // src/services/profileService.ts
 import { api, isAbortError } from './api';
 import type { ProfileData } from '../types/profile';
+import type { ApiResponse } from '../types/apiResponse';
 
 const MOCK_PROFILE: ProfileData = {
   id: 'mock',
@@ -29,7 +30,7 @@ export async function fetchProfile(signal?: AbortSignal): Promise<ProfileData> {
   }
 
   try {
-    const response = await api.get<{ success: boolean; data: ProfileData | null }>('/profile', signal);
+    const response = await api.get<ApiResponse<ProfileData | null>>('/profile', signal);
     if (!response.data) return MOCK_PROFILE;
 
     profileCache.set('profile', { data: response.data, timestamp: Date.now() });

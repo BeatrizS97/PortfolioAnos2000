@@ -1,6 +1,7 @@
 // src/services/friendsService.ts
 import { api, isAbortError } from './api';
 import type { Friend } from '../types/friend';
+import type { ApiResponse } from '../types/apiResponse';
 
 const MOCK_FRIENDS: Friend[] = [
   { id: '1', name: 'Marcela Santiago', avatar_url: '/assets/images/icons/user-placeholder.png', role: 'Banco de Trocas de Conhecimento — Fullstack' },
@@ -15,7 +16,7 @@ const MOCK_FRIENDS: Friend[] = [
  */
 export async function fetchFriends(signal?: AbortSignal): Promise<Friend[]> {
   try {
-    const response = await api.get<{ success: boolean; data: Friend[] }>('/friends', signal);
+    const response = await api.get<ApiResponse<Friend[]>>('/friends', signal);
     return response.data.length > 0 ? response.data : MOCK_FRIENDS;
   } catch (error) {
     // Requisição cancelada (componente saiu da tela): não é falha, então não usa mock.

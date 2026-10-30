@@ -9,3 +9,12 @@ dist-ssr
 *.log
 
 .vercel
+
+# Build outputs & caches
+dist/
+*.tsbuildinfo
+
+# Generated types for config
+vite.config.js
+*.tsbuildinfo
+vite.config.d.ts

@@ -14,7 +14,7 @@ export const WINDOW_TITLES: Record<WindowType, string> = {
 // Tamanhos padrão de janelas, usados ao abrir uma nova janela ou ao restaurar uma janela minimizada/maximizada.
 export const DEFAULT_WINDOW_SIZE: Record<WindowType, { width: number; height: number }> = {
   orkut: { width: 720, height: 560 },
-  msn: { width: 560, height: 620 },
+  msn: { width: 680, height: 500 },
   about: { width: 480, height: 360 },
   trash: { width: 360, height: 260 },
 };
@@ -26,7 +26,7 @@ export const TASKBAR_HEIGHT_PX = 42;
 export const SCRAPS_PAGE_SIZE = 5;
 
 export const SOUND_PATHS = {
-  startup: '/assets/sounds/windows-startup.wav',
+  startup: '/assets/sounds/Windows-XP-Startup.mp3',
   msnNotification: '/assets/sounds/msn-notification.mp3',
   orkutScrap: '/assets/sounds/orkut-scraps.mp3',
 };

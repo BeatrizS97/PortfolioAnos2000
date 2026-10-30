@@ -78,12 +78,7 @@
 }
 
 .desktop-icon--selected {
-  background: rgba(51, 130, 255, 0.4);
   outline: 1px dotted rgba(255, 255, 255, 0.8);
-}
-
-.desktop-icon--selected span {
-  background: rgba(51, 130, 255, 0.4);
 }
 
 .window {
@@ -178,29 +173,21 @@
 .win-btn--minimize {
   background-image: url('/assets/icons/xp-controls/minimize.svg');
 }
-.win-btn--minimize:hover {
-  background-image: url('/assets/icons/xp-controls/minimize-hover.svg');
-}
 
 .win-btn--maximize {
   background-image: url('/assets/icons/xp-controls/maximize.svg');
 }
-.win-btn--maximize:hover {
-  background-image: url('/assets/icons/xp-controls/maximize-hover.svg');
-}
 
+/* Janela maximizada: o botão do meio vira "restaurar" (duas janelinhas sobrepostas), como no Windows XP. */
 .win-btn--restore {
   background-image: url('/assets/icons/xp-controls/restore.svg');
-}
-.win-btn--restore:hover {
-  background-image: url('/assets/icons/xp-controls/restore-hover.svg');
 }
 
 .win-btn--close {
   background-image: url('/assets/icons/xp-controls/close.svg');
 }
-.win-btn--close:hover {
-  background-image: url('/assets/icons/xp-controls/close-hover.svg');
+.win-btn:hover {
+  filter: brightness(1.2);
 }
 
 .window-body {

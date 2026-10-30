@@ -194,6 +194,12 @@
   text-decoration: underline;
 }
 
+.quick-links li.resume-download-error {
+  color: crimson;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
 .quick-link-with-info {
   display: flex;
   align-items: center;
@@ -841,6 +847,12 @@
 .orkut-compose-error {
   color: crimson;
   font-size: 11px;
+  margin: 0;
+}
+
+.orkut-compose-hint {
+  color: #777;
+  font-size: 10px;
   margin: 0;
 }
 

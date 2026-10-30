@@ -10,23 +10,32 @@ interface BootSequenceProps {
   onFinish: () => void;
 }
 
-const BOOT_DURATION_MS = 2600;
+const BOOT_DURATION_MS = 4000;
 
 const BootSequence: React.FC<BootSequenceProps> = ({ onFinish }) => {
-  const { playSound } = useSound();
+  const { playSound, stopSound } = useSound();
   const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
+    // Se o navegador bloqueou o som, ele toca na primeira interação do usuário (clique ou tecla, ex.: trocar o idioma ou "pular").
+
     // O navegador pode bloquear o som antes da primeira interação do usuário; nesse caso o boot segue sem som.
     try {
-      playSound(SOUND_PATHS.startup);
+      void playSound(SOUND_PATHS.startup);
     } catch {
       // Sem som — não é motivo para quebrar o boot.
     }
     const timer = window.setTimeout(onFinish, BOOT_DURATION_MS);
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(timer);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleSkip = () => {
+    stopSound(SOUND_PATHS.startup);
+    onFinish();
+  };
 
   return (
     <div className="boot-screen" role="status" aria-label={t.shell.boot.ariaLabel}>
@@ -74,7 +83,7 @@ const BootSequence: React.FC<BootSequenceProps> = ({ onFinish }) => {
         <span className="boot-footer-brand">Portfólio</span>
       </div>
 
-      <button className="boot-skip" onClick={onFinish}>
+      <button className="boot-skip" onClick={handleSkip}>
         {t.shell.boot.skip}
       </button>
     </div>

@@ -10,12 +10,13 @@ function isBoolean(value: unknown): value is boolean {
 }
 
 // Toca efeitos sonoros retrô, respeitando a preferência de "mudo" do usuário. 
+// playSound devolve true quando o som realmente começou e false quando não tocou (mudo ou autoplay bloqueado pelo navegador).
 export function useSound() {
   const [muted, setMuted] = useLocalStorage<boolean>('portfolio:muted', false, isBoolean);
 
   const playSound = useCallback(
-    (src: string) => {
-      if (muted) return;
+    async (src: string): Promise<boolean> => {
+      if (muted) return false;
       try {
         let audio = audioCache.get(src);
         if (!audio) {
@@ -26,14 +27,24 @@ export function useSound() {
           audio.pause();
           audio.currentTime = 0;
         }
-        // Ignora falhas (ex.: navegador bloqueando autoplay antes de interação do usuário).
-        void audio.play().catch(() => undefined);
+        // Ignora falhas (ex.: navegador bloqueando autoplay antes de interação do usuário): elas viram "false", sem erro.
+        await audio.play();
+        return true;
       } catch {
-        // Web Audio API indisponível — degrada graciosamente sem som.
+        // Web Audio API indisponível ou som bloqueado — degrada graciosamente sem som.
+        return false;
       }
     },
     [muted]
   );
 
-  return { playSound, muted, setMuted };
+  // Para o som e volta ao início. Se o som nunca foi tocado, não faz nada.
+  const stopSound = useCallback((src: string): void => {
+    const audio = audioCache.get(src);
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
+  }, []);
+
+  return { playSound, stopSound, muted, setMuted };
 }

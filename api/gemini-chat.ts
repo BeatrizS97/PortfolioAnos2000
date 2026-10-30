@@ -1,5 +1,6 @@
 // api/gemini-chat.ts 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { applyRateLimit } from './_utils';
 
 // Interface que representa uma mensagem de chat recebida do usuário ou do modelo.
 interface IncomingChatMessage {
@@ -13,6 +14,7 @@ type Language = 'pt' | 'en' | 'es';
 const MAX_MESSAGE_LENGTH = 500;
 const MAX_HISTORY_ITEMS = 10;
 const MAX_HISTORY_TEXT_LENGTH = 1000;
+const GEMINI_RATE_LIMIT_MAX_REQUESTS = 20;
 
 // Mensagens de fallback para diferentes situações, em português, inglês e espanhol.
 const SYSTEM_PROMPTS: Record<Language, string> = {
@@ -236,6 +238,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, reply: 'Method not allowed' });
   }
+
+  // Limita quantas mensagens cada IP pode enviar à IA (protege a cota da chave do Gemini).
+  // A resposta 429 já é enviada dentro da função, e o front mostra "aguarde um instante" ou usa a base local de respostas.
+  if (applyRateLimit(req, res, 'gemini-chat', GEMINI_RATE_LIMIT_MAX_REQUESTS)) return;
 
   // Extrai os campos da requisição: mensagem do usuário, histórico de mensagens e idioma preferido.
   const { message, history, language } = (req.body ?? {}) as {

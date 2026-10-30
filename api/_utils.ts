@@ -60,7 +60,12 @@ export function getClientIp(req: VercelRequest): string {
 }
 
 // Retorna true quando a requisição foi BLOQUEADA (a resposta 429 já é enviada aqui dentro).
-export function applyRateLimit(req: VercelRequest, res: VercelResponse, route: string): boolean {
+export function applyRateLimit(
+  req: VercelRequest,
+  res: VercelResponse,
+  route: string,
+  maxRequests = RATE_LIMIT_MAX_REQUESTS
+): boolean {
   const now = Date.now();
   const key = `${route}:${getClientIp(req)}`;
 
@@ -74,16 +79,16 @@ export function applyRateLimit(req: VercelRequest, res: VercelResponse, route: s
   const current = requestCounts.get(key);
   if (!current || current.resetAt <= now) {
     requestCounts.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    res.setHeader('X-RateLimit-Limit', String(RATE_LIMIT_MAX_REQUESTS));
-    res.setHeader('X-RateLimit-Remaining', String(RATE_LIMIT_MAX_REQUESTS - 1));
+    res.setHeader('X-RateLimit-Limit', String(maxRequests));
+    res.setHeader('X-RateLimit-Remaining', String(maxRequests - 1));
     return false;
   }
 
   current.count += 1;
-  res.setHeader('X-RateLimit-Limit', String(RATE_LIMIT_MAX_REQUESTS));
-  res.setHeader('X-RateLimit-Remaining', String(Math.max(0, RATE_LIMIT_MAX_REQUESTS - current.count)));
+  res.setHeader('X-RateLimit-Limit', String(maxRequests));
+  res.setHeader('X-RateLimit-Remaining', String(Math.max(0, maxRequests - current.count)));
 
-  if (current.count > RATE_LIMIT_MAX_REQUESTS) {
+  if (current.count > maxRequests) {
     res.setHeader('Retry-After', String(Math.ceil((current.resetAt - now) / 1000)));
     res.status(429).json({
       success: false,

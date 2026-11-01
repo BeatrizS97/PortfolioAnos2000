@@ -14,7 +14,7 @@ type Language = 'pt' | 'en' | 'es';
 const MAX_MESSAGE_LENGTH = 500;
 const MAX_HISTORY_ITEMS = 10;
 const MAX_HISTORY_TEXT_LENGTH = 1000;
-// Atualização: máximo de mensagens à IA por IP a cada 10 minutos (o padrão das outras rotas, 5, seria pouco para um chat).
+// Máximo de mensagens à IA por IP a cada 10 minutos (o padrão das outras rotas, 5, seria pouco para um chat).
 const GEMINI_RATE_LIMIT_MAX_REQUESTS = 20;
 
 // Mensagens de fallback para diferentes situações, em português, inglês e espanhol.
@@ -240,7 +240,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ success: false, reply: 'Method not allowed' });
   }
 
-  // Atualização: limita quantas mensagens cada IP pode enviar à IA (protege a cota da chave do Gemini).
+  // Limita quantas mensagens cada IP pode enviar à IA (protege a cota da chave do Gemini).
   // A resposta 429 já é enviada dentro da função, e o front mostra "aguarde um instante" ou usa a base local de respostas.
   if (applyRateLimit(req, res, 'gemini-chat', GEMINI_RATE_LIMIT_MAX_REQUESTS)) return;
 

@@ -270,7 +270,6 @@ const COMMUNITY_DESCRIPTIONS: Record<string, string> = {
 };
 
 // Retorna um emoji representando a comunidade com base no nome e na categoria.
-// (Atualização: em vez de emoji, devolve o desenho em pixel art da comunidade, no estilo das miniaturas do Orkut.)
 function thumbnailFor(name: string, category: Community['category']): PixelArt {
   const normalized = name.toLowerCase();
   if (normalized.includes('react') || normalized.includes('next')) return PIXEL_ART.react;

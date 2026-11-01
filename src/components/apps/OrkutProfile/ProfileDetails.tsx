@@ -21,6 +21,7 @@ const LOAD_ERROR_TEXT: Record<Language, string> = {
 
 const ProfileDetails: React.FC = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
   const { t, tc, language } = useLanguage();
   const d = t.profileDetails;
   const errorText = LOAD_ERROR_TEXT[language];
@@ -33,7 +34,10 @@ const ProfileDetails: React.FC = () => {
   useEffect(() => {
     let mounted = true;
     fetchProfile().then((data) => {
-      if (mounted) setProfile(data);
+      if (mounted) {
+        setProfile(data);
+        setLoadingProfile(false);
+      }
     });
     return () => { mounted = false; };
   }, []);
@@ -41,7 +45,13 @@ const ProfileDetails: React.FC = () => {
   return (
     <div className="orkut-col orkut-col-center profile-details">
         <h3 className="welcome-msg">{d.aboutTitle}</h3>
-        {profile ? <p>{tc(profile.about_me)}</p> : <div className="loading-spinner">{t.orkut.loading}</div>}
+        {loadingProfile ? (
+          <div className="loading-spinner">{t.orkut.loading}</div>
+        ) : profile ? (
+          <p>{tc(profile.about_me)}</p>
+        ) : (
+          <p className="empty-state" role="alert">{errorText}</p>
+        )}
         <p>{d.aboutExtra}</p>
 
         <div className="section-heading"><h4>{d.contactTitle}</h4></div>

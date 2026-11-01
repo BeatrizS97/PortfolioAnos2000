@@ -24,3 +24,10 @@ export type Certification = AcademicItem<'title'>;
 export type ExperienceItem = AcademicItem<'title'> &
   LocalizedField<'period'> &
   LocalizedField<'description'>;
+
+export type PublicationItem = AcademicItem<'title'> & {
+  authors: string;
+  year: number;
+  venue: string;
+  doi: string;
+};

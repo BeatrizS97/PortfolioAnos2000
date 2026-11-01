@@ -10,6 +10,7 @@ import {
   useLanguageSkills,
   useCertifications,
   useExperience,
+  usePublications,
 } from '../../../hooks/useAcademicInfo';
 
 // Mensagem exibida no lugar de uma seção que não carregou (API fora do ar ou sem conexão), por idioma.
@@ -30,6 +31,7 @@ const ProfileDetails: React.FC = () => {
   const { data: languageSkills = [], isLoading: loadingLanguages, isError: errorLanguages } = useLanguageSkills();
   const { data: certifications = [], isLoading: loadingCertifications, isError: errorCertifications } = useCertifications();
   const { data: experience = [], isLoading: loadingExperience, isError: errorExperience } = useExperience();
+  const { data: publications = [], isLoading: loadingPublications, isError: errorPublications } = usePublications();
 
   useEffect(() => {
     let mounted = true;
@@ -125,14 +127,20 @@ const ProfileDetails: React.FC = () => {
         )}
 
         <div className="section-heading"><h4>{d.publicationTitle}</h4></div>
-        <p>
-          Santos, B. S. et al. (2025). <em>Inovação tecnológica e a inclusão
-          escolar: o caminho para a equidade.</em> Revista Processando o Saber –
-          FATEC PG. DOI:{' '}
-          <a href="https://doi.org/10.5281/zenodo.15477654" target="_blank" rel="noreferrer">
-            10.5281/zenodo.15477654
-          </a>
-        </p>
+        {loadingPublications ? (
+          <div className="loading-spinner">{t.orkut.loading}</div>
+        ) : errorPublications ? (
+          <p className="empty-state" role="alert">{errorText}</p>
+        ) : (
+          publications.map((item) => (
+            <p key={item.id}>
+              {item.authors} ({item.year}). <em>{getLocalizedField(item, 'title', language)}.</em> {item.venue}. DOI:{' '}
+              <a href={`https://doi.org/${item.doi}`} target="_blank" rel="noreferrer">
+                {item.doi}
+              </a>
+            </p>
+          ))
+        )}
     </div>
   );
 };

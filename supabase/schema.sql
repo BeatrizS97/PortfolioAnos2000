@@ -374,3 +374,30 @@ INSERT INTO communities (name, members_count, category) VALUES
   ('Metodologias Ágeis: Daily Sem Drama', 143310, 'soft_skill'),
   ('Voluntariado: Fazer o Bem Não Dói', 91337, 'soft_skill')
 ON CONFLICT (name) DO NOTHING;
+
+-- ------------------------------------------------------------------
+-- 9) Publicações científicas: antes o texto ficava fixo no ProfileDetails.tsx (só em português).
+--    Autores, ano, revista e DOI não mudam com o idioma; só o título tem versões _pt / _en / _es.
+--    O doi é UNIQUE para este bloco poder ser rodado mais de uma vez (ON CONFLICT ignora o que já existe).
+-- ------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS publications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  authors VARCHAR(500) NOT NULL,
+  year INTEGER NOT NULL,
+  title_pt VARCHAR(500) NOT NULL,
+  title_en VARCHAR(500),
+  title_es VARCHAR(500),
+  venue VARCHAR(500) NOT NULL,
+  doi VARCHAR(255) NOT NULL UNIQUE,
+  order_index INTEGER DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_publications_order ON publications(order_index);
+
+INSERT INTO publications (authors, year, title_pt, title_en, title_es, venue, doi, order_index) VALUES
+  ('Santos, B. S. et al.', 2025,
+   'Inovação tecnológica e a inclusão escolar: o caminho para a equidade',
+   'Technological innovation and school inclusion: the path to equity',
+   'Innovación tecnológica y la inclusión escolar: el camino hacia la equidad',
+   'Revista Processando o Saber – FATEC PG', '10.5281/zenodo.15477654', 1)
+ON CONFLICT (doi) DO NOTHING;

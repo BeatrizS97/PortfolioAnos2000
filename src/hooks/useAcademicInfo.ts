@@ -1,6 +1,6 @@
 // src/hooks/useAcademicInfo.ts
 import { useQuery } from '@tanstack/react-query';
-import { fetchEducation, fetchLanguages, fetchCertifications, fetchExperience } from '../services/academicService';
+import { fetchEducation, fetchLanguages, fetchCertifications, fetchExperience, fetchPublications } from '../services/academicService';
 
 // Tentativas extras quando a busca falha: mais insistente para o que é central no perfil (formação, experiência)
 // e nenhuma para certificações, que são complementares e podem falhar em silêncio.
@@ -44,5 +44,16 @@ export function useExperience() {
     queryFn: ({ signal }) => fetchExperience(signal),
     staleTime: 5 * 60 * 1000,
     retry: RETRY_CRITICAL,
+  });
+}
+
+// Hook para buscar as publicações científicas usando React Query.
+// É complementar (como as certificações), então não tenta de novo em silêncio.
+export function usePublications() {
+  return useQuery({
+    queryKey: ['publications'],
+    queryFn: ({ signal }) => fetchPublications(signal),
+    staleTime: 5 * 60 * 1000,
+    retry: RETRY_SILENT,
   });
 }

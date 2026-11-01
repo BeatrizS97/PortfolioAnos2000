@@ -6,6 +6,7 @@ export type {
   LanguageSkill,
   Certification,
   ExperienceItem,
+  PublicationItem,
 } from './academic';
 export type { ApiResponse } from './apiResponse';
 export type { ChatRole, ChatMessage, MsnContactMode, MsnContactStatus, MsnContact } from './chat';

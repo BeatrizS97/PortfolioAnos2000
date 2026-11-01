@@ -3,12 +3,6 @@ import { api, isAbortError } from './api';
 import type { Friend } from '../types/friend';
 import type { ApiResponse } from '../types/apiResponse';
 
-const MOCK_FRIENDS: Friend[] = [
-  { id: '1', name: 'Marcela Santiago', avatar_url: '/assets/images/icons/user-placeholder.png', role: 'Banco de Trocas de Conhecimento — Fullstack' },
-  { id: '2', name: 'Tatiana Nunes', avatar_url: '/assets/images/icons/user-placeholder.png', role: 'Form Generator — Colaboradora' },
-  { id: '3', name: 'Patrick Silva', avatar_url: '/assets/images/icons/user-placeholder.png', role: 'Banco de Trocas de Conhecimento — CRUD Conhecimentos' },
-];
-
 /**
  * Busca os amigos (colaboradores dos projetos) em GET /api/friends.
  * @param signal Opcional: AbortSignal para cancelar a requisição.
@@ -17,10 +11,10 @@ const MOCK_FRIENDS: Friend[] = [
 export async function fetchFriends(signal?: AbortSignal): Promise<Friend[]> {
   try {
     const response = await api.get<ApiResponse<Friend[]>>('/friends', signal);
-    return response.data.length > 0 ? response.data : MOCK_FRIENDS;
+    return response.data;
   } catch (error) {
     // Requisição cancelada (componente saiu da tela): não é falha, então não usa mock.
     if (isAbortError(error)) throw error;
-    return MOCK_FRIENDS;
+    return [];
   }
 }

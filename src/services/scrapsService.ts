@@ -4,25 +4,6 @@ import type { NewScrapPayload, Scrap, ScrapsApiResponse } from '../types/scrap';
 import { scrapSchema } from '../types/scrap';
 import type { ApiResponse } from '../types/apiResponse';
 
-const MOCK_SCRAPS: Scrap[] = [
-  {
-    id: '1',
-    author_name: 'João Recrutador',
-    author_avatar: '/assets/images/icons/user-placeholder.png',
-    message: 'Que perfil nostálgico! Adorei os projetos, vou te chamar pro MSN. 😄',
-    is_public: true,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    author_name: 'Maria Dev',
-    author_avatar: '/assets/images/icons/user-placeholder.png',
-    message: 'Lembrei dos anos 2000 assim que abri essa página, muito criativo!',
-    is_public: true,
-    created_at: new Date().toISOString(),
-  },
-];
-
 // Valida cada recado recebido da API com o scrapSchema (Zod). Recado inválido é ignorado e registrado no console,
 // para um único registro com formato errado não derrubar a lista inteira.
 function parseScraps(items: unknown[]): Scrap[] {
@@ -56,8 +37,7 @@ export async function fetchScraps(
     // Requisição cancelada (componente saiu da tela): não é falha, então não usa mock.
     if (isAbortError(error)) throw error;
     // Em produção os recados de exemplo seriam recados FALSOS exibidos como se fossem de visitantes reais: devolve lista vazia.
-    if (!import.meta.env.DEV) return { data: [], hasMore: false, total: 0 };
-    return { data: MOCK_SCRAPS, hasMore: false, total: MOCK_SCRAPS.length };
+    return { data: [], hasMore: false, total: 0 };
   }
 }
 

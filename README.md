@@ -42,10 +42,11 @@ npm install
 npm run dev
 ```
 
-O app abre em `http://localhost:3000`. **Sem configurar o Supabase**, os
-services (`projectsService.ts`, `scrapsService.ts`) caem automaticamente em
-dados mock, então a interface funciona de ponta a ponta mesmo sem backend —
-ótimo para desenvolver a UI isoladamente.
+O app abre em `http://localhost:3000`. Todos os dados vêm do banco (Supabase),
+via `/api`: **não há dados mockados**. Para ver projetos, perfil, recados e
+demais seções em desenvolvimento, rode também a API (por exemplo, com
+`vercel dev`, descrito abaixo) com as variáveis do Supabase em `.env.local`.
+Sem a API, as listas aparecem vazias.
 
 Para testar as funções serverless localmente com a Vercel CLI:
 
@@ -124,4 +125,4 @@ original.
 - `React.memo` implícito via componentes pequenos e desacoplados
 - Cache de dados remotos com TanStack Query (`staleTime`/`gcTime` configuráveis)
 - `manualChunks` no Vite para separar vendor bundle
-- Fallback para dados mock quando a API não está disponível (dev sem backend)
+- Dados só via banco: sem dados mockados; se a API falhar, as listas aparecem vazias

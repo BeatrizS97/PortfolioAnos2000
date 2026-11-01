@@ -28,7 +28,7 @@ const WindowContent: React.FC<WindowContentProps> = ({ type }) => {
       fallback={
         <div className="loading-screen" role="alert" style={{ flexDirection: 'column', gap: 12 }}>
           <p>{errorText.message}</p>
-          <button type="button" className="xp-button" onClick={() => window.location.reload()}>
+          <button type="button" className="xp-button" onClick={() => window.location.reload()} autoFocus>
             {errorText.reload}
           </button>
         </div>

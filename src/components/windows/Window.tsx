@@ -61,6 +61,19 @@ const Window: React.FC<WindowProps> = ({ win, isActive, onClose, onMinimize, onF
     (firstInteractive ?? container).focus({ preventScroll: true });
   }, [isActive, win.minimized]);
 
+  // Quando a janela do navegador diminui, traz a janela de volta para dentro da área visível (o mesmo ajuste feito nos ícones).
+  // Só a posição exibida muda; a posição salva em sessionStorage continua a do último arraste. O if evita re-renderizar sem necessidade.
+  useEffect(() => {
+    const handleResize = () => {
+      setPosition((prev) => {
+        const next = clampWindowPosition(prev, size.width, size.height);
+        return next.x === prev.x && next.y === prev.y ? prev : next;
+      });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [size.width, size.height]);
+
   // Função que inicia o arraste da janela, atualizando a posição do ghost conforme o mouse se move.
   const handleDragStart = useCallback((e: React.MouseEvent) => {
     // Janela maximizada não é arrastada (como no Windows XP).

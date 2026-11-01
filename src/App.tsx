@@ -47,7 +47,7 @@ const App: React.FC = () => {
     return (
       <div className="loading-screen" role="alert" style={{ flexDirection: 'column', gap: 12 }}>
         <p>{LOAD_ERROR_TEXT[language].message}</p>
-        <button type="button" className="xp-button" onClick={() => window.location.reload()}>
+        <button type="button" className="xp-button" onClick={() => window.location.reload()} autoFocus>
           {LOAD_ERROR_TEXT[language].reload}
         </button>
       </div>

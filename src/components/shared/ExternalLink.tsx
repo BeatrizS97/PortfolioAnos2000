@@ -2,10 +2,15 @@
 
 import React from 'react';
 
-// Link que abre em nova aba. Centraliza target="_blank" e rel="noreferrer" para não esquecer em nenhum lugar.
-const ExternalLink: React.FC<React.AnchorHTMLAttributes<HTMLAnchorElement>> = ({ children, ...rest }) => {
+// Componente para links externos, que abre em nova aba e não passa referrer. O target e rel são fixos, então não podem ser sobrescritos por props externas.
+interface ExternalLinkProps extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'target' | 'rel'> {
+  href: string;
+}
+
+// Target e rel ficam depois do {...rest}, então nada que venha de fora consegue sobrescrevê-los.
+const ExternalLink: React.FC<ExternalLinkProps> = ({ children, ...rest }) => {
   return (
-    <a target="_blank" rel="noreferrer" {...rest}>
+    <a {...rest} target="_blank" rel="noreferrer">
       {children}
     </a>
   );

@@ -76,7 +76,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
         <span style={titleStyle}>Portfólio Retrô</span>
         <p>Ocorreu um erro fatal e o portfólio precisa ser reiniciado.</p>
         <p style={{ opacity: 0.8 }}>{this.state.error.message}</p>
-        <button type="button" style={buttonStyle} onClick={() => window.location.reload()}>
+        <button type="button" style={buttonStyle} onClick={() => window.location.reload()} autoFocus>
           Reiniciar
         </button>
       </div>

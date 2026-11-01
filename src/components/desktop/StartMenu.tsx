@@ -3,6 +3,8 @@
 import React from 'react';
 import type { WindowType } from '../../types/window';
 import { useLanguage } from '../../hooks/useLanguage';
+import { useResumeDownload } from '../../hooks/useResumeDownload';
+import ExternalLink from '../shared/ExternalLink';
 
 interface StartMenuProps {
   onOpen: (type: WindowType) => void;
@@ -12,6 +14,8 @@ interface StartMenuProps {
 const StartMenu: React.FC<StartMenuProps> = ({ onOpen, onClose }) => {
   const { t } = useLanguage();
   const menu = t.shell.startMenu;
+  // Mesmo download do Orkut: baixa o PDF do idioma escolhido.
+  const { resumePath, resumeText, isDownloading, downloadError, downloadResume } = useResumeDownload();
 
   const handleOpen = (type: WindowType) => {
     onOpen(type);
@@ -45,9 +49,19 @@ const StartMenu: React.FC<StartMenuProps> = ({ onOpen, onClose }) => {
           <div className="start-menu-divider" />
 
           <div className="start-menu-recent-label">{menu.recentDocuments}</div>
-          <button className="start-menu-item" disabled title={menu.comingSoon}>
-            📄 {menu.resumeFile}
+          <button
+            className="start-menu-item"
+            onClick={downloadResume}
+            aria-label={resumeText.ariaLabel}
+            aria-busy={isDownloading}
+          >
+            📄 {isDownloading ? resumeText.downloading : menu.resumeFile}
           </button>
+          {downloadError && (
+            <p role="alert" style={{ margin: 0, padding: '2px 14px', fontSize: 10, color: 'crimson' }}>
+              {resumeText.error} <ExternalLink href={resumePath}>{resumeText.openLink}</ExternalLink>
+            </p>
+          )}
         </div>
 
         <div className="start-menu-col start-menu-col--right">

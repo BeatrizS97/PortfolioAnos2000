@@ -84,10 +84,10 @@ const OrkutProfile: React.FC = () => {
   const visibleProjects = showAllProjects ? filteredProjects : filteredProjects.slice(0, PROJECTS_VISIBLE_LIMIT);
   const firstName = profile?.full_name.split(' ')[0] ?? 'Beatriz'; // Extrai o primeiro nome do perfil para exibição na mensagem de boas-vindas.
 
-  // Função que lida com o envio do formulário de busca, aplicando o valor da busca e mudando para a aba "home".
+  // Função que lida com o envio do formulário de busca, aplicando o valor da busca na aba atual (a aba não muda).
+  // Home filtra os projetos, Perfil filtra as seções do perfil e Comunidades filtra as comunidades.
   const handleSearchSubmit = () => {
     setAppliedSearch(searchValue.trim().toLowerCase());
-    setActiveTab('home');
   };
 
   // Função que lida com o clique no link "Ver todos os recados", mudando para a aba "home" e rolando suavemente até a seção de recados.
@@ -160,7 +160,7 @@ const OrkutProfile: React.FC = () => {
       {activeTab === 'perfil' && (
         <div className="orkut-columns orkut-columns--two">
           {sidebar}
-          <ProfileDetails />
+          <ProfileDetails searchTerm={appliedSearch} />
         </div>
       )}
 
@@ -168,16 +168,16 @@ const OrkutProfile: React.FC = () => {
         <div className="orkut-columns orkut-columns--two">
           {sidebar}
           <main className="orkut-col orkut-col-center">
-            <Communities variant="full" />
+            <Communities variant="full" searchTerm={appliedSearch} />
           </main>
         </div>
       )}
 
       {activeTab === 'home' && (
-        <>
-          <div className="orkut-columns">
-            {sidebar}
+        <div className="orkut-columns">
+          {sidebar}
 
+          <div className="orkut-col">
             <main className="orkut-col orkut-col-center">
               <h3 className="welcome-msg">{t.orkut.welcome(firstName)}</h3>
               <p className="profile-role">
@@ -206,38 +206,38 @@ const OrkutProfile: React.FC = () => {
               <Testimonials />
             </main>
 
-            <aside className="orkut-col orkut-col-right">
-              <FriendsGrid />
-              <Communities variant="compact" />
-            </aside>
+            <section className="scraps-section">
+              <div className="scraps-section-inner" id="scraps">
+                <div className="section-heading">
+                  <h4>{t.orkut.commentsTitle(scrapsTotal)}</h4>
+                  <button
+                    type="button"
+                    className="scraps-admin-toggle"
+                    onClick={isAdmin ? logout : openLogin}
+                  >
+                    {isAdmin ? `🔓 ${t.scraps.adminLogoutLabel}` : `🔒 ${t.scraps.adminLoginLabel}`}
+                  </button>
+                </div>
+                <ScrapsList
+                  scraps={scraps}
+                  loading={scrapsLoading}
+                  page={scrapsPage}
+                  hasMore={scrapsHasMore}
+                  onPageChange={handlePageChange}
+                  isAdmin={isAdmin}
+                  adminKey={adminKey}
+                  onPosted={handleScrapPosted}
+                  onDeleted={handleScrapDeleted}
+                />
+              </div>
+            </section>
           </div>
 
-          <section className="scraps-section">
-            <div className="scraps-section-inner" id="scraps">
-              <div className="section-heading">
-                <h4>{t.orkut.commentsTitle(scrapsTotal)}</h4>
-                <button
-                  type="button"
-                  className="scraps-admin-toggle"
-                  onClick={isAdmin ? logout : openLogin}
-                >
-                  {isAdmin ? `🔓 ${t.scraps.adminLogoutLabel}` : `🔒 ${t.scraps.adminLoginLabel}`}
-                </button>
-              </div>
-              <ScrapsList
-                scraps={scraps}
-                loading={scrapsLoading}
-                page={scrapsPage}
-                hasMore={scrapsHasMore}
-                onPageChange={handlePageChange}
-                isAdmin={isAdmin}
-                adminKey={adminKey}
-                onPosted={handleScrapPosted}
-                onDeleted={handleScrapDeleted}
-              />
-            </div>
-          </section>
-        </>
+          <aside className="orkut-col orkut-col-right">
+            <FriendsGrid />
+            <Communities variant="compact" />
+          </aside>
+        </div>
       )}
 
       {showTestimonialModal && <TestimonialForm onClose={() => setShowTestimonialModal(false)} />}

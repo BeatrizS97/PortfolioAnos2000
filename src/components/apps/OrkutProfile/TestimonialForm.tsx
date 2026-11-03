@@ -141,19 +141,22 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ onClose }) => {
 
   return (
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-label={t.testimonialForm.ariaLabel}>
-      <div className="orkut-compose-box">
+      <div className={`orkut-compose-box ${status === 'sent' ? 'orkut-compose-box--sent' : ''}`}>
         <div className="orkut-compose-header">
           <span className="orkut-compose-title">{t.testimonialForm.title}</span>
           <button className="orkut-compose-close" onClick={onClose} aria-label={t.testimonialForm.close}>×</button>
         </div>
 
         {status === 'sent' ? (
-          <div className="orkut-compose-body">
-            <p>{t.testimonialForm.sent}</p>
-            <div className="orkut-compose-footer">
-              <button type="button" className="orkut-cancel-btn" onClick={onClose}>{t.testimonialForm.closeButton}</button>
+          <>
+            <div className="orkut-compose-body orkut-compose-body--sent">
+              <span className="orkut-sent-icon" aria-hidden="true">✓</span>
+              <p role="status">{t.testimonialForm.sent}</p>
             </div>
-          </div>
+            <div className="orkut-compose-footer orkut-compose-footer--sent">
+              <button type="button" className="orkut-post-btn" onClick={onClose}>{t.testimonialForm.closeButton}</button>
+            </div>
+          </>
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="orkut-compose-body">

@@ -328,10 +328,11 @@ const CommunityItem = React.memo(function CommunityItem({ art, name, membersText
 // 'compact' = lista vertical da sidebar direita; 'full' = cartões com descrição na aba Comunidades.
 interface CommunitiesProps {
   variant?: 'compact' | 'full';
+  searchTerm?: string;
 }
 
 // Componente que exibe a seção de comunidades no perfil do Orkut, incluindo título, link "ver todas" e lista de comunidades.
-const Communities: React.FC<CommunitiesProps> = ({ variant = 'compact' }) => {
+const Communities: React.FC<CommunitiesProps> = ({ variant = 'compact', searchTerm = '' }) => {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(true);
   const { t, tc } = useLanguage(); // Hook personalizado para obter traduções e funções de tradução de texto.
@@ -350,20 +351,28 @@ const Communities: React.FC<CommunitiesProps> = ({ variant = 'compact' }) => {
     return () => { mounted = false; };
   }, []);
 
+  // Filtra pelo texto da busca (nome ou descrição, já traduzidos); sem busca, mostra todas.
+  const filteredCommunities = communities.filter((c) => {
+    const description = COMMUNITY_DESCRIPTIONS[c.name];
+    return `${tc(c.name)} ${description ? tc(description) : ''}`.toLowerCase().includes(searchTerm);
+  });
+
   return (
     <section className="communities-section">
       <div className="section-heading">
         <h3>
           {t.communities.title}
-          {!loading && ` (${communities.length})`}
+          {!loading && ` (${filteredCommunities.length})`}
         </h3>
         <a href="#" className="see-all-link" onClick={(e) => e.preventDefault()}>{t.communities.seeAll}</a>
       </div>
       {loading ? (
         <div className="loading-spinner">{t.orkut.loading}</div>
+      ) : filteredCommunities.length === 0 ? (
+        <p className="empty-state">{t.orkut.noResults}</p>
       ) : (
         <ul className={`communities-list communities-list--${variant}`}>
-          {communities.map((c) => (
+          {filteredCommunities.map((c) => (
             <CommunityItem
               key={c.id}
               art={thumbnailFor(c.name, c.category)}

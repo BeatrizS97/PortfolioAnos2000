@@ -2,6 +2,7 @@
 import React, { lazy } from 'react';
 import type { WindowType } from '../../types/window';
 import { useLanguage } from '../../hooks/useLanguage';
+import { formatChatText } from '../../utils/formatChatText';
 
 // Componente de uma janela: comum ou carregado sob demanda (lazy).
 type WindowComponent = React.ComponentType | React.LazyExoticComponent<React.ComponentType>;
@@ -15,8 +16,8 @@ const About: React.FC = () => {
   return (
     <div className="about-content">
       <h2>{t.shell.about.title}</h2>
-      <p>{t.shell.about.paragraph1}</p>
-      <p>{t.shell.about.paragraph2}</p>
+      <p>{formatChatText(t.shell.about.paragraph1)}</p>
+      <p>{formatChatText(t.shell.about.paragraph2)}</p>
     </div>
   );
 };

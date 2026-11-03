@@ -6,6 +6,7 @@ import { useLanguage } from '../../../hooks/useLanguage';
 import { shakeScreen } from '../../../utils/animations';
 import { SOUND_PATHS } from '../../../utils/constants';
 import { findAnswer, formatLastMessageAt, TYPING_TEXT } from '../../../utils/msnHelpers';
+import { formatChatText } from '../../../utils/formatChatText';
 import { classifyChatError, sendChatMessage } from '../../../services/geminiChatService';
 import type { ChatMessage } from '../../../types/chat';
 import {
@@ -226,15 +227,6 @@ const AIAssistant: React.FC = () => {
     setFormat((prev) => ({ ...prev, ...patch }));
   };
 
-  // "Envia" um voice clip: toca o som (respeitando o botão de mudo) e registra a ação no histórico.
-  const handleVoiceClip = (clipId: string) => {
-    const clip = VOICE_CLIPS.find((item) => item.id === clipId);
-    if (!clip) return;
-    void playSound(clip.path);
-    setMessages((prev) => limitHistory([...prev, { from: 'system', text: '', kind: 'voice', itemId: clip.id }]));
-    setOpenMenu(null);
-  };
-
   // "Envia" um wink: o emoji aparece animado no histórico.
   const handleWink = (winkId: string) => {
     setMessages((prev) => limitHistory([...prev, { from: 'system', text: '', kind: 'wink', itemId: winkId }]));
@@ -287,7 +279,9 @@ const AIAssistant: React.FC = () => {
                       {m.from === 'bot' ? t.msn.botSays : t.msn.userSays}
                     </strong>
                     <br />
-                    <span style={m.format ? formatToStyle(m.format) : undefined}>{m.text}</span>
+                    <span style={m.format ? formatToStyle(m.format) : undefined}>
+                      {m.from === 'bot' ? formatChatText(m.text) : m.text}
+                    </span>
                   </p>
                 );
               })}
@@ -417,27 +411,15 @@ const AIAssistant: React.FC = () => {
                 )}
               </span>
 
-              <span className="msn-tool-wrap">
-                <button
-                  type="button"
-                  className="msn-compose-tool msn-compose-tool--active"
-                  aria-label={t.msn.tools.voiceClip}
-                  aria-expanded={openMenu === 'voice'}
-                  title={t.msn.tools.voiceClip}
-                  onClick={() => toggleMenu('voice')}
-                >
-                  <VoiceClipMiniIcon /> <span className="msn-compose-tool-label">{t.msn.tools.voiceClip}</span> <span className="msn-compose-tool-caret" role="presentation">▾</span>
-                </button>
-                {openMenu === 'voice' && (
-                  <div className="msn-menu msn-menu--list" role="menu">
-                    {VOICE_CLIPS.map((clip) => (
-                      <button key={clip.id} type="button" role="menuitem" onClick={() => handleVoiceClip(clip.id)}>
-                        <VoiceClipMiniIcon size={12} /> {clip.label[language]}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </span>
+              <button
+                type="button"
+                className="msn-compose-tool msn-compose-tool--active"
+                disabled
+                aria-label={t.msn.tools.voiceClip}
+                title={t.msn.toolbar.comingSoon}
+              >
+                <VoiceClipMiniIcon /> <span className="msn-compose-tool-label">{t.msn.tools.voiceClip}</span> <span className="msn-compose-tool-caret" role="presentation">▾</span>
+              </button>
 
               <span className="msn-tool-wrap">
                 <button

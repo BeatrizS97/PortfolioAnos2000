@@ -19,7 +19,7 @@ const pt = {
     windowControls: { minimize: 'Minimizar', close: 'Fechar' },
     startMenu: {
       orkutSubtitle: 'Meu perfil e projetos',
-      msnSubtitle: 'Conversar com a IA da Bia',
+      msnSubtitle: 'Conversar com o Jarvis, assistente da Bia',
       recentDocuments: 'Documentos recentes',
       resumeFile: 'Currículo.pdf',
       myComputer: 'Meu Computador',
@@ -34,9 +34,16 @@ const pt = {
     about: {
       title: 'Sobre mim',
       paragraph1:
-        'Beatriz Silva Santos — Desenvolvedora Full Stack Júnior, formada em Análise e Desenvolvimento de Sistemas (FATEC). Atuo com React.js, Next.js, TypeScript no front-end e C#/.NET no back-end, com passagem também por PHP e SQL.',
+        '**Beatriz Silva Santos** — Desenvolvedora Full Stack Júnior, formada em Análise e Desenvolvimento de Sistemas (FATEC). Atuo com React.js, Next.js, TypeScript no front-end e C#/.NET no back-end, com passagem também por PHP e SQL.',
       paragraph2:
-        'Abra o Orkut para ver o perfil completo (projetos, skills e depoimentos) ou espere o MSN chamar. 😉',
+        'Abra o **Orkut** para ver o perfil completo (projetos, skills e depoimentos) ou espere o **MSN** chamar. 😉',
+    },
+    welcome: {
+      title: 'Bem-vindo(a)!',
+      heading: 'Como navegar neste portfólio',
+      intro: 'Oi! Eu sou a **Beatriz Silva Santos**, Desenvolvedora Full Stack Júnior. Este site é o meu portfólio, montado como um computador dos anos 2000.',
+      orkut: 'Dê dois cliques no ícone do **Orkut** para ver o meu perfil completo: projetos, formação, certificações, comunidades e recados.',
+      msn: 'Dê dois cliques no **MSN Messenger** para conversar com o Jarvis, meu assistente virtual, e tirar dúvidas sobre mim. O meu currículo em PDF está no menu **Iniciar**.',
     },
     trash: { message: 'A lixeira está vazia... ou será que não? 👀' },
     boot: { ariaLabel: 'Carregando ambiente', caption: 'Portfólio', title: 'Retrô', skip: 'pular »' },
@@ -58,6 +65,7 @@ const pt = {
     commentsCount: (n: number) => `${n} comentários`,
     projectsCount: (n: number) => `${n} projetos`,
     projectsTitle: 'Meus Projetos (álbum de fotos)',
+    noResults: 'Nenhum resultado encontrado.',
     loading: 'Carregando...',
     seeMore: 'Ver mais',
     seeLess: 'Ver menos',
@@ -81,16 +89,16 @@ const pt = {
 
   friends: {
     title: 'Amigos',
-    seeAll: 'ver todos »',
+    seeAll: 'Ver todos »',
   },
 
   communities: {
     title: 'Comunidades',
-    seeAll: 'ver todas »',
-    members: 'membros',
-    categoryLabel: 'categoria:',
-    hardSkill: 'habilidade técnica',
-    softSkill: 'habilidade comportamental',
+    seeAll: 'Ver todas »',
+    members: 'Membros',
+    categoryLabel: 'Categoria:',
+    hardSkill: 'Habilidade técnica',
+    softSkill: 'Habilidade comportamental',
   },
 
   projects: {
@@ -116,15 +124,15 @@ const pt = {
     title: 'Escrever depoimento',
     close: 'Fechar',
     sent: 'Depoimento enviado! Obrigada 💌',
-    closeButton: 'fechar',
+    closeButton: 'Fechar',
     to: 'Para:',
     namePlaceholder: 'Seu nome',
     emailPlaceholder: 'Seu e-mail',
     messagePlaceholder: 'Escreva seu depoimento...',
     error: 'Erro ao enviar, tente novamente.',
-    post: 'postar',
-    sending: 'enviando...',
-    cancel: 'cancelar',
+    post: 'Postar',
+    sending: 'Enviando...',
+    cancel: 'Cancelar',
   },
 
   luckyMessage: {
@@ -154,7 +162,7 @@ const pt = {
   },
 
   msn: {
-    contactName: 'Suporte IA Beatriz',
+    contactName: 'Jarvis - Assistente da Beatriz',
     toolbar: {
       invite: 'Convidar',
       sendFile: 'Enviar arquivo',
@@ -166,13 +174,13 @@ const pt = {
     },
     notification: {
       close: 'Fechar notificação',
-      text: 'acabou de ficar disponível para conversar.',
+      text: 'Acabou de ficar disponível para conversar.',
       options: 'Opções',
     },
-    greeting: 'Oi! Eu sou a assistente virtual da Beatriz :) Pergunte sobre projetos, tecnologias ou carreira!',
+    greeting: 'Oi! Eu sou o Jarvis, assistente virtual da Beatriz :) Pergunte sobre projetos, tecnologias ou carreira!',
     to: 'Para:',
     securityTip: 'Nunca informe sua senha ou dados de cartão em uma conversa.',
-    botSays: 'Suporte IA Beatriz diz:',
+    botSays: 'Jarvis - Assistente da Beatriz diz:',
     userSays: 'Você diz:',
     you: 'Você',
     viewProjects: 'Ver Projetos',
@@ -230,7 +238,7 @@ const en: Translations = {
     windowControls: { minimize: 'Minimize', close: 'Close' },
     startMenu: {
       orkutSubtitle: 'My profile and projects',
-      msnSubtitle: "Chat with Bia's AI",
+      msnSubtitle: "Chat with Jarvis, Bia's assistant",
       recentDocuments: 'Recent documents',
       resumeFile: 'Resume.pdf',
       myComputer: 'My Computer',
@@ -245,9 +253,17 @@ const en: Translations = {
     about: {
       title: 'About me',
       paragraph1:
-        'Beatriz Silva Santos — Junior Full Stack Developer, graduated in Systems Analysis and Development (FATEC). I work with React.js, Next.js and TypeScript on the front end and C#/.NET on the back end, with some experience in PHP and SQL.',
+        '**Beatriz Silva Santos** — Junior Full Stack Developer, graduated in Systems Analysis and Development (FATEC). I work with React.js, Next.js and TypeScript on the front end and C#/.NET on the back end, with some experience in PHP and SQL.',
       paragraph2:
-        'Open Orkut to see the full profile (projects, skills and testimonials) or wait for MSN to call. 😉',
+        'Open **Orkut** to see the full profile (projects, skills and testimonials) or wait for **MSN** to call. 😉',
+    },
+    // Welcome message shown as soon as the desktop loads (explains how to navigate).
+    welcome: {
+      title: 'Welcome!',
+      heading: 'How to navigate this portfolio',
+      intro: "Hi! I'm **Beatriz Silva Santos**, a Junior Full Stack Developer. This website is my portfolio, built to look like an early-2000s computer.",
+      orkut: 'Double-click the **Orkut** icon to see my full profile: projects, education, certifications, communities and scraps.',
+      msn: 'Double-click **MSN Messenger** to chat with Jarvis, my virtual assistant, and ask anything about me. My resume (PDF) is in the **Start** menu.',
     },
     trash: { message: 'The recycle bin is empty... or is it? 👀' },
     boot: { ariaLabel: 'Loading environment', caption: 'Portfolio', title: 'Retro', skip: 'skip »' },
@@ -269,6 +285,7 @@ const en: Translations = {
     commentsCount: (n: number) => `${n} comments`,
     projectsCount: (n: number) => `${n} projects`,
     projectsTitle: 'My Projects (photo album)',
+    noResults: 'No results found.',
     loading: 'Loading...',
     seeMore: 'See more',
     seeLess: 'See less',
@@ -292,16 +309,16 @@ const en: Translations = {
 
   friends: {
     title: 'Friends',
-    seeAll: 'see all »',
+    seeAll: 'See all »',
   },
 
   communities: {
     title: 'Communities',
-    seeAll: 'see all »',
-    members: 'members',
-    categoryLabel: 'category:',
-    hardSkill: 'technical skill',
-    softSkill: 'soft skill',
+    seeAll: 'See all »',
+    members: 'Members',
+    categoryLabel: 'Category:',
+    hardSkill: 'Technical skill',
+    softSkill: 'Soft skill',
   },
 
   projects: {
@@ -327,15 +344,15 @@ const en: Translations = {
     title: 'Write testimonial',
     close: 'Close',
     sent: 'Testimonial sent! Thank you 💌',
-    closeButton: 'close',
+    closeButton: 'Close',
     to: 'To:',
     namePlaceholder: 'Your name',
     emailPlaceholder: 'Your email',
     messagePlaceholder: 'Write your testimonial...',
     error: 'Error sending, please try again.',
-    post: 'post',
-    sending: 'sending...',
-    cancel: 'cancel',
+    post: 'Post',
+    sending: 'Sending...',
+    cancel: 'Cancel',
   },
 
   luckyMessage: {
@@ -365,7 +382,7 @@ const en: Translations = {
   },
 
   msn: {
-    contactName: 'Beatriz AI Support',
+    contactName: "Jarvis - Beatriz's Assistant",
     toolbar: {
       invite: 'Invite',
       sendFile: 'Send file',
@@ -377,13 +394,13 @@ const en: Translations = {
     },
     notification: {
       close: 'Close notification',
-      text: 'just became available to chat.',
+      text: 'Just became available to chat.',
       options: 'Options',
     },
-    greeting: "Hi! I'm Beatriz's virtual assistant :) Ask me about projects, technologies or career!",
+    greeting: "Hi! I'm Jarvis, Beatriz's virtual assistant :) Ask me about projects, technologies or career!",
     to: 'To:',
     securityTip: 'Never share your password or card details in a chat.',
-    botSays: 'Beatriz AI Support says:',
+    botSays: "Jarvis - Beatriz's Assistant says:",
     userSays: 'You say:',
     you: 'You',
     viewProjects: 'View Projects',
@@ -439,7 +456,7 @@ const es: Translations = {
     windowControls: { minimize: 'Minimizar', close: 'Cerrar' },
     startMenu: {
       orkutSubtitle: 'Mi perfil y proyectos',
-      msnSubtitle: 'Conversa con la IA de Bia',
+      msnSubtitle: 'Conversa con Jarvis, el asistente de Bia',
       recentDocuments: 'Documentos recientes',
       resumeFile: 'Currículum.pdf',
       myComputer: 'Mi PC',
@@ -454,9 +471,17 @@ const es: Translations = {
     about: {
       title: 'Sobre mí',
       paragraph1:
-        'Beatriz Silva Santos — Desarrolladora Full Stack Júnior, graduada en Análisis y Desarrollo de Sistemas (FATEC). Trabajo con React.js, Next.js y TypeScript en el front-end y C#/.NET en el back-end, con experiencia también en PHP y SQL.',
+        '**Beatriz Silva Santos** — Desarrolladora Full Stack Júnior, graduada en Análisis y Desarrollo de Sistemas (FATEC). Trabajo con React.js, Next.js y TypeScript en el front-end y C#/.NET en el back-end, con experiencia también en PHP y SQL.',
       paragraph2:
-        'Abre Orkut para ver el perfil completo (proyectos, skills y testimonios) o espera a que MSN te llame. 😉',
+        'Abre **Orkut** para ver el perfil completo (proyectos, skills y testimonios) o espera a que **MSN** te llame. 😉',
+    },
+    // Mensaje de bienvenida que aparece apenas carga el escritorio (explica cómo navegar).
+    welcome: {
+      title: '¡Bienvenido(a)!',
+      heading: 'Cómo navegar por este portafolio',
+      intro: '¡Hola! Soy **Beatriz Silva Santos**, Desarrolladora Full Stack Júnior. Este sitio es mi portafolio, hecho para parecer una computadora de los años 2000.',
+      orkut: 'Haz doble clic en el ícono de **Orkut** para ver mi perfil completo: proyectos, formación, certificaciones, comunidades y mensajes.',
+      msn: 'Haz doble clic en **MSN Messenger** para conversar con Jarvis, mi asistente virtual, y resolver dudas sobre mí. Mi currículum en PDF está en el menú **Inicio**.',
     },
     trash: { message: 'La papelera está vacía... ¿o no? 👀' },
     boot: { ariaLabel: 'Cargando entorno', caption: 'Portafolio', title: 'Retro', skip: 'omitir »' },
@@ -478,6 +503,7 @@ const es: Translations = {
     commentsCount: (n: number) => `${n} comentarios`,
     projectsCount: (n: number) => `${n} proyectos`,
     projectsTitle: 'Mis Proyectos (álbum de fotos)',
+    noResults: 'No se encontraron resultados.',
     loading: 'Cargando...',
     seeMore: 'Ver más',
     seeLess: 'Ver menos',
@@ -501,16 +527,16 @@ const es: Translations = {
 
   friends: {
     title: 'Amigos',
-    seeAll: 'ver todos »',
+    seeAll: 'Ver todos »',
   },
 
   communities: {
     title: 'Comunidades',
-    seeAll: 'ver todas »',
-    members: 'miembros',
-    categoryLabel: 'categoría:',
-    hardSkill: 'habilidad técnica',
-    softSkill: 'habilidad blanda',
+    seeAll: 'Ver todas »',
+    members: 'Miembros',
+    categoryLabel: 'Categoría:',
+    hardSkill: 'Habilidad técnica',
+    softSkill: 'Habilidad blanda',
   },
 
   projects: {
@@ -536,15 +562,15 @@ const es: Translations = {
     title: 'Escribir testimonio',
     close: 'Cerrar',
     sent: '¡Testimonio enviado! Gracias 💌',
-    closeButton: 'cerrar',
+    closeButton: 'Cerrar',
     to: 'Para:',
     namePlaceholder: 'Tu nombre',
     emailPlaceholder: 'Tu correo electrónico',
     messagePlaceholder: 'Escribe tu testimonio...',
     error: 'Error al enviar, inténtalo de nuevo.',
-    post: 'publicar',
-    sending: 'enviando...',
-    cancel: 'cancelar',
+    post: 'Publicar',
+    sending: 'Enviando...',
+    cancel: 'Cancelar',
   },
 
   luckyMessage: {
@@ -574,7 +600,7 @@ const es: Translations = {
   },
 
   msn: {
-    contactName: 'Soporte IA Beatriz',
+    contactName: 'Jarvis - Asistente de Beatriz',
     toolbar: {
       invite: 'Invitar',
       sendFile: 'Enviar archivo',
@@ -589,10 +615,10 @@ const es: Translations = {
       text: 'acaba de conectarse para conversar.',
       options: 'Opciones',
     },
-    greeting: '¡Hola! Soy la asistente virtual de Beatriz :) ¡Pregunta sobre proyectos, tecnologías o carrera!',
+    greeting: '¡Hola! Soy Jarvis, el asistente virtual de Beatriz :) ¡Pregunta sobre proyectos, tecnologías o carrera!',
     to: 'Para:',
     securityTip: 'Nunca compartas tu contraseña ni los datos de tu tarjeta en una conversación.',
-    botSays: 'Soporte IA Beatriz dice:',
+    botSays: 'Jarvis - Asistente de Beatriz dice:',
     userSays: 'Tú dices:',
     you: 'Tú',
     viewProjects: 'Ver Proyectos',

@@ -160,7 +160,7 @@ INSERT INTO projects (title, description, tech_stack, github_url, live_url, imag
     'frontend', true, 7
   );
 
-  -- Tabela de Formação Acadêmica
+-- Tabela de Formação Acadêmica
 CREATE TABLE education (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   course_pt VARCHAR(500) NOT NULL,
@@ -239,7 +239,10 @@ INSERT INTO certifications (title_pt, title_en, title_es, order_index) VALUES
    'Curso de Extensión Universitaria: Acelerando Proyectos de Éxito — USP/ESALQ (Metodologías Ágiles)', 4),
   ('Trilha de Inteligência Artificial com React — Santander Open Academy, Bootcamp 2026 (em andamento)',
    'Artificial Intelligence with React Track — Santander Open Academy, Bootcamp 2026 (in progress)',
-   'Ruta de Inteligencia Artificial con React — Santander Open Academy, Bootcamp 2026 (en curso)', 5);
+   'Ruta de Inteligencia Artificial con React — Santander Open Academy, Bootcamp 2026 (en curso)', 5),
+  ('AWS AI Practitioner: fundamentos de IA na AWS — EDN (60h) | Em andamento, término previsto em nov/2026',
+   'AWS AI Practitioner: AI fundamentals on AWS — EDN (60h) | In progress, expected completion Nov/2026',
+   'AWS AI Practitioner: fundamentos de IA en AWS — EDN (60h) | En curso, finalización prevista en nov/2026', 6);
 
 INSERT INTO experience (title_pt, title_en, title_es, period_pt, period_en, period_es, description_pt, description_en, description_es, order_index) VALUES
   ('Estagiária Full Stack — Hub Connect Eventos',
@@ -401,3 +404,23 @@ INSERT INTO publications (authors, year, title_pt, title_en, title_es, venue, do
    'Innovación tecnológica y la inclusión escolar: el camino hacia la equidad',
    'Revista Processando o Saber – FATEC PG', '10.5281/zenodo.15477654', 1)
 ON CONFLICT (doi) DO NOTHING;
+
+ALTER TABLE projects       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE friends        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE communities    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE education      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE languages      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE certifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE experience     ENABLE ROW LEVEL SECURITY;
+ALTER TABLE publications   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE visitor_log    ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "projects_select_public"       ON projects       FOR SELECT TO anon USING (true);
+CREATE POLICY "friends_select_public"        ON friends        FOR SELECT TO anon USING (true);
+CREATE POLICY "communities_select_public"    ON communities    FOR SELECT TO anon USING (true);
+CREATE POLICY "education_select_public"      ON education      FOR SELECT TO anon USING (true);
+CREATE POLICY "languages_select_public"      ON languages      FOR SELECT TO anon USING (true);
+CREATE POLICY "certifications_select_public" ON certifications FOR SELECT TO anon USING (true);
+CREATE POLICY "experience_select_public"     ON experience     FOR SELECT TO anon USING (true);
+CREATE POLICY "publications_select_public"   ON publications   FOR SELECT TO anon USING (true);
+-- visitor_log: RLS ligado sem policy, só a service_role acessa.

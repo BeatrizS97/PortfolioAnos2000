@@ -471,16 +471,10 @@
 }
 
 .scraps-section {
-  display: grid;
-  grid-template-columns: 180px 1fr 200px;
-  gap: 16px;
-  padding: 0 8px 12px;
-  margin: 0 auto;
-  max-width: 980px;
+  margin-top: 16px;
 }
 
 .scraps-section-inner {
-  grid-column: 2;
   background: #FFFDE7;
   border-top: 2px solid #FFD700;
   border-radius: 3px;
@@ -886,6 +880,41 @@
   cursor: pointer;
 }
 
+.orkut-compose-box--sent {
+  width: 300px;
+}
+
+.orkut-compose-body--sent {
+  align-items: center;
+  gap: 8px;
+  padding: 20px 16px 8px;
+  text-align: center;
+}
+
+.orkut-compose-body--sent p {
+  margin: 0;
+  font-size: 12px;
+  color: #444;
+}
+
+.orkut-sent-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #2E8B47;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.orkut-compose-footer--sent {
+  justify-content: center;
+  padding: 8px 16px 16px;
+}
+
 .profile-details p {
   margin: 0 0 6px;
   line-height: 1.55;
@@ -915,11 +944,5 @@
   .orkut-columns,
   .orkut-columns--two {
     grid-template-columns: 1fr;
-  }
-  .scraps-section {
-    grid-template-columns: 1fr;
-  }
-  .scraps-section-inner {
-    grid-column: 1;
   }
 }

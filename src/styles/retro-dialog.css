@@ -1,0 +1,76 @@
+/* src/styles/retro-dialog.css */
+
+.retro-dialog {
+  width: 420px;
+  max-width: 92vw;
+  padding: 2px;
+  background: #C0C0C0;
+  border: 1px solid #000000;
+  box-shadow:
+    inset -1px -1px #404040,
+    inset 1px 1px #FFFFFF,
+    3px 3px 10px rgba(0, 0, 0, 0.4);
+  font-family: Tahoma, sans-serif;
+  font-size: 12px;
+  color: #000000;
+}
+
+.retro-dialog-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 3px 3px 6px;
+  background: linear-gradient(to right, var(--xp-blue-primary), var(--xp-blue-light));
+  color: #FFFFFF;
+  font-weight: bold;
+  user-select: none;
+}
+
+.retro-dialog-body {
+  padding: 16px 16px 8px;
+}
+
+.retro-dialog-body h2 {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.retro-dialog-body p {
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+
+.retro-dialog-footer {
+  display: flex;
+  justify-content: center;
+  padding: 8px 16px 14px;
+}
+
+.retro-dialog-button {
+  min-width: 90px;
+  padding: 4px 16px;
+  background: #C0C0C0;
+  color: #000000;
+  border: 1px solid #000000;
+  box-shadow:
+    inset -1px -1px #404040,
+    inset 1px 1px #FFFFFF,
+    inset -2px -2px #808080,
+    inset 2px 2px #DFDFDF;
+  font-family: Tahoma, sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.retro-dialog-button:active {
+  box-shadow:
+    inset 1px 1px #404040,
+    inset -1px -1px #FFFFFF,
+    inset 2px 2px #808080,
+    inset -2px -2px #DFDFDF;
+}
+
+.retro-dialog-button:focus-visible {
+  outline: 1px dotted #000000;
+  outline-offset: -5px;
+}

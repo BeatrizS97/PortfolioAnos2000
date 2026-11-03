@@ -65,7 +65,7 @@ const StartMenu: React.FC<StartMenuProps> = ({ onOpen, onClose }) => {
         </div>
 
         <div className="start-menu-col start-menu-col--right">
-          <button className="start-menu-item start-menu-item--dark" onClick={() => handleOpen('about')}>
+          <button className="start-menu-item start-menu-item--dark" disabled title={menu.comingSoon}>
             🖥️ {menu.myComputer}
           </button>
           <button className="start-menu-item start-menu-item--dark" disabled title={menu.comingSoon}>

@@ -8,6 +8,7 @@ import WindowManager from '../windows/WindowManager';
 import Taskbar from './Taskbar';
 import DesktopIcon from './DesktopIcon';
 import NotificationPopup from '../apps/MSNMessenger/NotificationPopup';
+import RetroDialog from '../shared/RetroDialog';
 import {
   MSN_POPUP_DELAY_MS,
   TASKBAR_HEIGHT_PX,
@@ -18,8 +19,17 @@ import {
   DESKTOP_ICON_PITCH_Y,
 } from '../../utils/constants';
 import { useLanguage } from '../../hooks/useLanguage';
+import { formatChatText } from '../../utils/formatChatText';
+import type { Language } from '../../types/language';
 
 const ICON_SIZE = 46;
+
+// Texto do botão do diálogo de boas-vindas, por idioma.
+const ABOUT_DIALOG_BUTTON: Record<Language, string> = {
+  pt: 'Entendi',
+  en: 'Got it',
+  es: 'Entendido',
+};
 
 interface DesktopIconConfig {
   id: string;
@@ -67,10 +77,11 @@ function clampPosition(position: IconPosition): IconPosition {
 
 const DesktopInner: React.FC = () => {
   const { windows, activeWindowId, openWindow, focusWindow, minimizeWindow, blurWindows } = useWindowManager();
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const msnTriggered = useRef(false);
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [showMsnNotification, setShowMsnNotification] = useState(false);
+  const [showAboutDialog, setShowAboutDialog] = useState(true);
   const [iconPositions, setIconPositions] = useLocalStorage<Record<string, IconPosition>>(
     'portfolio:iconPositions',
     {},
@@ -231,6 +242,20 @@ const DesktopInner: React.FC = () => {
           }}
           onDismiss={() => setShowMsnNotification(false)}
         />
+      )}
+
+      {showAboutDialog && (
+        <RetroDialog
+          title={t.shell.welcome.title}
+          buttonLabel={ABOUT_DIALOG_BUTTON[language]}
+          onConfirm={() => setShowAboutDialog(false)}
+          onClose={() => setShowAboutDialog(false)}
+        >
+          <h2>{t.shell.welcome.heading}</h2>
+          <p>{formatChatText(t.shell.welcome.intro)}</p>
+          <p>{formatChatText(t.shell.welcome.orkut)}</p>
+          <p>{formatChatText(t.shell.welcome.msn)}</p>
+        </RetroDialog>
       )}
     </div>
   );

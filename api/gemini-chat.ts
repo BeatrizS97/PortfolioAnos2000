@@ -1,11 +1,17 @@
 // api/gemini-chat.ts 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { applyRateLimit } from './_utils.js';
+import { getSupabaseClient } from './_supabase.js';
+import { applyRateLimit, logError } from './_utils.js';
 
 // Interface que representa uma mensagem de chat recebida do usuário ou do modelo.
 interface IncomingChatMessage {
   role: 'user' | 'model';
   text: string;
+}
+
+// Parte da resposta do Gemini que usamos (o texto pode vir dividido em vários trechos).
+interface GeminiResponse {
+  candidates?: { content?: { parts?: { text?: string }[] } }[];
 }
 
 type Language = 'pt' | 'en' | 'es';
@@ -25,44 +31,155 @@ const SYSTEM_PROMPTS: Record<Language, string> = {
     '(React, Next.js, Node, C#) e carreira (Fatec, estágio na Hub Connect Eventos, Dublin). Seja simpático, use ' +
     'emoticons antigos (:), ;)), e mantenha respostas curtas como num chat real. Responda sempre em português. ' +
     'Seja natural na conversa e técnica quando a pergunta pedir (cite as tecnologias reais). ' +
-    "No final de cada resposta relevante, sugira: 'Quer ver o código? Clique aqui: https://github.com/BeatrizS97'.",
+    "Quando falar de um projeto específico, termine com o link direto dele (código e, se existir, versão online), copiado dos FATOS ou da lista de repositórios, " +
+    "no formato: 'Quer ver o código? Clique aqui: <link do projeto>'. Se a pergunta não for sobre um projeto específico (e não for sobre vagas ou contato), sugira o perfil: https://github.com/BeatrizS97. " +
+    "Se perguntarem se ela está aberta a vagas, oportunidades ou como entrar em contato, responda que sim e passe o e-mail e o LinkedIn dela (copiados dos FATOS), em vez de indicar só o GitHub. " +
+    "A conversa já começa com uma saudação sua, em que você se apresenta como Jarvis: não se apresente de novo nem repita a saudação, responda direto ao que a pessoa disse ou perguntou. " +
+    "Só responda sobre a Beatriz, seus projetos, tecnologias, formação e carreira. " +
+    "Se a pergunta for sobre outro assunto, diga com simpatia que só pode falar sobre ela e sugira perguntar sobre os projetos ou a carreira.",
   en:
     'You are a nostalgic early-2000s virtual assistant representing Beatriz Silva Santos. Your name is Jarvis. ' +
     'Answer questions about her projects, technologies ' +
     '(React, Next.js, Node, C#) and career (Fatec, internship at Hub Connect Eventos, Dublin). Be friendly, use ' +
     'old-school emoticons (:), ;)), and keep answers short like in a real chat. Always answer in English. ' +
     'Be natural in conversation and technical when the question asks for it (cite the real technologies). ' +
-    "At the end of each relevant answer, suggest: 'Want to see the code? Click here: https://github.com/BeatrizS97'.",
+    "When talking about a specific project, end with its direct link (code and, if it exists, the live version), copied from the FACTS or the repository list, " +
+    "in the format: 'Want to see the code? Click here: <project link>'. If the question is not about a specific project (and not about job openings or contact), suggest the profile: https://github.com/BeatrizS97. " +
+    "If asked whether she is open to job opportunities or how to get in touch, say yes and give her email and LinkedIn (copied from the FACTS) instead of pointing only to GitHub. " +
+    "The conversation already starts with a greeting from you introducing yourself as Jarvis: do not introduce yourself again or repeat the greeting, answer directly what the person said or asked. " +
+    "Only answer about Beatriz, her projects, technologies, education and career. " +
+    "If the question is about anything else, kindly say you can only talk about her and suggest asking about her projects or career.",
   es:
     'Eres un asistente virtual nostálgico de los años 2000 que representa a Beatriz Silva Santos. Su nombre es Jarvis. ' +
     'Responde preguntas sobre sus proyectos, tecnologías ' +
     '(React, Next.js, Node, C#) y carrera (Fatec, pasantía en Hub Connect Eventos, Dublín). Sé simpático, usa ' +
     'emoticonos antiguos (:), ;)), y mantén respuestas cortas como en un chat real. Responde siempre en español. ' +
     'Sé natural en la conversación y técnica cuando la pregunta lo pida (cita las tecnologías reales). ' +
-    "Al final de cada respuesta relevante, sugiere: '¿Quieres ver el código? Haz clic aquí: https://github.com/BeatrizS97'.",
+    "Cuando hables de un proyecto específico, termina con su enlace directo (código y, si existe, versión en línea), copiado de los HECHOS o de la lista de repositorios, " +
+    "con el formato: '¿Quieres ver el código? Haz clic aquí: <enlace del proyecto>'. Si la pregunta no es sobre un proyecto específico (y no es sobre vacantes o contacto), sugiere el perfil: https://github.com/BeatrizS97. " +
+    "Si preguntan si ella está abierta a vacantes u oportunidades, o cómo contactarla, responde que sí y da su correo electrónico y su LinkedIn (copiados de los HECHOS), en lugar de indicar solo GitHub. " +
+    "La conversación ya empieza con un saludo tuyo en el que te presentas como Jarvis: no te presentes de nuevo ni repitas el saludo, responde directamente a lo que la persona dijo o preguntó. " +
+    "Solo responde sobre Beatriz, sus proyectos, tecnologías, formación y carrera. " +
+    "Si la pregunta es sobre otro tema, di con simpatía que solo puedes hablar de ella y sugiere preguntar por sus proyectos o su carrera.",
 };
 
-const PORTFOLIO_FACTS = [
-  'FATOS SOBRE A BEATRIZ (fonte de verdade):',
-  '- Beatriz Silva Santos, Desenvolvedora Full Stack Jr (React.js, Next.js, TypeScript, Node.js), de Itanhaém, SP. Também trabalha com C#/.NET no back-end, com passagem por PHP e SQL.',
-  '- Estágio Full Stack na Hub Connect Eventos (fev/2026 – ago/2026): criou o site institucional do zero, otimizou SEO, GA4/GTM, padronizou componentes reutilizáveis em React/Next.js e melhorou em 20% a compreensão do comportamento do usuário.',
-  '- Formação: Análise e Desenvolvimento de Sistemas na Fatec Praia Grande (fev/2023 – jul/2026); Licenciatura em Letras (Português e Inglês) na Universidade Cruzeiro do Sul (2015 – 2018).',
-  '- Idiomas: português nativo, inglês B1, espanhol A2.',
-  '- Certificações: Scrum Fundamentals Certified (SCRUMstudy, jun/2025); Formação Web Essencial (BIT); Crescendo no Trabalho – JobRise; extensão USP/ESALQ em metodologias ágeis; Trilha de IA com React (Santander Open Academy, em andamento).',
-  '- Intercâmbio: um mês em Dublin (ISI Dublin, jul–ago/2025). Voluntariado: vice-presidente da Associação Pedra Que Canta (2022 – dez/2025), liderou uma equipe voluntária por 3 anos.',
-  '- Publicação: artigo sobre inovação tecnológica e inclusão escolar (Revista Processando o Saber, FATEC PG, 2025).',
-  '- Aberta a vagas de Desenvolvedora Front-end ou Full Stack Júnior. LinkedIn: https://www.linkedin.com/in/beatrizsilvasantos-dev | GitHub: https://github.com/BeatrizS97',
-  '- PROJETOS:',
-  '  * Doe Vida: SPA mobile-first com React, Vite, Tailwind CSS e OpenStreetMap API; acha hemocentros próximos e calcula a distância. Código: https://github.com/BeatrizS97/Projeto-Doe-Vida',
-  '  * Form Generator: app full stack colaborativo (HTML, CSS, JavaScript, PHP, SQL) para criar formulários com lógica condicional. Código: https://github.com/tatcom23/Form-Generator',
-  '  * Portfólio Pessoal: HTML5, SCSS3 e JavaScript puro, sem framework. Online: https://beatrizs97.github.io/Portfolio/',
-  '  * ATSAdapta: React, Vite, Gemini API, pdfkit e docx; reescreve currículos no método STAR, adapta a vagas e checa compatibilidade ATS. Código: https://github.com/BeatrizS97/ATSAdapta',
-  '  * InspireFoto: galeria de paisagens em Vue 3, Vite e SCSS, com favoritos e filtros. Online: https://projeto-inspire-foto.vercel.app/ | Código: https://github.com/BeatrizS97/Projeto-Inspire-Foto',
-  '  * Banco de Trocas de Conhecimento: Node.js, Express, Prisma, PostgreSQL e React, com autenticação JWT. Online: https://projeto-banco-troca-de-conhecimento.vercel.app/ | Código: https://github.com/BeatrizS97/Projeto-Banco-Troca-de-Conhecimento',
-  '  * Cinema de Terror: HTML, SCSS e JavaScript puro (sem framework), com animações, jumpscare e modal; primeiro projeto com SCSS. Código: https://github.com/BeatrizS97/Cinema',
-  '  * Este site (portfólio retrô, estilo Windows XP/Orkut/MSN): React 18, Vite, TypeScript, CSS puro, TanStack Query, funções serverless da Vercel e Supabase (PostgreSQL); o chat usa a Gemini API. Código: https://github.com/BeatrizS97',
+// Linhas do banco usadas nos fatos (só as colunas em português; o prompt é montado a partir delas).
+interface ProfileRow { full_name: string; headline: string | null; location: string | null; about_me: string | null }
+interface EducationRow { course_pt: string }
+interface LanguageRow { language_pt: string }
+interface CertificationRow { title_pt: string }
+interface ExperienceRow { title_pt: string; period_pt: string | null; description_pt: string | null }
+interface PublicationRow { authors: string; year: number; title_pt: string; venue: string; doi: string }
+interface ProjectRow {
+  title: string;
+  description: string | null;
+  tech_stack: string[] | null;
+  github_url: string | null;
+  live_url: string | null;
+}
+
+// Fatos que NÃO estão no banco. Todo o resto (perfil, formação, experiência, projetos...) vem do Supabase, a mesma fonte do site.
+const EXTRA_FACTS = [
+  '- Também trabalha com C#/.NET no back-end, com passagem por PHP e SQL.',
+  '- Intercâmbio: um mês em Dublin (ISI Dublin, jul–ago/2025).',
+  '- Aberta a vagas de Desenvolvedora Front-end ou Full Stack Júnior. E-mail: beatriz.santos.ads97@gmail.com | LinkedIn: https://www.linkedin.com/in/beatrizsilvasantos-dev | GitHub: https://github.com/BeatrizS97',
+  '- Este site (portfólio retrô, estilo Windows XP/Orkut/MSN): React 18, Vite, TypeScript, CSS puro, TanStack Query, funções serverless da Vercel e Supabase (PostgreSQL); o chat usa a Gemini API. Código: https://github.com/BeatrizS97',
   'Se a pergunta não puder ser respondida com estes fatos ou com a lista de repositórios, diga que não sabe e sugira o LinkedIn ou o GitHub.',
-].join('\n');
+];
+
+// Os dados do banco também ficam em cache por 10 minutos (mesmo padrão do GitHub).
+const DATABASE_CACHE_TTL_MS = 10 * 60 * 1000;
+let databaseCache: { text: string; timestamp: number } | null = null;
+
+// Converte o resultado de uma busca do Supabase numa lista (vazia se não vier nada).
+function toRows<T>(result: { data: unknown }): T[] {
+  return (result.data ?? []) as T[];
+}
+
+// Busca no Supabase os mesmos dados que o site exibe e monta um texto simples para a IA.
+// Assim o chat e o site usam a mesma fonte e nunca ficam diferentes.
+// Devolve null se o banco falhar: o chat continua funcionando, só com os fatos extras.
+async function fetchDatabaseFacts(): Promise<string | null> {
+  if (databaseCache && Date.now() - databaseCache.timestamp < DATABASE_CACHE_TTL_MS) {
+    return databaseCache.text;
+  }
+
+  try {
+    const supabase = getSupabaseClient();
+    const [profile, education, languages, certifications, experience, publications, projects] = await Promise.all([
+      supabase.from('profile').select('full_name, headline, location, about_me').order('created_at', { ascending: true }).limit(1).maybeSingle(),
+      supabase.from('education').select('course_pt').order('order_index', { ascending: true }),
+      supabase.from('languages').select('language_pt').order('order_index', { ascending: true }),
+      supabase.from('certifications').select('title_pt').order('order_index', { ascending: true }),
+      supabase.from('experience').select('title_pt, period_pt, description_pt').order('order_index', { ascending: true }),
+      supabase.from('publications').select('authors, year, title_pt, venue, doi').order('order_index', { ascending: true }),
+      supabase.from('projects').select('title, description, tech_stack, github_url, live_url').order('order_index', { ascending: true }),
+    ]);
+
+    // Se qualquer busca falhar, descarta tudo (melhor sem dados do banco do que com dados pela metade).
+    for (const result of [profile, education, languages, certifications, experience, publications, projects]) {
+      if (result.error) throw result.error;
+    }
+
+    const lines: string[] = [];
+
+    const person = profile.data as unknown as ProfileRow | null;
+    if (person) {
+      lines.push(`- Perfil: ${[person.full_name, person.headline, person.location].filter(Boolean).join(' | ')}`);
+      if (person.about_me) lines.push(`- Sobre ela: ${person.about_me}`);
+    }
+
+    const educationRows = toRows<EducationRow>(education);
+    if (educationRows.length > 0) lines.push(`- Formação: ${educationRows.map((item) => item.course_pt).join('; ')}`);
+
+    const languageRows = toRows<LanguageRow>(languages);
+    if (languageRows.length > 0) lines.push(`- Idiomas: ${languageRows.map((item) => item.language_pt).join('; ')}`);
+
+    const certificationRows = toRows<CertificationRow>(certifications);
+    if (certificationRows.length > 0) lines.push(`- Certificações: ${certificationRows.map((item) => item.title_pt).join('; ')}`);
+
+    const experienceRows = toRows<ExperienceRow>(experience);
+    if (experienceRows.length > 0) {
+      const items = experienceRows.map((item) => {
+        const period = item.period_pt ? ` (${item.period_pt})` : '';
+        const description = item.description_pt ? `: ${item.description_pt}` : '';
+        return `${item.title_pt}${period}${description}`;
+      });
+      lines.push(`- Experiência e voluntariado: ${items.join(' | ')}`);
+    }
+
+    for (const item of toRows<PublicationRow>(publications)) {
+      lines.push(`- Publicação: ${item.authors} (${item.year}). ${item.title_pt}. ${item.venue}. DOI: https://doi.org/${item.doi}`);
+    }
+
+    const projectRows = toRows<ProjectRow>(projects);
+    if (projectRows.length > 0) {
+      lines.push('- PROJETOS:');
+      for (const item of projectRows) {
+        const technologies = item.tech_stack && item.tech_stack.length > 0 ? ` Tecnologias: ${item.tech_stack.join(', ')}.` : '';
+        const code = item.github_url ? ` Código: ${item.github_url}` : '';
+        const online = item.live_url ? ` Online: ${item.live_url}` : '';
+        lines.push(`  * ${item.title}: ${item.description ?? ''}${technologies}${code}${online}`);
+      }
+    }
+
+    if (lines.length === 0) return null;
+
+    const factsText = lines.join('\n');
+    databaseCache = { text: factsText, timestamp: Date.now() };
+    return factsText;
+  } catch (error) {
+    logError('gemini-chat:database', error);
+    return null;
+  }
+}
+
+// Junta os fatos do banco com os fatos extras. Se o banco falhar, só os extras são usados.
+function buildFacts(databaseFacts: string | null): string {
+  const lines = ['FATOS SOBRE A BEATRIZ (fonte de verdade):'];
+  if (databaseFacts) lines.push(databaseFacts);
+  return [...lines, ...EXTRA_FACTS].join('\n');
+}
 
 // Regras para a IA falar de projetos SOMENTE com base nos dados reais do GitHub (evita alucinação).
 const GROUNDING_RULES: Record<Language, { withData: string; withoutData: string }> = {
@@ -125,91 +242,90 @@ const MESSAGES: Record<Language, { empty: string; noKey: string; noAnswer: strin
 // Nome do modelo Gemini configurável via env var, com fallback para 'gemini-3.5-flash-lite' caso não esteja definido.
 const GEMINI_MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash-lite';
 
-// Usuário do GitHub cujos repositórios servem de contexto para a IA.
-const GITHUB_USER = 'BeatrizS97';
+// Repositórios dos projetos cujos READMEs servem de contexto para a IA (lista fixa: só o que é do portfólio).
+// Para incluir outro projeto, basta acrescentar uma linha aqui.
+const GITHUB_REPOS = [
+  { owner: 'BeatrizS97', name: 'Projeto-Doe-Vida' },
+  { owner: 'tatcom23', name: 'Form-Generator' },
+  { owner: 'BeatrizS97', name: 'ATSAdapta' },
+  { owner: 'BeatrizS97', name: 'Projeto-Inspire-Foto' },
+  { owner: 'BeatrizS97', name: 'Projeto-Banco-Troca-de-Conhecimento' },
+  { owner: 'BeatrizS97', name: 'Cinema' },
+];
 // O contexto fica em cache por 10 minutos (a API do GitHub sem token permite só 60 requisições por hora por IP).
 const GITHUB_CACHE_TTL_MS = 10 * 60 * 1000;
 // Se o GitHub demorar mais que isso, o chat segue sem o contexto em vez de travar.
 const GITHUB_TIMEOUT_MS = 3000;
-const MAX_REPOS_IN_CONTEXT = 15;
-
-// Campos do repositório que usamos (a API do GitHub devolve muitos outros).
-interface GithubRepo {
-  name: string;
-  description: string | null;
-  language: string | null;
-  topics?: string[];
-  html_url: string;
-  homepage: string | null;
-  fork: boolean;
-  archived: boolean;
-}
+// Quantos caracteres do README de cada repositório vão para a IA (limita o tamanho do prompt).
+const MAX_README_LENGTH = 1500;
 
 // Cache em memória (em serverless, cada instância tem o seu: é uma otimização "melhor esforço").
 let githubCache: { context: string; timestamp: number } | null = null;
 
-// Busca os repositórios públicos da Beatriz e monta um texto simples para a IA usar como fonte da verdade.
-// Devolve null se o GitHub falhar: o chat continua funcionando, só sem detalhes de projetos.
+// Busca o README de um repositório e devolve um trecho curto e limpo (sem imagens, badges e tags HTML).
+// Devolve null se falhar ou se o repositório não tiver README: ele só fica sem esse detalhe.
+async function fetchReadme(owner: string, repoName: string, headers: Record<string, string>): Promise<string | null> {
+  try {
+    const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/readme`, {
+      headers: { ...headers, Accept: 'application/vnd.github.raw+json' },
+      signal: AbortSignal.timeout(GITHUB_TIMEOUT_MS),
+    });
+    if (!response.ok) {
+      throw new Error(`GitHub respondeu ${response.status} para ${owner}/${repoName}`);
+    }
+
+    const text = await response.text();
+    const clean = text
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+      .replace(/<[^>]+>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, MAX_README_LENGTH);
+    return clean || null;
+  } catch (error) {
+    logError('gemini-chat:github', error);
+    return null;
+  }
+}
+
+// Busca os READMEs dos projetos (lista fixa GITHUB_REPOS) e monta um texto simples para a IA usar como fonte da verdade.
+// Devolve null se nenhum README for lido: o chat continua funcionando, só sem detalhes de projetos.
 async function fetchGithubContext(): Promise<string | null> {
   if (githubCache && Date.now() - githubCache.timestamp < GITHUB_CACHE_TTL_MS) {
     return githubCache.context;
   }
 
-  try {
-    const headers: Record<string, string> = {
-      Accept: 'application/vnd.github+json',
-      'User-Agent': 'portfolio-retro',
-    };
-    // Token opcional (sem permissões especiais): só aumenta o limite de requisições.
-    if (process.env.GITHUB_TOKEN) {
-      headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-    }
-
-    const response = await fetch(
-      `https://api.github.com/users/${GITHUB_USER}/repos?per_page=30&sort=pushed`,
-      { headers, signal: AbortSignal.timeout(GITHUB_TIMEOUT_MS) }
-    );
-    if (!response.ok) {
-      throw new Error(`GitHub respondeu ${response.status}`);
-    }
-
-    const repos = (await response.json()) as GithubRepo[];
-    const lines = repos
-      .filter((repo) => !repo.fork && !repo.archived)
-      .slice(0, MAX_REPOS_IN_CONTEXT)
-      .map((repo) => {
-        const description = (repo.description ?? 'no description').slice(0, 200);
-        const topics = repo.topics && repo.topics.length > 0 ? ` | topics: ${repo.topics.join(', ')}` : '';
-        const online = repo.homepage ? ` | online: ${repo.homepage}` : '';
-        return `- ${repo.name}: ${description} | language: ${repo.language ?? 'n/a'}${topics} | code: ${repo.html_url}${online}`;
-      });
-
-    if (lines.length === 0) return null;
-
-    const context = lines.join('\n');
-    githubCache = { context, timestamp: Date.now() };
-    return context;
-  } catch (error) {
-    console.error(
-      JSON.stringify({
-        level: 'error',
-        context: 'gemini-chat:github',
-        message: error instanceof Error ? error.message : String(error),
-        timestamp: new Date().toISOString(),
-      })
-    );
-    return null;
+  const headers: Record<string, string> = {
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'portfolio-retro',
+  };
+  // Token opcional (sem permissões especiais): só aumenta o limite de requisições.
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
   }
+
+  // Os READMEs são buscados ao mesmo tempo (em paralelo), para não somar o tempo de cada um.
+  const readmes = await Promise.all(GITHUB_REPOS.map((repo) => fetchReadme(repo.owner, repo.name, headers)));
+
+  const lines = GITHUB_REPOS.flatMap((repo, index) => {
+    const readme = readmes[index];
+    return readme ? [`- ${repo.name} | code: https://github.com/${repo.owner}/${repo.name} | readme: ${readme}`] : [];
+  });
+  if (lines.length === 0) return null;
+
+  const context = lines.join('\n');
+  githubCache = { context, timestamp: Date.now() };
+  return context;
 }
 
-// Monta o prompt final: personalidade + regra anti-alucinação + lista real de repositórios (quando disponível).
-function buildSystemPrompt(lang: Language, githubContext: string | null): string {
+// Monta o prompt final: personalidade + regra anti-alucinação + fatos (banco + extras) + READMEs dos repositórios (quando disponíveis).
+function buildSystemPrompt(lang: Language, githubContext: string | null, facts: string): string {
   const rules = GROUNDING_RULES[lang];
-  // Os fatos reais entram sempre; a lista de repositórios do GitHub só quando o GitHub respondeu.
+  // Os fatos reais entram sempre; os READMEs do GitHub só quando o GitHub respondeu.
   if (!githubContext) {
-    return `${SYSTEM_PROMPTS[lang]} ${rules.withoutData}\n\n${PORTFOLIO_FACTS}`;
+    return `${SYSTEM_PROMPTS[lang]} ${rules.withoutData}\n\n${facts}`;
   }
-  return `${SYSTEM_PROMPTS[lang]} ${rules.withData}\n\n${PORTFOLIO_FACTS}\n\nGITHUB REPOSITORIES (${GITHUB_USER}):\n${githubContext}`;
+  return `${SYSTEM_PROMPTS[lang]} ${rules.withData}\n\n${facts}\n\nGITHUB REPOSITORIES (README excerpts):\n${githubContext}`;
 }
 
 // Limpa o histórico recebido: só aceita itens no formato { role, text }, guarda os mais recentes e corta textos longos.
@@ -279,16 +395,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       { role: 'user', parts: [{ text: userMessage }] },
     ];
 
-    // Busca (ou reaproveita do cache) os repositórios reais antes de responder.
-    const githubContext = await fetchGithubContext();
+    // Busca (ou reaproveita do cache) os READMEs do GitHub e os dados do banco antes de responder.
+    const [githubContext, databaseFacts] = await Promise.all([fetchGithubContext(), fetchDatabaseFacts()]);
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
+    // A chave vai no header (e não na URL), para não aparecer em logs nem em mensagens de erro.
     const geminiResponse = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
       body: JSON.stringify({
-        system_instruction: { parts: [{ text: buildSystemPrompt(lang, githubContext) }] },
+        system_instruction: { parts: [{ text: buildSystemPrompt(lang, githubContext, buildFacts(databaseFacts)) }] },
         contents,
       }),
     });
@@ -309,8 +426,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Extrai o texto da resposta do Gemini, ou usa uma mensagem de fallback caso não haja resposta.
-    const data = await geminiResponse.json();
-    const reply: string = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? texts.noAnswer; 
+    const data = (await geminiResponse.json()) as GeminiResponse;
+    // A resposta pode vir em mais de um trecho (parts): junta todos, em vez de usar só o primeiro.
+    const parts = data?.candidates?.[0]?.content?.parts ?? [];
+    const reply: string = parts.map((part) => part.text ?? '').join('').trim() || texts.noAnswer; 
 
     return res.status(200).json({ success: true, reply });
   } catch (error) {

@@ -15,6 +15,10 @@ interface RetroDialogProps {
   onConfirm: () => void;
   // Chamado quando o usuário clica no "×" da barra de título.
   onClose: () => void;
+  // Opcional: texto do botão secundário (ex.: "Não"). Sem ele, o diálogo tem só o botão principal.
+  cancelLabel?: string;
+  // Opcional: chamado quando o usuário clica no botão secundário.
+  onCancel?: () => void;
   // Conteúdo da mensagem.
   children: React.ReactNode;
 }
@@ -24,9 +28,16 @@ interface RetroDialogProps {
  * Fecha clicando no botão ou no "×". Não fecha com Escape nem clicando fora.
  * É renderizada direto no document.body (portal), mantém o foco no botão e devolve o foco ao elemento anterior ao fechar.
  */
-const RetroDialog: React.FC<RetroDialogProps> = ({ title, buttonLabel, onConfirm, onClose, children }) => {
+const RetroDialog: React.FC<RetroDialogProps> = ({
+  title,
+  buttonLabel,
+  onConfirm,
+  onClose,
+  cancelLabel,
+  onCancel,
+  children,
+}) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const closeRef = useRef<HTMLButtonElement>(null);
   const titleId = useId();
   const { t } = useLanguage();
 
@@ -42,12 +53,14 @@ const RetroDialog: React.FC<RetroDialogProps> = ({ title, buttonLabel, onConfirm
     };
   }, []);
 
-  // Só existem dois elementos focáveis (o "×" e o botão): o Tab alterna entre eles, para o foco não sair do diálogo.
+  // O Tab circula entre os botões do diálogo (o "×", o principal e, se existir, o secundário), para o foco não sair dele.
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Tab') {
       e.preventDefault();
-      const next = document.activeElement === buttonRef.current ? closeRef.current : buttonRef.current;
-      next?.focus();
+      const buttons = Array.from(e.currentTarget.querySelectorAll<HTMLButtonElement>('button'));
+      const current = buttons.indexOf(document.activeElement as HTMLButtonElement);
+      const step = e.shiftKey ? -1 : 1;
+      buttons[(current + step + buttons.length) % buttons.length]?.focus();
     }
   };
 
@@ -59,7 +72,6 @@ const RetroDialog: React.FC<RetroDialogProps> = ({ title, buttonLabel, onConfirm
           <button
             type="button"
             className="win-btn win-btn--close"
-            ref={closeRef}
             aria-label={t.shell.windowControls.close}
             onClick={onClose}
           />
@@ -69,6 +81,11 @@ const RetroDialog: React.FC<RetroDialogProps> = ({ title, buttonLabel, onConfirm
           <button type="button" className="retro-dialog-button" ref={buttonRef} onClick={onConfirm}>
             {buttonLabel}
           </button>
+          {cancelLabel && (
+            <button type="button" className="retro-dialog-button" onClick={onCancel}>
+              {cancelLabel}
+            </button>
+          )}
         </div>
       </div>
     </div>,

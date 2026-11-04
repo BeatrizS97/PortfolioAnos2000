@@ -43,6 +43,7 @@
 .retro-dialog-footer {
   display: flex;
   justify-content: center;
+  gap: 8px;
   padding: 8px 16px 14px;
 }
 

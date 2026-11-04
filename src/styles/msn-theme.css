@@ -398,6 +398,31 @@
   text-align: left;
 }
 
+/* Sugestões de perguntas: aparecem sob a saudação enquanto a conversa está vazia. */
+.msn-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0 6px;
+  white-space: normal;
+}
+
+.msn-suggestion {
+  background: linear-gradient(to bottom, #F7F9FC 0%, #DCE4F0 100%);
+  border: 1px solid #A9B8CC;
+  border-radius: 10px;
+  padding: 2px 10px;
+  font-family: Tahoma, Verdana, sans-serif;
+  font-size: 11px;
+  color: #1a5da0;
+  cursor: pointer;
+}
+
+.msn-suggestion:hover {
+  border-color: #6E93BC;
+  background: linear-gradient(to bottom, #ffffff 0%, #EAF4FD 50%, #CFE4F7 100%);
+}
+
 /* Faixa inferior: botões do portfólio à esquerda e caneta / "A" à direita, sobre o fundo azul claro do container. */
 .msn-toolbar-row {
   display: flex;

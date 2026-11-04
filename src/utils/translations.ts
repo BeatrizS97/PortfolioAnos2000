@@ -38,6 +38,7 @@ const pt = {
       paragraph2:
         'Abra o **Orkut** para ver o perfil completo (projetos, skills e depoimentos) ou espere o **MSN** chamar. 😉',
     },
+    // Mensagem de boas-vindas exibida assim que a área de trabalho carrega (explica como navegar).
     welcome: {
       title: 'Bem-vindo(a)!',
       heading: 'Como navegar neste portfólio',
@@ -52,7 +53,7 @@ const pt = {
   orkut: {
     searchPlaceholder: 'Buscar no orkut...',
     searchLabel: 'Buscar',
-    tabs: { home: 'Início', perfil: 'Perfil', scraps: 'Scraps', comunidades: 'Comunidades' },
+    tabs: { home: 'Início', perfil: 'Perfil', comunidades: 'Comunidades' },
     online: 'Online',
     welcome: (name: string) => `Bem-vindo(a), ${name}!`,
     quickLinks: {
@@ -168,13 +169,12 @@ const pt = {
       sendFile: 'Enviar arquivo',
       webcam: 'Webcam',
       audio: 'Áudio',
-      activities: 'Atividades',
       games: 'Jogos',
       comingSoon: 'Em breve',
     },
     notification: {
       close: 'Fechar notificação',
-      text: 'Acabou de ficar disponível para conversar.',
+      text: 'acabou de ficar disponível para conversar.',
       options: 'Opções',
     },
     greeting: 'Oi! Eu sou o Jarvis, assistente virtual da Beatriz :) Pergunte sobre projetos, tecnologias ou carreira!',
@@ -188,6 +188,10 @@ const pt = {
     nudgeSent: 'Você chamou a atenção!',
     tools: { font: 'Fonte', emoticons: 'Emoticons', voiceClip: 'Voice Clip', winks: 'Winks', backgrounds: 'Planos de fundo' },
     inputPlaceholder: 'Digite uma pergunta...',
+    suggestionsLabel: 'Sugestões de perguntas',
+    clearHistory: 'Limpar conversa',
+    clearHistoryConfirm: 'Tem certeza que deseja excluir o histórico da conversa?',
+    suggestions: ['Quais são os projetos da Beatriz?', 'Quais tecnologias ela usa?', 'Qual a formação e a experiência dela?', 'Ela está aberta a vagas?'],
     send: 'Enviar',
     search: 'Pesquisar',
     lastMessage: (dateText: string, timeText: string) =>
@@ -272,7 +276,7 @@ const en: Translations = {
   orkut: {
     searchPlaceholder: 'Search orkut...',
     searchLabel: 'Search',
-    tabs: { home: 'Home', perfil: 'Profile', scraps: 'Scraps', comunidades: 'Communities' },
+    tabs: { home: 'Home', perfil: 'Profile', comunidades: 'Communities' },
     online: 'Online',
     welcome: (name: string) => `Welcome, ${name}!`,
     quickLinks: {
@@ -388,7 +392,6 @@ const en: Translations = {
       sendFile: 'Send file',
       webcam: 'Webcam',
       audio: 'Audio',
-      activities: 'Activities',
       games: 'Games',
       comingSoon: 'Coming soon',
     },
@@ -408,6 +411,10 @@ const en: Translations = {
     nudgeSent: 'You just got their attention!',
     tools: { font: 'Font', emoticons: 'Emoticons', voiceClip: 'Voice Clip', winks: 'Winks', backgrounds: 'Backgrounds' },
     inputPlaceholder: 'Type a question...',
+    suggestionsLabel: 'Suggested questions',
+    clearHistory: 'Clear chat',
+    clearHistoryConfirm: 'Are you sure you want to delete the chat history?',
+    suggestions: ["What are Beatriz's projects?", 'Which technologies does she use?', 'What is her education and experience?', 'Is she open to job opportunities?'],
     send: 'Send',
     search: 'Search',
     lastMessage: (dateText: string, timeText: string) =>
@@ -490,7 +497,7 @@ const es: Translations = {
   orkut: {
     searchPlaceholder: 'Buscar en orkut...',
     searchLabel: 'Buscar',
-    tabs: { home: 'Inicio', perfil: 'Perfil', scraps: 'Scraps', comunidades: 'Comunidades' },
+    tabs: { home: 'Inicio', perfil: 'Perfil', comunidades: 'Comunidades' },
     online: 'En línea',
     welcome: (name: string) => `¡Bienvenido(a), ${name}!`,
     quickLinks: {
@@ -606,7 +613,6 @@ const es: Translations = {
       sendFile: 'Enviar archivo',
       webcam: 'Webcam',
       audio: 'Audio',
-      activities: 'Actividades',
       games: 'Juegos',
       comingSoon: 'Próximamente',
     },
@@ -626,6 +632,10 @@ const es: Translations = {
     nudgeSent: '¡Acabas de llamar la atención!',
     tools: { font: 'Fuente', emoticons: 'Emoticonos', voiceClip: 'Clip de voz', winks: 'Guiños', backgrounds: 'Fondos' },
     inputPlaceholder: 'Escribe una pregunta...',
+    suggestionsLabel: 'Preguntas sugeridas',
+    clearHistory: 'Borrar conversación',
+    clearHistoryConfirm: '¿Seguro que quieres eliminar el historial de la conversación?',
+    suggestions: ['¿Cuáles son los proyectos de Beatriz?', '¿Qué tecnologías usa?', '¿Cuál es su formación y experiencia?', '¿Está disponible para nuevas vacantes?'],
     send: 'Enviar',
     search: 'Buscar',
     lastMessage: (dateText: string, timeText: string) =>

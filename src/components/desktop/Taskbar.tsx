@@ -2,9 +2,9 @@
 import React, { useState } from 'react';
 import type { AppWindow, WindowType } from '../../types/window';
 import StartMenu from './StartMenu';
+import LanguageSwitcher from './LanguageSwitcher';
 import { useSound } from '../../hooks/useSound';
 import { useLanguage } from '../../hooks/useLanguage';
-import { LANGUAGE_OPTIONS } from '../../constants/languages';
 
 interface TaskbarProps {
   windows: AppWindow[];
@@ -35,7 +35,7 @@ const Clock = React.memo(function Clock() {
 const Taskbar: React.FC<TaskbarProps> = ({ windows, activeWindowId, onFocus, onMinimize, onOpen }) => {
   const [startOpen, setStartOpen] = useState(false);
   const { muted, setMuted } = useSound();
-  const { language, setLanguage, t } = useLanguage();
+  const { t } = useLanguage();
 
   // Função que decide o que fazer quando o usuário clica em um item da Taskbar:
   // - Se a janela estiver minimizada, restaura e foca ela.
@@ -79,22 +79,7 @@ const Taskbar: React.FC<TaskbarProps> = ({ windows, activeWindowId, onFocus, onM
       </div>
 
       <div className="taskbar-tray">
-        <div className="tray-language" role="group" aria-label={t.shell.taskbar.language}>
-          {LANGUAGE_OPTIONS.map(({ code, label, Flag }) => (
-            <button
-              key={code}
-              type="button"
-              className={`tray-language-btn ${language === code ? 'tray-language-btn--active' : ''}`}
-              onClick={() => setLanguage(code)}
-              title={label}
-              aria-label={label}
-              aria-pressed={language === code}
-            >
-              <Flag />
-              <span>{code.toUpperCase()}</span>
-            </button>
-          ))}
-        </div>
+        <LanguageSwitcher containerClass="tray-language" buttonClass="tray-language-btn" />
         <button
           className="tray-icon tray-icon--button"
           title={muted ? t.shell.taskbar.unmute : t.shell.taskbar.mute}

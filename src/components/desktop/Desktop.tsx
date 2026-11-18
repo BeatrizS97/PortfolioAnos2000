@@ -11,25 +11,18 @@ import NotificationPopup from '../apps/MSNMessenger/NotificationPopup';
 import RetroDialog from '../shared/RetroDialog';
 import {
   MSN_POPUP_DELAY_MS,
-  TASKBAR_HEIGHT_PX,
   DESKTOP_ICON_DRAG_TYPE,
   DESKTOP_ICON_WIDTH,
   DESKTOP_ICON_HEIGHT,
   DESKTOP_ICON_MARGIN,
   DESKTOP_ICON_PITCH_Y,
 } from '../../utils/constants';
+import { isFiniteNumber } from '../../utils/typeGuards';
+import { clampWindowPosition } from '../../utils/windowGeometry';
 import { useLanguage } from '../../hooks/useLanguage';
 import { formatChatText } from '../../utils/formatChatText';
-import type { Language } from '../../types/language';
 
 const ICON_SIZE = 46;
-
-// Texto do botão do diálogo de boas-vindas, por idioma.
-const ABOUT_DIALOG_BUTTON: Record<Language, string> = {
-  pt: 'Entendi',
-  en: 'Got it',
-  es: 'Entendido',
-};
 
 interface DesktopIconConfig {
   id: string;
@@ -43,10 +36,6 @@ interface DesktopIconConfig {
 interface IconPosition {
   x: number;
   y: number;
-}
-
-function isFiniteNumber(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value);
 }
 
 // Confere se o valor salvo no localStorage tem o formato { [idDoIcone]: { x, y } }. Se não tiver, as posições voltam ao padrão.
@@ -67,17 +56,13 @@ function getDefaultPosition(index: number): IconPosition {
 
 // Mantém o ícone dentro da tela (e acima da barra de tarefas), mesmo se a janela do navegador tiver diminuído.
 function clampPosition(position: IconPosition): IconPosition {
-  const maxX = Math.max(0, window.innerWidth - DESKTOP_ICON_WIDTH);
-  const maxY = Math.max(0, window.innerHeight - TASKBAR_HEIGHT_PX - DESKTOP_ICON_HEIGHT);
-  return {
-    x: Math.min(Math.max(0, position.x), maxX),
-    y: Math.min(Math.max(0, position.y), maxY),
-  };
+  // Mesma conta usada nas janelas (utils/windowGeometry), só mudando o tamanho do item.
+  return clampWindowPosition(position, DESKTOP_ICON_WIDTH, DESKTOP_ICON_HEIGHT);
 }
 
 const DesktopInner: React.FC = () => {
   const { windows, activeWindowId, openWindow, focusWindow, minimizeWindow, blurWindows } = useWindowManager();
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const msnTriggered = useRef(false);
   const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
   const [showMsnNotification, setShowMsnNotification] = useState(false);
@@ -247,7 +232,7 @@ const DesktopInner: React.FC = () => {
       {showAboutDialog && (
         <RetroDialog
           title={t.shell.welcome.title}
-          buttonLabel={ABOUT_DIALOG_BUTTON[language]}
+          buttonLabel={t.shell.welcome.button}
           onConfirm={() => setShowAboutDialog(false)}
           onClose={() => setShowAboutDialog(false)}
         >

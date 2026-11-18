@@ -1,10 +1,10 @@
 // src/components/desktop/BootSequence.tsx
 import React, { useEffect } from 'react';
 import '../../styles/windows-theme.css';
+import LanguageSwitcher from './LanguageSwitcher';
 import { useSound } from '../../hooks/useSound';
 import { useLanguage } from '../../hooks/useLanguage';
 import { SOUND_PATHS } from '../../utils/constants';
-import { LANGUAGE_OPTIONS } from '../../constants/languages';
 
 interface BootSequenceProps {
   onFinish: () => void;
@@ -14,7 +14,7 @@ const BOOT_DURATION_MS = 4000;
 
 const BootSequence: React.FC<BootSequenceProps> = ({ onFinish }) => {
   const { playSound, stopSound } = useSound();
-  const { language, setLanguage, t } = useLanguage();
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Se o navegador bloqueou o som, ele toca na primeira interação do usuário (clique ou tecla, ex.: trocar o idioma ou "pular").
@@ -39,22 +39,7 @@ const BootSequence: React.FC<BootSequenceProps> = ({ onFinish }) => {
 
   return (
     <div className="boot-screen" role="status" aria-label={t.shell.boot.ariaLabel}>
-      <div className="boot-language-switcher" role="group" aria-label={t.shell.taskbar.language}>
-        {LANGUAGE_OPTIONS.map(({ code, label, Flag }) => (
-          <button
-            key={code}
-            type="button"
-            className={`boot-language-btn ${language === code ? 'boot-language-btn--active' : ''}`}
-            onClick={() => setLanguage(code)}
-            title={label}
-            aria-label={label}
-            aria-pressed={language === code}
-          >
-            <Flag />
-            <span>{code.toUpperCase()}</span>
-          </button>
-        ))}
-      </div>
+      <LanguageSwitcher containerClass="boot-language-switcher" buttonClass="boot-language-btn" />
 
       <div className="boot-logo-row">
         <img

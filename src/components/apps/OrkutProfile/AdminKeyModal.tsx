@@ -4,7 +4,6 @@ import Modal from '../../shared/Modal';
 import Input from '../../shared/Input';
 import Button from '../../shared/Button';
 import { useLanguage } from '../../../hooks/useLanguage';
-import type { Language } from '../../../types/language';
 
 interface AdminKeyModalProps {
   /** Recebe a chave digitada. Devolve false se ela for vazia (o campo fica marcado como inválido). */
@@ -13,19 +12,11 @@ interface AdminKeyModalProps {
   onClose: () => void;
 }
 
-// Textos dos botões por idioma (o título e o rótulo do campo vêm de t.scraps).
-const ADMIN_MODAL_TEXT: Record<Language, { confirm: string; cancel: string }> = {
-  pt: { confirm: 'Entrar', cancel: 'Cancelar' },
-  en: { confirm: 'Sign in', cancel: 'Cancel' },
-  es: { confirm: 'Entrar', cancel: 'Cancelar' },
-};
-
 // Modal que pede a chave de administrador (substitui o window.prompt).
 const AdminKeyModal: React.FC<AdminKeyModalProps> = ({ onSubmit, onClose }) => {
   const [value, setValue] = useState('');
   const [hasError, setHasError] = useState(false);
-  const { language, t } = useLanguage();
-  const text = ADMIN_MODAL_TEXT[language];
+  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,9 +35,12 @@ const AdminKeyModal: React.FC<AdminKeyModalProps> = ({ onSubmit, onClose }) => {
           onChange={(e) => setValue(e.target.value)}
           hasError={hasError}
         />
+        {hasError && (
+          <p role="alert" style={{ margin: 0, color: 'crimson', fontSize: 11 }}>{t.scraps.adminKeyRequired}</p>
+        )}
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
-          <Button type="button" variant="secondary" onClick={onClose}>{text.cancel}</Button>
-          <Button type="submit">{text.confirm}</Button>
+          <Button type="button" variant="secondary" onClick={onClose}>{t.scraps.adminCancel}</Button>
+          <Button type="submit">{t.scraps.adminConfirm}</Button>
         </div>
       </form>
     </Modal>

@@ -1,15 +1,16 @@
 // src/components/apps/OrkutProfile/Communities.tsx
-import React, { useEffect, useState } from 'react';
-import { fetchCommunities } from '../../../services/communitiesService';
+import React from 'react';
+import { useCommunities } from '../../../hooks/useCommunities';
 import type { Community } from '../../../types/community';
 import { useLanguage } from '../../../hooks/useLanguage';
+import { getLocalizedField } from '../../../utils/getLocalizedField';
 
 // Formata o número de membros de uma comunidade para exibição, usando a localidade atual para formatação.
 function formatMembers(n: number, locale: string): string {
   return n.toLocaleString(locale);
 }
 
-// Desenho em pixel art (grade 10x10) do ícone de uma comunidade, como as miniaturas de baixa resolução do Orkut.
+// Desenho em pixel art (grade 16x16) do ícone de uma comunidade, como as miniaturas de baixa resolução do Orkut.
 // Cada letra da grade é uma cor da paleta e o "." é o fundo.
 interface PixelArt {
   background: string;
@@ -247,41 +248,11 @@ const PIXEL_ART: Record<string, PixelArt> = {
   },
 };
 
-// Descrição de cada comunidade (aparece ao passar o mouse), ligada a projetos, cursos e experiências reais.
-// A chave é o nome da comunidade; os textos são traduzidos por tc() (ver contentTranslations.ts).
-// Na aba Comunidades a descrição também aparece escrita, abaixo do nome.
-const COMMUNITY_DESCRIPTIONS: Record<string, string> = {
-  'React.js & Next.js Lovers':
-    'Front-end com React.js e Next.js: site institucional da Hub Connect Eventos e projetos como Doe Vida, ATSAdapta e Banco de Trocas.',
-  'TypeScript Salvou Meu Código': 'Tipagem estática no front-end e no back-end — este portfólio é feito em TypeScript.',
-  'Node.js em Aprendizado Contínuo':
-    'APIs com Node.js, Express e Prisma: Banco de Trocas de Conhecimento e as funções serverless deste portfólio.',
-  'C# & .NET Não São Só Café':
-    'Back-end com C# e .NET, complementando a stack de React e Next.js — além de PHP e SQL no Form Generator.',
-  'Scrum Fundamentals Certified': 'Certificação Scrum Fundamentals Certified (SFC™) — SCRUMstudy, jun/2025.',
-  'Metodologias Ágeis: Daily Sem Drama':
-    'Metodologias ágeis na prática — curso de extensão universitária USP/ESALQ (Acelerando Projetos de Sucesso).',
-  'Liderei uma Equipe por 3 Anos e Sobrevivi': 'Três anos liderando a equipe voluntária da Associação Pedra Que Canta.',
-  'Inovação Tecnológica e Inclusão':
-    'Artigo científico sobre inovação tecnológica e inclusão escolar — Revista Processando o Saber, FATEC PG (2025).',
-  'Voluntariado: Fazer o Bem Não Dói':
-    'Vice-presidência da Associação Cultural e Comunitária Pedra Que Canta (2022 – dez/2025).',
-  'Adaptabilidade & Diversidade Cultural': 'Intercâmbio em Dublin (ISI Dublin, 2025) e trabalho em equipes multidisciplinares.',
-};
-
-// Retorna um emoji representando a comunidade com base no nome e na categoria.
-function thumbnailFor(name: string, category: Community['category']): PixelArt {
-  const normalized = name.toLowerCase();
-  if (normalized.includes('react') || normalized.includes('next')) return PIXEL_ART.react;
-  if (normalized.includes('typescript')) return PIXEL_ART.typescript;
-  if (normalized.includes('c#') || normalized.includes('.net')) return PIXEL_ART.csharp;
-  if (normalized.includes('node')) return PIXEL_ART.node;
-  if (normalized.includes('scrum')) return PIXEL_ART.scrum;
-  if (normalized.includes('ágeis') || normalized.includes('ageis')) return PIXEL_ART.agile;
-  if (normalized.includes('lider')) return PIXEL_ART.trophy;
-  if (normalized.includes('inova')) return PIXEL_ART.bulb;
-  if (normalized.includes('volunt')) return PIXEL_ART.heart;
-  if (normalized.includes('adapt')) return PIXEL_ART.globe;
+// Retorna o desenho (pixel art) da comunidade pela coluna "icon" do banco (uma das chaves de PIXEL_ART).
+// Sem icon (ou com um nome desconhecido), usa um desenho padrão pela categoria.
+function thumbnailFor(icon: string | null, category: Community['category']): PixelArt {
+  const art = icon ? PIXEL_ART[icon] : undefined;
+  if (art) return art;
   return category === 'hard_skill' ? PIXEL_ART.bulb : PIXEL_ART.globe;
 }
 
@@ -326,36 +297,26 @@ const CommunityItem = React.memo(function CommunityItem({ art, name, membersText
 });
 
 // 'compact' = lista vertical da sidebar direita; 'full' = cartões com descrição na aba Comunidades.
+// onSeeAll (opcional): quando informado, aparece o link "Ver todas" no cabeçalho (ex.: a sidebar leva à aba Comunidades).
 interface CommunitiesProps {
   variant?: 'compact' | 'full';
   searchTerm?: string;
+  onSeeAll?: () => void;
 }
 
 // Componente que exibe a seção de comunidades no perfil do Orkut, incluindo título, link "ver todas" e lista de comunidades.
-const Communities: React.FC<CommunitiesProps> = ({ variant = 'compact', searchTerm = '' }) => {
-  const [communities, setCommunities] = useState<Community[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { t, tc } = useLanguage(); // Hook personalizado para obter traduções e funções de tradução de texto.
+const Communities: React.FC<CommunitiesProps> = ({ variant = 'compact', searchTerm = '', onSeeAll }) => {
+  // As comunidades vêm do React Query (useCommunities), que guarda o resultado em cache e cancela a busca se o componente sair da tela.
+  const { data = [], isLoading: loading } = useCommunities();
+  const { language, t } = useLanguage(); // Hook personalizado para obter o idioma atual e as traduções dos textos fixos.
 
-  // Efeito colateral que busca as comunidades do serviço ao montar o componente.
-  useEffect(() => {
-    let mounted = true;
-    // Chama a função fetchCommunities para buscar os dados das comunidades e atualiza o estado do componente.
-    fetchCommunities().then((data) => {
-      if (mounted) {
-        // Ordem por relevância profissional: mais membros primeiro (garante a ordem mesmo se a API devolver fora de ordem).
-        setCommunities([...data].sort((a, b) => b.members_count - a.members_count));
-        setLoading(false);
-      }
-    });
-    return () => { mounted = false; };
-  }, []);
+  // Ordem por relevância profissional: mais membros primeiro (garante a ordem mesmo se a API devolver fora de ordem).
+  const communities = [...data].sort((a, b) => b.members_count - a.members_count);
 
-  // Filtra pelo texto da busca (nome ou descrição, já traduzidos); sem busca, mostra todas.
-  const filteredCommunities = communities.filter((c) => {
-    const description = COMMUNITY_DESCRIPTIONS[c.name];
-    return `${tc(c.name)} ${description ? tc(description) : ''}`.toLowerCase().includes(searchTerm);
-  });
+  // Filtra pelo texto da busca (nome ou descrição, no idioma atual); sem busca, mostra todas.
+  const filteredCommunities = communities.filter((c) =>
+    `${getLocalizedField(c, 'name', language)} ${getLocalizedField(c, 'description', language)}`.toLowerCase().includes(searchTerm)
+  );
 
   return (
     <section className="communities-section">
@@ -364,7 +325,18 @@ const Communities: React.FC<CommunitiesProps> = ({ variant = 'compact', searchTe
           {t.communities.title}
           {!loading && ` (${filteredCommunities.length})`}
         </h3>
-        <a href="#" className="see-all-link" onClick={(e) => e.preventDefault()}>{t.communities.seeAll}</a>
+        {onSeeAll && (
+          <a
+            href="#"
+            className="see-all-link"
+            onClick={(e) => {
+              e.preventDefault();
+              onSeeAll();
+            }}
+          >
+            {t.communities.seeAll}
+          </a>
+        )}
       </div>
       {loading ? (
         <div className="loading-spinner">{t.orkut.loading}</div>
@@ -375,10 +347,10 @@ const Communities: React.FC<CommunitiesProps> = ({ variant = 'compact', searchTe
           {filteredCommunities.map((c) => (
             <CommunityItem
               key={c.id}
-              art={thumbnailFor(c.name, c.category)}
-              name={tc(c.name)}
+              art={thumbnailFor(c.icon, c.category)}
+              name={getLocalizedField(c, 'name', language)}
               membersText={`${formatMembers(c.members_count, t.locale)} ${t.communities.members}`}
-              description={COMMUNITY_DESCRIPTIONS[c.name] ? tc(COMMUNITY_DESCRIPTIONS[c.name]) : undefined}
+              description={getLocalizedField(c, 'description', language) || undefined}
               categoryText={`${t.communities.categoryLabel} ${c.category === 'hard_skill' ? t.communities.hardSkill : t.communities.softSkill}`}
               variant={variant}
             />

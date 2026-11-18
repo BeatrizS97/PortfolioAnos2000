@@ -1,57 +1,42 @@
 // src/components/apps/OrkutProfile/ProfileDetails.tsx
-import React, { useEffect, useState } from 'react';
-import { fetchProfile } from '../../../services/profileService';
-import type { ProfileData } from '../../../types/profile';
-import type { Language } from '../../../types/language';
+import React from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { getLocalizedField } from '../../../utils/getLocalizedField';
+import { useProfile } from '../../../hooks/useProfile';
+import ProfileSection from './ProfileSection';
 import {
   useEducation,
   useLanguageSkills,
   useCertifications,
   useExperience,
+  useExchange,
   usePublications,
 } from '../../../hooks/useAcademicInfo';
 
-// Mensagem exibida no lugar de uma seção que não carregou (API fora do ar ou sem conexão), por idioma.
-const LOAD_ERROR_TEXT: Record<Language, string> = {
-  pt: 'Não foi possível carregar esta seção agora. Tente novamente mais tarde.',
-  en: "Couldn't load this section right now. Please try again later.",
-  es: 'No se pudo cargar esta sección ahora. Inténtalo de nuevo más tarde.',
-};
-
-// Dados da seção "Contato" (também usados pela busca).
-const CONTACT_EMAIL = 'beatriz.santos.ads97@gmail.com';
-const CONTACT_LINKEDIN = 'beatrizsilvasantos-dev';
-const CONTACT_GITHUB = 'BeatrizS97';
+// Pega o último trecho de um link (ex.: ".../in/beatrizsilvasantos-dev" vira "beatrizsilvasantos-dev"),
+// usado como nome exibido do LinkedIn e do GitHub (os links completos vêm do banco).
+function getLastPathSegment(url: string): string {
+  return url.split('/').filter(Boolean).pop() ?? url;
+}
 
 interface ProfileDetailsProps {
   searchTerm?: string;
 }
 
 const ProfileDetails: React.FC<ProfileDetailsProps> = ({ searchTerm = '' }) => {
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [loadingProfile, setLoadingProfile] = useState(true);
-  const { t, tc, language } = useLanguage();
+  const { t, language } = useLanguage();
   const d = t.profileDetails;
-  const errorText = LOAD_ERROR_TEXT[language];
+  // Mensagem exibida no lugar de uma seção que não carregou (API fora do ar ou sem conexão): d.loadError.
+  const errorText = d.loadError;
 
+  // O perfil vem do React Query (useProfile), como as seções abaixo. Sem perfil (API fora do ar), "profile" fica null.
+  const { data: profile = null, isLoading: loadingProfile } = useProfile();
   const { data: education = [], isLoading: loadingEducation, isError: errorEducation } = useEducation();
   const { data: languageSkills = [], isLoading: loadingLanguages, isError: errorLanguages } = useLanguageSkills();
   const { data: certifications = [], isLoading: loadingCertifications, isError: errorCertifications } = useCertifications();
   const { data: experience = [], isLoading: loadingExperience, isError: errorExperience } = useExperience();
+  const { data: exchange = [], isLoading: loadingExchange, isError: errorExchange } = useExchange();
   const { data: publications = [], isLoading: loadingPublications, isError: errorPublications } = usePublications();
-
-  useEffect(() => {
-    let mounted = true;
-    fetchProfile().then((data) => {
-      if (mounted) {
-        setProfile(data);
-        setLoadingProfile(false);
-      }
-    });
-    return () => { mounted = false; };
-  }, []);
 
   // Confere se algum dos textos contém o que foi buscado (sem busca, tudo "combina").
   const matches = (...texts: string[]) => texts.join(' ').toLowerCase().includes(searchTerm);
@@ -74,6 +59,9 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ searchTerm = '' }) => {
       getLocalizedField(item, 'description', language)
     )
   );
+  const shownExchange = exchange.filter((item) =>
+    matches(d.exchangeTitle, getLocalizedField(item, 'description', language))
+  );
   const shownPublications = publications.filter((item) =>
     matches(
       d.publicationTitle,
@@ -85,13 +73,20 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ searchTerm = '' }) => {
     )
   );
 
+  // Parágrafos que vêm depois do "sobre mim" (também vêm do banco, na tabela profile). Vazios se o perfil não carregou.
+  const aboutHubConnect = profile ? getLocalizedField(profile, 'about_hub_connect', language) : '';
+  const aboutExtra = profile ? getLocalizedField(profile, 'about_extra', language) : '';
+
   // Quais seções aparecem. Durante a busca, as seções sem resultado ficam escondidas.
+  // O contato (e-mail, LinkedIn e GitHub) vem do perfil: sem perfil carregado, a seção não aparece.
   const searching = searchTerm !== '';
-  const showAbout = matches(d.aboutTitle, profile ? tc(profile.about_me) : '', d.aboutExtra);
-  const showContact = matches(d.contactTitle, d.emailLabel, CONTACT_EMAIL, 'LinkedIn', CONTACT_LINKEDIN, 'GitHub', CONTACT_GITHUB);
+  const showAbout = matches(d.aboutTitle, profile ? getLocalizedField(profile, 'about_me', language) : '', aboutHubConnect, aboutExtra);
+  const showContact =
+    profile !== null &&
+    matches(d.contactTitle, d.emailLabel, profile.email ?? '', 'LinkedIn', profile.linkedin_url ?? '', 'GitHub', profile.github_url ?? '');
   const showEducation = !searching || shownEducation.length > 0;
   const showLanguages = !searching || shownLanguages.length > 0;
-  const showExchange = matches(d.exchangeTitle, d.exchange);
+  const showExchange = !searching || shownExchange.length > 0;
   const showCertifications = !searching || shownCertifications.length > 0;
   const showExperience = !searching || shownExperience.length > 0;
   const showPublications = !searching || shownPublications.length > 0;
@@ -108,126 +103,97 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ searchTerm = '' }) => {
             {loadingProfile ? (
               <div className="loading-spinner">{t.orkut.loading}</div>
             ) : profile ? (
-              <p>{tc(profile.about_me)}</p>
+              <p>{getLocalizedField(profile, 'about_me', language)}</p>
             ) : (
               <p className="empty-state" role="alert">{errorText}</p>
             )}
-            <p>{d.aboutExtra}</p>
+            {aboutHubConnect && <p>{aboutHubConnect}</p>}
+            {aboutExtra && <p>{aboutExtra}</p>}
           </>
         )}
 
-        {showContact && (
+        {showContact && profile && (
           <>
             <div className="section-heading"><h4>{d.contactTitle}</h4></div>
             <ul className="quick-links">
-              <li>{d.emailLabel}: {CONTACT_EMAIL}</li>
-              <li>LinkedIn: <a href={`https://www.linkedin.com/in/${CONTACT_LINKEDIN}`} target="_blank" rel="noreferrer">{CONTACT_LINKEDIN}</a></li>
-              <li>GitHub: <a href={`https://github.com/${CONTACT_GITHUB}`} target="_blank" rel="noreferrer">@{CONTACT_GITHUB}</a></li>
+              {profile.email && <li>{d.emailLabel}: {profile.email}</li>}
+              {profile.linkedin_url && (
+                <li>LinkedIn: <a href={profile.linkedin_url} target="_blank" rel="noreferrer">{getLastPathSegment(profile.linkedin_url)}</a></li>
+              )}
+              {profile.github_url && (
+                <li>GitHub: <a href={profile.github_url} target="_blank" rel="noreferrer">@{getLastPathSegment(profile.github_url)}</a></li>
+              )}
             </ul>
           </>
         )}
 
         {showEducation && (
-          <>
-            <div className="section-heading"><h4>{d.educationTitle}</h4></div>
-            {loadingEducation ? (
-              <div className="loading-spinner">{t.orkut.loading}</div>
-            ) : errorEducation ? (
-              <p className="empty-state" role="alert">{errorText}</p>
-            ) : (
-              <ul className="quick-links">
-                {shownEducation.map((item) => (
-                  <li key={item.id}>{getLocalizedField(item, 'course', language)}</li>
-                ))}
-              </ul>
-            )}
-          </>
+          <ProfileSection title={d.educationTitle} isLoading={loadingEducation} isError={errorEducation}>
+            <ul className="quick-links">
+              {shownEducation.map((item) => (
+                <li key={item.id}>{getLocalizedField(item, 'course', language)}</li>
+              ))}
+            </ul>
+          </ProfileSection>
         )}
 
         {showLanguages && (
-          <>
-            <div className="section-heading"><h4>{d.languagesTitle}</h4></div>
-            {loadingLanguages ? (
-              <div className="loading-spinner">{t.orkut.loading}</div>
-            ) : errorLanguages ? (
-              <p className="empty-state" role="alert">{errorText}</p>
-            ) : (
-              <ul className="quick-links">
-                {shownLanguages.map((item) => (
-                  <li key={item.id}>{getLocalizedField(item, 'language', language)}</li>
-                ))}
-              </ul>
-            )}
-          </>
+          <ProfileSection title={d.languagesTitle} isLoading={loadingLanguages} isError={errorLanguages}>
+            <ul className="quick-links">
+              {shownLanguages.map((item) => (
+                <li key={item.id}>{getLocalizedField(item, 'language', language)}</li>
+              ))}
+            </ul>
+          </ProfileSection>
         )}
 
         {showExchange && (
-          <>
-            <div className="section-heading"><h4>{d.exchangeTitle}</h4></div>
-            <p>{d.exchange}</p>
-          </>
+          <ProfileSection title={d.exchangeTitle} isLoading={loadingExchange} isError={errorExchange}>
+            {shownExchange.map((item) => (
+              <p key={item.id}>{getLocalizedField(item, 'description', language)}</p>
+            ))}
+          </ProfileSection>
         )}
 
         {showCertifications && (
-          <>
-            <div className="section-heading"><h4>{d.certificationsTitle}</h4></div>
-            {loadingCertifications ? (
-              <div className="loading-spinner">{t.orkut.loading}</div>
-            ) : errorCertifications ? (
-              <p className="empty-state" role="alert">{errorText}</p>
-            ) : (
-              <ul className="quick-links">
-                {shownCertifications.map((item) => (
-                  <li key={item.id}>{getLocalizedField(item, 'title', language)}</li>
-                ))}
-              </ul>
-            )}
-          </>
+          <ProfileSection title={d.certificationsTitle} isLoading={loadingCertifications} isError={errorCertifications}>
+            <ul className="quick-links">
+              {shownCertifications.map((item) => (
+                <li key={item.id}>{getLocalizedField(item, 'title', language)}</li>
+              ))}
+            </ul>
+          </ProfileSection>
         )}
 
         {showExperience && (
-          <>
-            <div className="section-heading"><h4>{d.experienceTitle}</h4></div>
-            {loadingExperience ? (
-              <div className="loading-spinner">{t.orkut.loading}</div>
-            ) : errorExperience ? (
-              <p className="empty-state" role="alert">{errorText}</p>
-            ) : (
-              <ul className="quick-links">
-                {shownExperience.map((item) => {
-                  const title = getLocalizedField(item, 'title', language);
-                  const period = getLocalizedField(item, 'period', language);
-                  const description = getLocalizedField(item, 'description', language);
+          <ProfileSection title={d.experienceTitle} isLoading={loadingExperience} isError={errorExperience}>
+            <ul className="quick-links">
+              {shownExperience.map((item) => {
+                const title = getLocalizedField(item, 'title', language);
+                const period = getLocalizedField(item, 'period', language);
+                const description = getLocalizedField(item, 'description', language);
 
-                  return (
-                    <li key={item.id}>
-                      <strong>{title}</strong> ({period}): {description}
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </>
+                return (
+                  <li key={item.id}>
+                    <strong>{title}</strong> ({period}): {description}
+                  </li>
+                );
+              })}
+            </ul>
+          </ProfileSection>
         )}
 
         {showPublications && (
-          <>
-            <div className="section-heading"><h4>{d.publicationTitle}</h4></div>
-            {loadingPublications ? (
-              <div className="loading-spinner">{t.orkut.loading}</div>
-            ) : errorPublications ? (
-              <p className="empty-state" role="alert">{errorText}</p>
-            ) : (
-              shownPublications.map((item) => (
-                <p key={item.id}>
-                  {item.authors} ({item.year}). <em>{getLocalizedField(item, 'title', language)}.</em> {item.venue}. DOI:{' '}
-                  <a href={`https://doi.org/${item.doi}`} target="_blank" rel="noreferrer">
-                    {item.doi}
-                  </a>
-                </p>
-              ))
-            )}
-          </>
+          <ProfileSection title={d.publicationTitle} isLoading={loadingPublications} isError={errorPublications}>
+            {shownPublications.map((item) => (
+              <p key={item.id}>
+                {item.authors} ({item.year}). <em>{getLocalizedField(item, 'title', language)}.</em> {item.venue}. DOI:{' '}
+                <a href={`https://doi.org/${item.doi}`} target="_blank" rel="noreferrer">
+                  {item.doi}
+                </a>
+              </p>
+            ))}
+          </ProfileSection>
         )}
     </div>
   );

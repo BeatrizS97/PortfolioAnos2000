@@ -15,7 +15,7 @@ export const scrapSchema = z.object({
 });
 
 // Tipo derivado do schema (antes era uma interface escrita à mão). O author_avatar continua podendo ser undefined,
-// mas agora a chave precisa existir no objeto (os dados de exemplo já trazem essa chave).
+// mas agora a chave precisa existir no objeto (os dados que vêm da API já trazem essa chave).
 export type Scrap = z.infer<typeof scrapSchema>;
 
 // Resposta da API de scraps, usada para paginação.

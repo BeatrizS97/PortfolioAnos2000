@@ -9,11 +9,16 @@ export const PROJECT_CATEGORIES = ['frontend', 'fullstack', 'ai', 'mobile', 'oth
  * Schema Zod que espelha a interface Project, usado com .safeParse() em projectsService.
  * O banco devolve null nas colunas vazias; o transform converte null em undefined (ou lista/texto vazio)
  * para o resultado bater com a interface acima.
+ * Título e descrição seguem o padrão _pt / _en / _es (use getLocalizedField para ler no idioma atual).
  */
 export const projectSchema = z.object({
   id: z.string(),
-  title: z.string(),
-  description: z.string().nullish().transform((value) => value ?? ''),
+  title_pt: z.string(),
+  title_en: z.string().nullish().transform((value) => value ?? undefined),
+  title_es: z.string().nullish().transform((value) => value ?? undefined),
+  description_pt: z.string().nullish().transform((value) => value ?? ''),
+  description_en: z.string().nullish().transform((value) => value ?? undefined),
+  description_es: z.string().nullish().transform((value) => value ?? undefined),
   tech_stack: z.array(z.string()).nullish().transform((value) => value ?? []),
   github_url: z.string().nullish().transform((value) => value ?? undefined),
   live_url: z.string().nullish().transform((value) => value ?? undefined),
@@ -26,14 +31,9 @@ export const projectSchema = z.object({
 });
 
 // Tipo derivado do schema (antes era uma interface escrita à mão). Os campos github_url, live_url e image_url
-// continuam podendo ser undefined, mas agora a chave precisa existir no objeto (os dados de exemplo já trazem as três).
+// continuam podendo ser undefined, mas agora a chave precisa existir no objeto (os dados que vêm da API já trazem as três).
 export type Project = z.infer<typeof projectSchema>;
 
-
-export interface ProjectFilters {
-  category?: Project['category'];
-  featured?: boolean;
-}
 
 export interface ProjectsApiResponse {
   success: boolean;

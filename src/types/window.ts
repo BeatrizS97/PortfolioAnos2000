@@ -1,10 +1,9 @@
 // src/types/window.ts
-export type WindowType = 'orkut' | 'msn' | 'about' | 'trash';
+export type WindowType = 'orkut' | 'msn';
 
 export interface AppWindow {
   id: string;
   type: WindowType;
-  title: string;
   zIndex: number;
   minimized: boolean;
   maximized: boolean;

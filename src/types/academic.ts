@@ -25,6 +25,9 @@ export type ExperienceItem = AcademicItem<'title'> &
   LocalizedField<'period'> &
   LocalizedField<'description'>;
 
+// Intercâmbio: um texto traduzido (descrição) por item.
+export type ExchangeItem = AcademicItem<'description'>;
+
 export type PublicationItem = AcademicItem<'title'> & {
   authors: string;
   year: number;

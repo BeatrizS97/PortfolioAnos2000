@@ -7,6 +7,8 @@ interface ErrorBoundaryProps {
   children: React.ReactNode;
   // Opcional: o que exibir no lugar dos filhos quando der erro. Sem ele, aparece a tela azul de tela cheia. 
   fallback?: React.ReactNode;
+  // Opcional: textos da tela azul no idioma atual (quem está dentro do LanguageProvider passa t.shell.errors). Sem ele, usa português.
+  texts?: { message: string; restart: string };
 }
 
 // Estado interno: o erro capturado (null enquanto tudo vai bem). 
@@ -74,10 +76,10 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
     return (
       <div style={screenStyle} role="alert">
         <span style={titleStyle}>Portfólio Retrô</span>
-        <p>Ocorreu um erro fatal e o portfólio precisa ser reiniciado.</p>
+        <p>{this.props.texts?.message ?? 'Ocorreu um erro fatal e o portfólio precisa ser reiniciado.'}</p>
         <p style={{ opacity: 0.8 }}>{this.state.error.message}</p>
         <button type="button" style={buttonStyle} onClick={() => window.location.reload()} autoFocus>
-          Reiniciar
+          {this.props.texts?.restart ?? 'Reiniciar'}
         </button>
       </div>
     );

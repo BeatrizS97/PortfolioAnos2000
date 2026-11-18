@@ -19,6 +19,8 @@ interface RetroDialogProps {
   cancelLabel?: string;
   // Opcional: chamado quando o usuário clica no botão secundário.
   onCancel?: () => void;
+  // Opcional: versão estreita do diálogo (300px, a mesma largura do modal de depoimento enviado). Sem ele, usa a largura padrão.
+  compact?: boolean;
   // Conteúdo da mensagem.
   children: React.ReactNode;
 }
@@ -35,6 +37,7 @@ const RetroDialog: React.FC<RetroDialogProps> = ({
   onClose,
   cancelLabel,
   onCancel,
+  compact = false,
   children,
 }) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -66,7 +69,7 @@ const RetroDialog: React.FC<RetroDialogProps> = ({
 
   return createPortal(
     <div className="modal-overlay" role="alertdialog" aria-modal="true" aria-labelledby={titleId}>
-      <div className="retro-dialog" onKeyDown={handleKeyDown}>
+      <div className={`retro-dialog ${compact ? 'retro-dialog--compact' : ''}`} onKeyDown={handleKeyDown}>
         <div className="retro-dialog-titlebar">
           <span id={titleId}>{title}</span>
           <button

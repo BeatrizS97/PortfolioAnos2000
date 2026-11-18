@@ -1,31 +1,37 @@
 // src/components/shared/ReloadError.tsx
-import React from 'react';
-import type { Language } from '../../types/language';
+import React, { useState } from 'react';
 import { useLanguage } from '../../hooks/useLanguage';
+import RetroDialog from './RetroDialog';
 
 interface ReloadErrorProps {
   // Mensagem de erro (cada tela passa a sua, já no idioma atual).
   message: string;
 }
 
-// Texto do botão de recarregar, por idioma.
-const RELOAD_TEXT: Record<Language, string> = {
-  pt: 'Recarregar',
-  en: 'Reload',
-  es: 'Recargar',
-};
-
-// Tela de erro com botão "Recarregar" (usada quando a área de trabalho ou uma janela não consegue carregar).
+// Erro com botão "Recarregar" (usado quando a área de trabalho ou uma janela não consegue carregar).
+// Aparece como um diálogo no estilo RetroDialog. Se for fechado no "×", a mensagem continua visível no lugar dele.
+// O título e o texto do botão vêm de t.shell.errors.
 const ReloadError: React.FC<ReloadErrorProps> = ({ message }) => {
-  const { language } = useLanguage();
+  const { t } = useLanguage();
+  const [dismissed, setDismissed] = useState(false);
+
+  if (dismissed) {
+    return (
+      <div className="loading-screen" role="alert">
+        <p>{message}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="loading-screen" role="alert" style={{ flexDirection: 'column', gap: 12 }}>
+    <RetroDialog
+      title={t.shell.errors.title}
+      buttonLabel={t.shell.errors.reload}
+      onConfirm={() => window.location.reload()}
+      onClose={() => setDismissed(true)}
+    >
       <p>{message}</p>
-      <button type="button" className="xp-button" onClick={() => window.location.reload()} autoFocus>
-        {RELOAD_TEXT[language]}
-      </button>
-    </div>
+    </RetroDialog>
   );
 };
 

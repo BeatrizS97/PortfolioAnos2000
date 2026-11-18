@@ -1,12 +1,12 @@
 // src/hooks/useProjects.ts
 import { useQuery } from '@tanstack/react-query';
 import { fetchProjects } from '../services/projectsService';
-import type { ProjectFilters } from '../types/project';
 
-export function useProjects(filters?: ProjectFilters) {
+// Hook para buscar os projetos usando React Query.
+// O "signal" do React Query cancela a requisição quando o componente sai da tela.
+export function useProjects() {
   return useQuery({
-    queryKey: ['projects', filters],
-    queryFn: ({ signal }) => fetchProjects(filters, signal),
-    staleTime: 5 * 60 * 1000,
+    queryKey: ['projects'],
+    queryFn: ({ signal }) => fetchProjects(signal),
   });
 }

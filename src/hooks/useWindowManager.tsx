@@ -1,7 +1,7 @@
 // src/hooks/useWindowManager.tsx
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import type { AppWindow, WindowType } from '../types/window';
-import { DEFAULT_WINDOW_SIZE, WINDOW_TITLES, TASKBAR_HEIGHT_PX } from '../utils/constants';
+import { DEFAULT_WINDOW_SIZE, TASKBAR_HEIGHT_PX } from '../utils/constants';
 import { clampWindowPosition, loadWindowGeometry } from '../utils/windowGeometry';
 
 // Contexto de LEITURA: muda quando as janelas mudam.
@@ -64,8 +64,8 @@ function bringToFront(state: WindowState, id: string): WindowState {
 function windowReducer(state: WindowState, action: WindowAction): WindowState {
   switch (action.type) {
     case 'open': {
-      // Se já existe uma janela minimizada deste tipo, apenas restaura em vez de duplicar.
-      const existing = state.windows.find((w) => w.type === action.window.type && w.minimized);
+      // Se já existe uma janela deste tipo (minimizada ou não), apenas a traz para a frente (restaurando-a se estiver minimizada) em vez de duplicar.
+      const existing = state.windows.find((w) => w.type === action.window.type);
       if (existing) return bringToFront(state, existing.id);
 
       const zIndex = state.maxZIndex + 1;
@@ -144,6 +144,9 @@ export const WindowProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           width: saved.width,
           height: saved.height,
         };
+      } else if (alreadyOpen) {
+        // A janela já existe: o reducer só a traz para a frente e ignora esta geometria, então a cascata não avança.
+        geometry = { x: 0, y: 0, width: size.width, height: size.height };
       } else {
         cascadeOffset.current = (cascadeOffset.current + 1) % 6;
         geometry = {
@@ -160,7 +163,6 @@ export const WindowProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       window: {
         id,
         type,
-        title: WINDOW_TITLES[type] ?? type,
         minimized: false,
         maximized: isMaximized,
         ...geometry,

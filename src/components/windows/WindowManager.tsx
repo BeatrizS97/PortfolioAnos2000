@@ -15,8 +15,9 @@ const WindowManager: React.FC = () => {
       {windows.map((win) => (
         <Window
           key={win.id}
-          // O título da barra da janela vem do idioma atual (o win.title salvo no estado é sempre em português).
-          win={{ ...win, title: t.shell.windowTitles[win.type] }}
+          win={win}
+          // O título da barra da janela vem do idioma atual.
+          title={t.shell.windowTitles[win.type]}
           isActive={win.id === activeWindowId}
           onClose={closeWindow}
           onMinimize={minimizeWindow}

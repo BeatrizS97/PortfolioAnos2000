@@ -1,7 +1,6 @@
 // src/components/windows/WindowHeader.tsx
 import React from 'react';
 import { useLanguage } from '../../hooks/useLanguage';
-import type { Language } from '../../types/language';
 
 interface WindowHeaderProps {
   title: string;
@@ -13,12 +12,6 @@ interface WindowHeaderProps {
   onDragStart: (e: React.MouseEvent) => void;
 }
 
-const MAXIMIZE_TEXT: Record<Language, { maximize: string; restore: string }> = {
-  pt: { maximize: 'Maximizar', restore: 'Restaurar' },
-  en: { maximize: 'Maximize', restore: 'Restore' },
-  es: { maximize: 'Maximizar', restore: 'Restaurar' },
-};
-
 const WindowHeader: React.FC<WindowHeaderProps> = ({
   title,
   iconSrc,
@@ -28,8 +21,8 @@ const WindowHeader: React.FC<WindowHeaderProps> = ({
   onMaximize,
   onDragStart,
 }) => {
-  const { language, t } = useLanguage();
-  const maximizeLabel = maximized ? MAXIMIZE_TEXT[language].restore : MAXIMIZE_TEXT[language].maximize;
+  const { t } = useLanguage();
+  const maximizeLabel = maximized ? t.shell.windowControls.restore : t.shell.windowControls.maximize;
 
   // Duplo clique na barra de título maximiza/restaura (como no Windows XP), mas não quando o clique foi num dos botões.
   const handleDoubleClick = (e: React.MouseEvent) => {

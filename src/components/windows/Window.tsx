@@ -4,11 +4,7 @@ import type { AppWindow } from '../../types/window';
 import WindowHeader from './WindowHeader';
 import WindowContent from './WindowContent';
 import { clampWindowPosition, saveWindowGeometry } from '../../utils/windowGeometry';
-import { DEFAULT_WINDOW_SIZE, TASKBAR_HEIGHT_PX } from '../../utils/constants';
-
-// Elementos que podem receber foco do teclado dentro da janela.
-const FOCUSABLE_SELECTOR =
-  'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+import { DEFAULT_WINDOW_SIZE, FOCUSABLE_SELECTOR, TASKBAR_HEIGHT_PX } from '../../utils/constants';
 
 // Ícone pequeno à esquerda do título, por tipo de janela (por enquanto só o MSN tem).
 const WINDOW_ICONS: Partial<Record<AppWindow['type'], string>> = {
@@ -17,13 +13,14 @@ const WINDOW_ICONS: Partial<Record<AppWindow['type'], string>> = {
 
 interface WindowProps {
   win: AppWindow;
+  title: string;
   isActive: boolean;
   onClose: (id: string) => void;
   onMinimize: (id: string) => void;
   onFocus: (id: string) => void;
 }
 
-const Window: React.FC<WindowProps> = ({ win, isActive, onClose, onMinimize, onFocus }) => {
+const Window: React.FC<WindowProps> = ({ win, title, isActive, onClose, onMinimize, onFocus }) => {
   // Janelas que já abrem maximizadas (ex.: Orkut) guardam o tamanho/posição padrão para o botão "restaurar" voltar a eles.
   const restoreSize = DEFAULT_WINDOW_SIZE[win.type];
   const [maximized, setMaximized] = useState(win.maximized);
@@ -165,7 +162,7 @@ const Window: React.FC<WindowProps> = ({ win, isActive, onClose, onMinimize, onF
         onMouseDown={() => onFocus(win.id)}
       >
         <WindowHeader
-          title={win.title}
+          title={title}
           iconSrc={WINDOW_ICONS[win.type]}
           onClose={() => onClose(win.id)}
           maximized={maximized}

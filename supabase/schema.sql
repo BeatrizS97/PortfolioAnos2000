@@ -61,15 +61,6 @@ CREATE TABLE testimonial_requests (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Tabela de Log de Visitantes
-CREATE TABLE visitor_log (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  ip_address INET,
-  user_agent TEXT,
-  visited_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  pages_visited TEXT[]
-);
-
 CREATE INDEX idx_projects_featured ON projects(featured);
 CREATE INDEX idx_projects_category ON projects(category);
 CREATE INDEX idx_scraps_created ON scraps(created_at DESC);
@@ -85,7 +76,7 @@ INSERT INTO profile (full_name, headline, location, about_me, photo_url) VALUES 
   'Beatriz Silva Santos',
   'Desenvolvedora Full Stack Jr | React.js | Next.js | TypeScript | Node.js',
   'Itanhaém, São Paulo',
-  'Oi! Sou a Beatriz, Dev Full Stack Jr formada pela Fatec Praia Grande (2026). Trabalho com React, Next.js e Node.js. Na Hub Connect Eventos, criei um site do zero e melhorei a compreensão do comportamento do usuário em 20% com SEO e GA4. Já fiz intercâmbio em Dublin (ISI Dublin) e tenho certificação Scrum Fundamentals. Amo criar interfaces acessíveis e performáticas. Vamos conversar?',
+  'Oi! Sou a Beatriz, Dev Full Stack Jr formada pela Fatec Praia Grande (2026). Trabalho com React, Next.js e Node.js. Já fiz intercâmbio em Dublin (ISI Dublin) e tenho certificação Scrum Fundamentals. Amo criar interfaces acessíveis e performáticas.',
   '/assets/images/icons/user.png'
 );
 
@@ -114,7 +105,7 @@ INSERT INTO projects (title, description, tech_stack, github_url, live_url, imag
     'Doe Vida — Incentivo à Doação de Sangue',
     'SPA responsiva mobile-first que integra a OpenStreetMap API para localizar hemocentros próximos e calcular distância até o usuário.',
     ARRAY['React.js', 'Vite', 'Tailwind CSS', 'OpenStreetMap API'],
-    'https://github.com/BeatrizS97/Projeto-Doe-Vida', '', '/assets/images/projects/doe-vida.png',
+    'https://github.com/BeatrizS97/Projeto-Doe-Vida', 'https://projeto-doe-vida.vercel.app/', '/assets/images/projects/doe-vida.png',
     'frontend', true, 1
   ),
   (
@@ -318,23 +309,6 @@ ALTER TABLE communities ADD CONSTRAINT uq_communities_name UNIQUE (name);
 ALTER TABLE languages ADD CONSTRAINT uq_languages_language_pt UNIQUE (language_pt);
 
 -- ------------------------------------------------------------------
--- 6) visitor_log: guarda o hash (sha256) do IP em vez do IP puro.
---    Atenção: sha256 puro de IP ainda pode ser descoberto por força bruta (há poucos IPs possíveis).
---    Serve como camada básica de privacidade, não como anonimização forte.
--- ------------------------------------------------------------------
-ALTER TABLE visitor_log ADD COLUMN ip_hash TEXT;
-
-UPDATE visitor_log
-  SET ip_hash = encode(sha256(host(ip_address)::bytea), 'hex')
-  WHERE ip_address IS NOT NULL;
-
-ALTER TABLE visitor_log DROP COLUMN ip_address;
-
--- Retenção de 90 dias: sem pg_cron, rode este comando manualmente de vez em quando
--- (a tabela visitor_log nem é usada pelo site hoje):
--- DELETE FROM visitor_log WHERE visited_at < NOW() - INTERVAL '90 days';
-
--- ------------------------------------------------------------------
 -- 7) RLS (Row Level Security)
 --    Estas policies valem para a chave "anon". A chave "service_role" ignora o RLS.
 -- ------------------------------------------------------------------
@@ -413,7 +387,6 @@ ALTER TABLE languages      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE certifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE experience     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE publications   ENABLE ROW LEVEL SECURITY;
-ALTER TABLE visitor_log    ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "projects_select_public"       ON projects       FOR SELECT TO anon USING (true);
 CREATE POLICY "friends_select_public"        ON friends        FOR SELECT TO anon USING (true);
@@ -423,4 +396,308 @@ CREATE POLICY "languages_select_public"      ON languages      FOR SELECT TO ano
 CREATE POLICY "certifications_select_public" ON certifications FOR SELECT TO anon USING (true);
 CREATE POLICY "experience_select_public"     ON experience     FOR SELECT TO anon USING (true);
 CREATE POLICY "publications_select_public"   ON publications   FOR SELECT TO anon USING (true);
--- visitor_log: RLS ligado sem policy, só a service_role acessa.
+-- ------------------------------------------------------------------
+-- 10) Conteúdo traduzido e dados de contato no banco (padrão _pt / _en / _es, o mesmo de education, certifications etc.).
+--     Antes, as traduções de projetos, comunidades, amigos e perfil ficavam no dicionário contentTranslations.ts, chaveado
+--     pelo texto em português: editar o texto no banco fazia a tradução sumir em silêncio.
+-- ------------------------------------------------------------------
+
+-- 10.1) projects: título e descrição nos 3 idiomas (title e description viram title_pt e description_pt).
+ALTER TABLE projects RENAME COLUMN title TO title_pt;
+ALTER TABLE projects RENAME COLUMN description TO description_pt;
+ALTER TABLE projects
+  ADD COLUMN title_en VARCHAR(255),
+  ADD COLUMN title_es VARCHAR(255),
+  ADD COLUMN description_en TEXT,
+  ADD COLUMN description_es TEXT;
+
+UPDATE projects SET
+  title_en = 'Doe Vida — Encouraging Blood Donation',
+  title_es = 'Doe Vida — Incentivo a la Donación de Sangre',
+  description_en = 'Responsive mobile-first SPA that integrates the OpenStreetMap API to locate nearby blood centers and calculate the distance to the user.',
+  description_es = 'SPA responsiva mobile-first que integra la API de OpenStreetMap para ubicar hemocentros cercanos y calcular la distancia hasta el usuario.'
+WHERE title_pt = 'Doe Vida — Incentivo à Doação de Sangue';
+
+UPDATE projects SET
+  title_en = 'Form Generator',
+  title_es = 'Form Generator',
+  description_en = 'Collaborative full stack application for creating and managing forms with conditional logic, integrating the front end with a PHP back end and a SQL database.',
+  description_es = 'Aplicación full stack colaborativa para la creación y gestión de formularios con lógica condicional, integrando el front-end con un back-end en PHP y una base de datos SQL.'
+WHERE title_pt = 'Form Generator';
+
+UPDATE projects SET
+  title_en = 'Personal Portfolio',
+  title_es = 'Portafolio Personal',
+  description_en = 'Personal portfolio built from scratch with HTML5, SCSS3 and vanilla JavaScript.',
+  description_es = 'Portafolio personal construido desde cero con HTML5, SCSS3 y JavaScript puro.'
+WHERE title_pt = 'Portfolio Pessoal';
+
+UPDATE projects SET
+  title_en = 'ATSAdapta',
+  title_es = 'ATSAdapta',
+  description_en = 'Rewrites resumes using the STAR method and tailors them to job openings using AI, with ATS compatibility checking and export to .txt, PDF and Word.',
+  description_es = 'Reescribe currículos con el método STAR y los adapta a vacantes usando IA, con verificación de compatibilidad ATS y exportación en .txt, PDF y Word.'
+WHERE title_pt = 'ATSAdapta';
+
+UPDATE projects SET
+  title_en = 'InspireFoto',
+  title_es = 'InspireFoto',
+  description_en = 'Landscape photography gallery with persisted favorites, category filters and editorial design, built with Vue 3.',
+  description_es = 'Galería de fotografías de paisajes con favoritos persistentes, filtros por categoría y diseño editorial en Vue 3.'
+WHERE title_pt = 'InspireFoto';
+
+UPDATE projects SET
+  title_en = 'Knowledge Exchange Bank',
+  title_es = 'Banco de Intercambio de Conocimiento',
+  description_en = 'Platform for people to exchange knowledge for free — REST API in Node/Express/Prisma and a React SPA, with JWT authentication.',
+  description_es = 'Plataforma para intercambiar conocimientos gratuitamente entre personas — API REST en Node/Express/Prisma y SPA en React, con autenticación JWT.'
+WHERE title_pt = 'Banco de Trocas de Conhecimento';
+
+UPDATE projects SET
+  title_en = 'Horror Cinema',
+  title_es = 'Cine de Terror',
+  description_en = 'Horror-cinema themed page with animations, jumpscare effects and an interactive modal — first project with SCSS.',
+  description_es = 'Página temática de cine de terror con animaciones, efectos de jumpscare y modal interactivo — primer proyecto con SCSS.'
+WHERE title_pt = 'Cinema de Terror';
+
+-- 10.2) communities: nome e descrição nos 3 idiomas (name vira name_pt; a descrição antes ficava fixa no Communities.tsx).
+ALTER TABLE communities RENAME COLUMN name TO name_pt;
+ALTER TABLE communities
+  ADD COLUMN name_en VARCHAR(255),
+  ADD COLUMN name_es VARCHAR(255),
+  ADD COLUMN description_pt TEXT,
+  ADD COLUMN description_en TEXT,
+  ADD COLUMN description_es TEXT;
+
+UPDATE communities SET
+  name_en = 'React.js & Next.js Lovers',
+  name_es = 'Amantes de React.js y Next.js',
+  description_pt = 'Front-end com React.js e Next.js: site institucional da Hub Connect Eventos e projetos como Doe Vida, ATSAdapta e Banco de Trocas.',
+  description_en = 'Front end with React.js and Next.js: the Hub Connect Eventos institutional website and projects such as Doe Vida, ATSAdapta and Banco de Trocas.',
+  description_es = 'Front-end con React.js y Next.js: el sitio institucional de Hub Connect Eventos y proyectos como Doe Vida, ATSAdapta y Banco de Trocas.'
+WHERE name_pt = 'React.js & Next.js Lovers';
+
+UPDATE communities SET
+  name_en = 'TypeScript Saved My Code',
+  name_es = 'TypeScript Salvó Mi Código',
+  description_pt = 'Tipagem estática no front-end e no back-end — este portfólio é feito em TypeScript.',
+  description_en = 'Static typing on the front end and the back end — this portfolio is built with TypeScript.',
+  description_es = 'Tipado estático en el front-end y en el back-end — este portafolio está hecho con TypeScript.'
+WHERE name_pt = 'TypeScript Salvou Meu Código';
+
+UPDATE communities SET
+  name_en = 'C# & .NET Are Not Just Coffee',
+  name_es = 'C# y .NET No Son Solo Café',
+  description_pt = 'Back-end com C# e .NET, complementando a stack de React e Next.js — além de PHP e SQL no Form Generator.',
+  description_en = 'Back end with C# and .NET, complementing the React and Next.js stack — plus PHP and SQL in Form Generator.',
+  description_es = 'Back-end con C# y .NET, complementando el stack de React y Next.js — además de PHP y SQL en Form Generator.'
+WHERE name_pt = 'C# & .NET Não São Só Café';
+
+UPDATE communities SET
+  name_en = 'Node.js in Continuous Learning',
+  name_es = 'Node.js en Aprendizaje Continuo',
+  description_pt = 'APIs com Node.js, Express e Prisma: Banco de Trocas de Conhecimento e as funções serverless deste portfólio.',
+  description_en = 'APIs with Node.js, Express and Prisma: the Knowledge Exchange Bank and this portfolio''s serverless functions.',
+  description_es = 'APIs con Node.js, Express y Prisma: el Banco de Intercambio de Conocimiento y las funciones serverless de este portafolio.'
+WHERE name_pt = 'Node.js em Aprendizado Contínuo';
+
+UPDATE communities SET
+  name_en = 'Scrum Fundamentals Certified',
+  name_es = 'Scrum Fundamentals Certified',
+  description_pt = 'Certificação Scrum Fundamentals Certified (SFC™) — SCRUMstudy, jun/2025.',
+  description_en = 'Scrum Fundamentals Certified (SFC™) certification — SCRUMstudy, Jun/2025.',
+  description_es = 'Certificación Scrum Fundamentals Certified (SFC™) — SCRUMstudy, jun/2025.'
+WHERE name_pt = 'Scrum Fundamentals Certified';
+
+UPDATE communities SET
+  name_en = 'Agile Methodologies: Drama-Free Daily',
+  name_es = 'Metodologías Ágiles: Daily Sin Drama',
+  description_pt = 'Metodologias ágeis na prática — curso de extensão universitária USP/ESALQ (Acelerando Projetos de Sucesso).',
+  description_en = 'Agile methodologies in practice — USP/ESALQ university extension course (Accelerating Successful Projects).',
+  description_es = 'Metodologías ágiles en la práctica — curso de extensión universitaria USP/ESALQ (Acelerando Proyectos de Éxito).'
+WHERE name_pt = 'Metodologias Ágeis: Daily Sem Drama';
+
+UPDATE communities SET
+  name_en = 'Technological Innovation and Inclusion',
+  name_es = 'Innovación Tecnológica e Inclusión',
+  description_pt = 'Artigo científico sobre inovação tecnológica e inclusão escolar — Revista Processando o Saber, FATEC PG (2025).',
+  description_en = 'Scientific paper on technological innovation and school inclusion — Revista Processando o Saber, FATEC PG (2025).',
+  description_es = 'Artículo científico sobre innovación tecnológica e inclusión escolar — Revista Processando o Saber, FATEC PG (2025).'
+WHERE name_pt = 'Inovação Tecnológica e Inclusão';
+
+UPDATE communities SET
+  name_en = 'Volunteering: Doing Good Doesn''t Hurt',
+  name_es = 'Voluntariado: Hacer el Bien No Duele',
+  description_pt = 'Vice-presidência da Associação Cultural e Comunitária Pedra Que Canta (2022 – dez/2025).',
+  description_en = 'Vice presidency of the Pedra Que Canta Cultural and Community Association (2022 – Dec/2025).',
+  description_es = 'Vicepresidencia de la Asociación Cultural y Comunitaria Pedra Que Canta (2022 – dic/2025).'
+WHERE name_pt = 'Voluntariado: Fazer o Bem Não Dói';
+
+UPDATE communities SET
+  name_en = 'Adaptability & Cultural Diversity',
+  name_es = 'Adaptabilidad y Diversidad Cultural',
+  description_pt = 'Intercâmbio em Dublin (ISI Dublin, 2025) e trabalho em equipes multidisciplinares.',
+  description_en = 'Study abroad in Dublin (ISI Dublin, 2025) and work in multidisciplinary teams.',
+  description_es = 'Intercambio en Dublín (ISI Dublin, 2025) y trabajo en equipos multidisciplinarios.'
+WHERE name_pt = 'Adaptabilidade & Diversidade Cultural';
+
+UPDATE communities SET
+  name_en = 'I Led a Team for 3 Years and Survived',
+  name_es = 'Lideré un Equipo por 3 Años y Sobreviví',
+  description_pt = 'Três anos liderando a equipe voluntária da Associação Pedra Que Canta.',
+  description_en = 'Three years leading the volunteer team at the Pedra Que Canta Association.',
+  description_es = 'Tres años liderando al equipo voluntario de la Asociación Pedra Que Canta.'
+WHERE name_pt = 'Liderei uma Equipe por 3 Anos e Sobrevivi';
+
+-- 10.3) friends: a função exibida ao passar o mouse nos 3 idiomas (role vira role_pt). O nome da pessoa não é traduzido.
+ALTER TABLE friends RENAME COLUMN role TO role_pt;
+ALTER TABLE friends
+  ADD COLUMN role_en VARCHAR(255),
+  ADD COLUMN role_es VARCHAR(255);
+
+UPDATE friends SET
+  role_en = 'Knowledge Exchange Bank — Fullstack, Architecture',
+  role_es = 'Banco de Intercambio de Conocimiento — Fullstack, Arquitectura'
+WHERE name = 'Marcela Santiago';
+
+UPDATE friends SET
+  role_en = 'Form Generator — Collaborator',
+  role_es = 'Form Generator — Colaboradora'
+WHERE name = 'Tatiana Nunes';
+
+UPDATE friends SET
+  role_en = 'Knowledge Exchange Bank — Knowledge CRUD',
+  role_es = 'Banco de Intercambio de Conocimiento — CRUD de Conocimientos'
+WHERE name = 'Patrick Silva';
+
+-- 10.4) profile: título e "sobre mim" nos 3 idiomas (headline e about_me viram headline_pt e about_me_pt)
+--       e os dados de contato (antes repetidos no ProfileDetails.tsx e no prompt do chat).
+ALTER TABLE profile RENAME COLUMN headline TO headline_pt;
+ALTER TABLE profile RENAME COLUMN about_me TO about_me_pt;
+ALTER TABLE profile
+  ADD COLUMN headline_en VARCHAR(255),
+  ADD COLUMN headline_es VARCHAR(255),
+  ADD COLUMN about_me_en TEXT,
+  ADD COLUMN about_me_es TEXT,
+  ADD COLUMN email VARCHAR(255),
+  ADD COLUMN linkedin_url VARCHAR(500),
+  ADD COLUMN github_url VARCHAR(500);
+
+ALTER TABLE profile ADD CONSTRAINT chk_profile_linkedin_url
+  CHECK (linkedin_url IS NULL OR linkedin_url LIKE 'https://%');
+
+ALTER TABLE profile ADD CONSTRAINT chk_profile_github_url
+  CHECK (github_url IS NULL OR github_url LIKE 'https://%');
+
+UPDATE profile SET
+  headline_en = 'Junior Full Stack Developer | React.js | Next.js | TypeScript | Node.js',
+  headline_es = 'Desarrolladora Full Stack Jr | React.js | Next.js | TypeScript | Node.js',
+  about_me_en = 'Hi! I''m Beatriz, a Junior Full Stack Dev who graduated from Fatec Praia Grande (2026). I work with React, Next.js and Node.js. I also did an exchange program in Dublin (ISI Dublin) and hold a Scrum Fundamentals certification. I love building accessible, high-performance interfaces.',
+  about_me_es = '¡Hola! Soy Beatriz, Dev Full Stack Jr graduada en la Fatec Praia Grande (2026). Trabajo con React, Next.js y Node.js. También hice un intercambio en Dublín (ISI Dublin) y tengo la certificación Scrum Fundamentals. Me encanta crear interfaces accesibles y de alto rendimiento.',
+  email = 'beatriz.santos.ads97@gmail.com',
+  linkedin_url = 'https://www.linkedin.com/in/beatrizsilvasantos-dev',
+  github_url = 'https://github.com/BeatrizS97'
+WHERE full_name = 'Beatriz Silva Santos';
+
+-- 10.5) exchange: a seção "Intercâmbio" do Perfil (antes fixa em translations.ts e repetida no prompt do chat).
+CREATE TABLE exchange (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  description_pt TEXT NOT NULL,
+  description_en TEXT,
+  description_es TEXT,
+  order_index INTEGER DEFAULT 0
+);
+
+CREATE INDEX idx_exchange_order ON exchange(order_index);
+
+INSERT INTO exchange (description_pt, description_en, description_es, order_index) VALUES
+  ('Um mês de imersão em Dublin, Irlanda, na ISI Dublin – English Language School (jul–ago/2025), curso de inglês geral nível A2. A vivência reforçou autonomia, comunicação intercultural e adaptabilidade em um ambiente totalmente novo.',
+   'One month of immersion in Dublin, Ireland, at ISI Dublin – English Language School (Jul–Aug/2025), general English course at A2 level. The experience strengthened autonomy, intercultural communication and adaptability in a completely new environment.',
+   'Un mes de inmersión en Dublín, Irlanda, en ISI Dublin – English Language School (jul–ago/2025), curso de inglés general nivel A2. La vivencia reforzó la autonomía, la comunicación intercultural y la adaptabilidad en un entorno totalmente nuevo.',
+   1);
+
+ALTER TABLE exchange ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "exchange_select_public" ON exchange FOR SELECT TO anon USING (true);
+
+-- -------------------------------------------------------------------- ------------------------------------------------------------------
+UPDATE profile SET
+  about_me_pt = 'Oi! Sou a Beatriz, Dev Full Stack Jr formada pela Fatec Praia Grande (2026). Trabalho com React, Next.js e Node.js. Já fiz intercâmbio em Dublin (ISI Dublin) e tenho certificação Scrum Fundamentals. Amo criar interfaces acessíveis e performáticas.',
+  about_me_en = 'Hi! I''m Beatriz, a Junior Full Stack Dev who graduated from Fatec Praia Grande (2026). I work with React, Next.js and Node.js. I also did an exchange program in Dublin (ISI Dublin) and hold a Scrum Fundamentals certification. I love building accessible, high-performance interfaces.',
+  about_me_es = '¡Hola! Soy Beatriz, Dev Full Stack Jr graduada en la Fatec Praia Grande (2026). Trabajo con React, Next.js y Node.js. También hice un intercambio en Dublín (ISI Dublin) y tengo la certificación Scrum Fundamentals. Me encanta crear interfaces accesibles y de alto rendimiento.'
+WHERE full_name = 'Beatriz Silva Santos';
+
+-- ------------------------------------------------------------------
+-- 12) Limpeza e dados que antes ficavam no código.
+-- ------------------------------------------------------------------
+
+-- 12.1) A tabela visitor_log nunca foi escrita por nenhuma rota da API, então foi removida.
+DROP TABLE IF EXISTS visitor_log;
+
+-- 12.2) O projeto Doe Vida também tem versão online.
+UPDATE projects SET live_url = 'https://projeto-doe-vida.vercel.app/'
+WHERE title_pt = 'Doe Vida — Incentivo à Doação de Sangue';
+
+-- 12.3) communities.icon: o desenho em pixel art de cada comunidade. Antes o Communities.tsx escolhia o desenho pelo texto do nome,
+--       e renomear a comunidade no banco trocava o ícone sem avisar. Os valores válidos são as chaves de PIXEL_ART no Communities.tsx.
+ALTER TABLE communities ADD COLUMN IF NOT EXISTS icon VARCHAR(30);
+
+ALTER TABLE communities DROP CONSTRAINT IF EXISTS chk_communities_icon;
+ALTER TABLE communities ADD CONSTRAINT chk_communities_icon
+  CHECK (icon IS NULL OR icon IN ('react', 'typescript', 'csharp', 'node', 'scrum', 'agile', 'trophy', 'bulb', 'heart', 'globe'));
+
+UPDATE communities SET icon = 'react'      WHERE name_pt = 'React.js & Next.js Lovers';
+UPDATE communities SET icon = 'typescript' WHERE name_pt = 'TypeScript Salvou Meu Código';
+UPDATE communities SET icon = 'csharp'     WHERE name_pt = 'C# & .NET Não São Só Café';
+UPDATE communities SET icon = 'node'       WHERE name_pt = 'Node.js em Aprendizado Contínuo';
+UPDATE communities SET icon = 'scrum'      WHERE name_pt = 'Scrum Fundamentals Certified';
+UPDATE communities SET icon = 'agile'      WHERE name_pt = 'Metodologias Ágeis: Daily Sem Drama';
+UPDATE communities SET icon = 'bulb'       WHERE name_pt = 'Inovação Tecnológica e Inclusão';
+UPDATE communities SET icon = 'heart'      WHERE name_pt = 'Voluntariado: Fazer o Bem Não Dói';
+UPDATE communities SET icon = 'globe'      WHERE name_pt = 'Adaptabilidade & Diversidade Cultural';
+UPDATE communities SET icon = 'trophy'     WHERE name_pt = 'Liderei uma Equipe por 3 Anos e Sobrevivi';
+
+-- 12.4) profile: os dois parágrafos que aparecem depois do "sobre mim" na aba Perfil (antes ficavam no translations.ts).
+--       about_extra = formação em Letras e abertura a vagas; about_hub_connect = o que ela fez na Hub Connect Eventos.
+ALTER TABLE profile
+  ADD COLUMN IF NOT EXISTS about_extra_pt TEXT,
+  ADD COLUMN IF NOT EXISTS about_extra_en TEXT,
+  ADD COLUMN IF NOT EXISTS about_extra_es TEXT,
+  ADD COLUMN IF NOT EXISTS about_hub_connect_pt TEXT,
+  ADD COLUMN IF NOT EXISTS about_hub_connect_en TEXT,
+  ADD COLUMN IF NOT EXISTS about_hub_connect_es TEXT;
+
+UPDATE profile SET
+  about_extra_pt = 'Minha formação em Letras reforça minha comunicação e trabalho em equipes multidisciplinares (design, produto, QA). Estou aberta a oportunidades como Desenvolvedora Front-End ou Full Stack Júnior — vamos conversar?',
+  about_extra_en = 'My background in Languages and Literature strengthens my communication and my work in multidisciplinary teams (design, product, QA). I am open to opportunities as a Junior Front-End or Full Stack Developer — shall we talk?',
+  about_extra_es = 'Mi formación en Letras refuerza mi comunicación y mi trabajo en equipos multidisciplinarios (diseño, producto, QA). Estoy abierta a oportunidades como Desarrolladora Front-End o Full Stack Júnior — ¿conversamos?',
+  about_hub_connect_pt = 'Na Hub Connect Eventos, onde estagiei como Full Stack, criei o site institucional do zero e melhorei em 20% a compreensão do comportamento do usuário com SEO e GA4/GTM, além de padronizar componentes reutilizáveis em React/Next.js.',
+  about_hub_connect_en = 'At Hub Connect Eventos, where I interned as a Full Stack developer, I built the institutional website from scratch and improved the understanding of user behavior by 20% with SEO and GA4/GTM, as well as standardizing reusable components in React/Next.js.',
+  about_hub_connect_es = 'En Hub Connect Eventos, donde hice una pasantía Full Stack, creé el sitio institucional desde cero y mejoré en un 20% la comprensión del comportamiento del usuario con SEO y GA4/GTM, además de estandarizar componentes reutilizables en React/Next.js.'
+WHERE full_name = 'Beatriz Silva Santos';
+
+-- ------------------------------------------------------------------
+-- 13) Contador de visitas. Cada linha é a PRIMEIRA visita de um navegador: o site marca o navegador (localStorage)
+--     e só avisa a rota /api/visits uma vez. Não guarda IP nem dado pessoal, só o momento da visita.
+--     Pode ser rodado mais de uma vez (IF NOT EXISTS / DROP POLICY IF EXISTS). Só o INSERT é liberado para anon (policy abaixo); a leitura é só da service_role (a API).
+-- ------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS site_visits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  visited_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_site_visits_visited ON site_visits(visited_at DESC);
+
+ALTER TABLE site_visits ENABLE ROW LEVEL SECURITY;
+
+-- Só aceita INSERT (mesmo padrão de testimonial_requests). Sem policy de SELECT, ninguém lê as visitas pela chave anon.
+-- Sem esta policy, o INSERT feito pela API falhava com "new row violates row-level security policy" quando a SUPABASE_KEY não era a service_role.
+DROP POLICY IF EXISTS "site_visits_insert_public" ON site_visits;
+CREATE POLICY "site_visits_insert_public" ON site_visits
+  FOR INSERT TO anon
+  WITH CHECK (true);
+
+-- Para ver os números, rode no SQL Editor do Supabase:
+--   Total de visitas:   SELECT count(*) FROM site_visits;
+--   Visitas por dia:    SELECT (visited_at AT TIME ZONE 'America/Sao_Paulo')::date AS dia, count(*) AS visitas
+--                       FROM site_visits GROUP BY dia ORDER BY dia DESC;

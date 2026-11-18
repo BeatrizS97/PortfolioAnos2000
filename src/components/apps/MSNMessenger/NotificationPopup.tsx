@@ -23,7 +23,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ contactName, onOp
     <div className="wlm-toast" role="alert">
       <div className="wlm-toast-header">
         <span className="wlm-toast-app-icon" aria-hidden="true">
-          <img src="/assets/images/msn-icon.png" alt="MSN Icon" width={16} height={16} />
+          <img src="/assets/images/msn-icon.png" alt="" width={16} height={16} />
         </span>
         <span>Windows Live Messenger</span>
         <button aria-label={t.msn.notification.close} onClick={onDismiss}>×</button>

@@ -3,21 +3,20 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSound } from '../../../hooks/useSound';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { useLanguage } from '../../../hooks/useLanguage';
+import { useInsertAtCursor } from '../../../hooks/useInsertAtCursor';
 import { shakeScreen } from '../../../utils/animations';
 import { SOUND_PATHS } from '../../../utils/constants';
-import { findAnswer, formatLastMessageAt, TYPING_TEXT } from '../../../utils/msnHelpers';
+import { findAnswer, formatLastMessageAt } from '../../../utils/msnHelpers';
 import { formatChatText } from '../../../utils/formatChatText';
 import { classifyChatError, sendChatMessage } from '../../../services/geminiChatService';
 import type { ChatMessage } from '../../../types/chat';
 import {
   BACKGROUNDS,
-  COMPOSE_TEXT,
   DEFAULT_TEXT_FORMAT,
   EMOTICONS,
   FONT_FAMILIES,
   FONT_SIZES,
   TEXT_COLORS,
-  VOICE_CLIPS,
   WINKS,
   formatToStyle,
   isBackgroundId,
@@ -36,17 +35,18 @@ import {
   GiftMiniIcon,
   ParenSmileyMiniIcon,
 } from './MSNIcons';
+import ClearHistoryButton from './ClearHistoryButton';
 
 // A mensagem do usuário guarda a formatação usada (fonte, cor, etc.) para continuar igual depois de recarregar a página.
-type SystemKind = 'nudge' | 'voice' | 'wink';
+type SystemKind = 'nudge' | 'wink';
 interface Message { from: 'bot' | 'user' | 'system'; text: string; format?: TextFormat; kind?: SystemKind; itemId?: string; }
 
 // Quem pode ser o autor de uma mensagem salva.
 const MESSAGE_SENDERS: string[] = ['bot', 'user', 'system'];
-const SYSTEM_KINDS: string[] = ['nudge', 'voice', 'wink'];
+const SYSTEM_KINDS: string[] = ['nudge', 'wink'];
 
 // Qual menu da faixa de formatação está aberto (só um por vez).
-type MenuName = 'font' | 'emoticons' | 'voice' | 'wink' | 'background';
+type MenuName = 'font' | 'emoticons' | 'wink' | 'background';
 
 // Confere se o valor salvo no localStorage é uma lista de mensagens válidas ({ from, text }).
 // Se não for (ex.: editado à mão ou corrompido), o histórico começa vazio em vez de quebrar o chat.
@@ -107,7 +107,7 @@ const AvatarFrame: React.FC<{ src: string; alt: string }> = ({ src, alt }) => (
 const AIAssistant: React.FC = () => {
   const { playSound } = useSound();
   const { language, t } = useLanguage();
-  const compose = COMPOSE_TEXT[language];
+  const compose = t.msn.compose;
   // O histórico fica salvo no localStorage para não se perder ao recarregar a página.
   // A saudação não é salva: ela é exibida a cada render, já no idioma atual.
   const [messages, setMessages] = useLocalStorage<Message[]>('portfolio:msnHistory', [], isMessageList);
@@ -116,9 +116,9 @@ const AIAssistant: React.FC = () => {
   // Estado para o rascunho da mensagem que o usuário está digitando e para a data/hora da última mensagem recebida. 
   const [draft, setDraft] = useState('');
   const [lastMessageAt, setLastMessageAt] = useState<Date>(() => new Date());
-  // Indica que estamos aguardando a resposta da API ("Beatriz está digitando...").
+  // Indica que estamos aguardando a resposta da API ("Jarvis está digitando...", t.msn.typing).
   const [isTyping, setIsTyping] = useState(false);
-  // Controla qual menu da faixa de formatação está aberto (fonte, emoticons, voice clip, wink ou fundo).
+  // Controla qual menu da faixa de formatação está aberto (fonte, emoticons, wink ou fundo).
   const [openMenu, setOpenMenu] = useState<MenuName | null>(null);
   // Elemento vazio no fim da lista de mensagens: é para ele que a rolagem automática desce.
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -150,17 +150,14 @@ const AIAssistant: React.FC = () => {
     };
   }, [openMenu]);
 
-  // Função que lida com o envio de mensagens pelo usuário.
-  // Ela normaliza a pergunta, busca uma resposta na base de conhecimento e atualiza o estado das mensagens.
-  // Se não houver palavra-chave local, consulta a API /api/gemini-chat (com fallback local se ela falhar).
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault(); // Impede o comportamento padrão do formulário (recarregar a página).
-    const question = draft.trim(); // Remove espaços em branco do início e do fim da pergunta.
+  // Função que lida com o envio de uma pergunta (digitada ou escolhida numa das sugestões).
+  // Ela consulta primeiro a API /api/gemini-chat e atualiza o estado das mensagens com a resposta.
+  // Se a API falhar, usa a base de conhecimento local por palavra-chave (t.msn.kb) e, sem resposta local, uma mensagem padrão.
+  const sendQuestion = async (question: string) => {
     if (!question || isTyping) return;
 
     // Atualiza o estado das mensagens, adicionando a pergunta do usuário (com a formatação escolhida) e a resposta do bot, e atualiza a data/hora da última mensagem recebida.
     setMessages((prev) => limitHistory([...prev, { from: 'user', text: question, format }]));
-    setDraft('');
     setOpenMenu(null);
 
     // A IA responde primeiro (ela conhece os dados pelo prompt do servidor), então perguntas livres como
@@ -185,6 +182,16 @@ const AIAssistant: React.FC = () => {
     setLastMessageAt(new Date());
   };
 
+  // Envio pelo formulário: usa o texto digitado, limpa o campo e envia a pergunta.
+  const handleSend = (e: React.FormEvent) => {
+    e.preventDefault(); // Impede o comportamento padrão do formulário (recarregar a página).
+    const question = draft.trim(); // Remove espaços em branco do início e do fim da pergunta.
+    if (!question || isTyping) return;
+
+    setDraft('');
+    void sendQuestion(question);
+  };
+
   // No campo de texto de 2 linhas, Enter envia a mensagem (como antes) e Shift+Enter quebra a linha.
   const handleDraftKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -200,26 +207,23 @@ const AIAssistant: React.FC = () => {
     setMessages((prev) => limitHistory([...prev, { from: 'system', text: '', kind: 'nudge' }]));
   };
 
+  // Apaga o histórico da conversa (inclusive o salvo no localStorage). A saudação continua, pois é exibida a cada render.
+  const handleClearHistory = () => {
+    setMessages([]);
+  };
+
   // Abre o menu escolhido (ou fecha, se ele já estava aberto).
   const toggleMenu = (menu: MenuName) => {
     setOpenMenu((current) => (current === menu ? null : menu));
   };
 
-  // Insere o texto (emoticon, presente) na posição do cursor, fecha o menu e devolve o foco ao campo de digitação.
+  // Insere o texto (emoticon, presente) na posição do cursor e devolve o foco ao campo de digitação (lógica compartilhada com o formulário de depoimento).
+  const insertTextAtCursor = useInsertAtCursor(textareaRef, setDraft);
+
+  // Além de inserir o texto, fecha o menu que estava aberto.
   const insertAtCursor = (text: string) => {
     setOpenMenu(null);
-    const el = textareaRef.current;
-    if (!el) {
-      setDraft((prev) => prev + text);
-      return;
-    }
-    const { selectionStart, selectionEnd, value } = el;
-    setDraft(value.slice(0, selectionStart) + text + value.slice(selectionEnd));
-    const cursor = selectionStart + text.length;
-    requestAnimationFrame(() => {
-      el.focus();
-      el.setSelectionRange(cursor, cursor);
-    });
+    insertTextAtCursor(text);
   };
 
   // Muda só os campos informados da formatação do texto (ex.: { bold: true }).
@@ -235,10 +239,6 @@ const AIAssistant: React.FC = () => {
 
   // Texto exibido numa mensagem de sistema, sempre no idioma atual (inclusive em históricos salvos antes da troca de idioma).
   const getSystemText = (m: Message): string => {
-    if (m.kind === 'voice') {
-      const clip = VOICE_CLIPS.find((item) => item.id === m.itemId);
-      return `${compose.voiceSent} ${clip?.label[language] ?? ''}`;
-    }
     if (m.kind === 'wink') {
       const wink = WINKS.find((item) => item.id === m.itemId);
       return `${compose.winkSent} ${wink?.label[language] ?? ''}`;
@@ -286,9 +286,19 @@ const AIAssistant: React.FC = () => {
                 );
               })}
 
+              {messages.length === 0 && (
+                <div className="msn-suggestions" role="group" aria-label={t.msn.suggestionsLabel}>
+                  {t.msn.suggestions.map((suggestion) => (
+                    <button key={suggestion} type="button" className="msn-suggestion" onClick={() => void sendQuestion(suggestion)}>
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {isTyping && (
                 <p className="msn-message" role="status" style={{ fontStyle: 'italic', color: '#666' }}>
-                  {TYPING_TEXT[language]}
+                  {t.msn.typing}
                 </p>
               )}
               <div ref={messagesEndRef} />
@@ -493,6 +503,8 @@ const AIAssistant: React.FC = () => {
               >
                 <ParenSmileyMiniIcon /> <span className="msn-compose-tool-caret" role="presentation">▾</span>
               </button>
+
+              <ClearHistoryButton onClear={handleClearHistory} disabled={messages.length === 0 || isTyping} />
             </div>
 
             <form className="msn-compose-row" onSubmit={handleSend}>

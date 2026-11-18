@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { useSound } from '../../../hooks/useSound';
 import { shakeScreen } from '../../../utils/animations';
 import { SOUND_PATHS } from '../../../utils/constants';
+import { normalizeText } from '../../../utils/msnHelpers';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useWindowManager } from '../../../hooks/useWindowManager';
 import AIAssistant from './AIAssistant';
@@ -21,24 +22,19 @@ const MnemonicLabel: React.FC<{ text: string; index?: number }> = ({ text, index
   </span>
 );
 
-// Tira o acento e passa para minúscula, para "Á" e "A" contarem como a mesma letra.
-function normalizeLetter(letter: string): string {
-  return letter.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-}
-
 // Para cada rótulo, escolhe a primeira letra que ainda não foi usada por outro rótulo (assim nenhuma tecla de atalho se repete).
 function pickMnemonicIndexes(labels: string[]): number[] {
   const used = new Set<string>();
   return labels.map((label) => {
-    let index = label.split('').findIndex((char) => /\p{L}/u.test(char) && !used.has(normalizeLetter(char)));
+    let index = label.split('').findIndex((char) => /\p{L}/u.test(char) && !used.has(normalizeText(char)));
     if (index === -1) index = 0;
-    used.add(normalizeLetter(label.charAt(index)));
+    used.add(normalizeText(label.charAt(index)));
     return index;
   });
 }
 
-// Itens da barra de menu decorativa do topo da janela (como no MSN 7.0: File, Edit, Actions, Tools, Help). Não têm função, só estética.
-const MENU_ITEMS = ['File', 'Edit', 'Actions', 'Tools', 'Help'];
+// Os itens da barra de menu decorativa do topo da janela (como no MSN 7.0: File, Edit, Actions, Tools, Help) vêm de t.msn.menu,
+// no idioma atual. Não têm função, só estética.
 
 // Componente principal da janela de chat do MSN Messenger, incluindo a barra de ferramentas e o assistente virtual.
 const MSNChat: React.FC = () => {
@@ -76,9 +72,9 @@ const MSNChat: React.FC = () => {
 
   return (
     <div className="msn-classic">
-      <div className="msn-toolbar-container">
+      <div>
         <div className="msn-menubar" aria-hidden="true">
-          {MENU_ITEMS.map((item) => (
+          {t.msn.menu.map((item) => (
             <span key={item}><MnemonicLabel text={item} /></span>
           ))}
         </div>

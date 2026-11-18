@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import RetroDialog from '../../shared/RetroDialog';
-import type { Language } from '../../../types/language';
 
 interface ClearHistoryButtonProps {
   // Chamado depois que a pessoa confirma que quer apagar o histórico.
@@ -10,13 +9,6 @@ interface ClearHistoryButtonProps {
   // Desabilita o botão (ex.: conversa vazia ou resposta a caminho).
   disabled?: boolean;
 }
-
-// Textos dos botões do modal de confirmação, por idioma (o título e a pergunta vêm de t.msn).
-const CONFIRM_TEXT: Record<Language, { yes: string; no: string }> = {
-  pt: { yes: 'Sim', no: 'Não' },
-  en: { yes: 'Yes', no: 'No' },
-  es: { yes: 'Sí', no: 'No' },
-};
 
 // Lixeirinha no mesmo tamanho e traço dos outros ícones pequenos da faixa de formatação.
 const TrashMiniIcon: React.FC = () => (
@@ -31,9 +23,9 @@ const TrashMiniIcon: React.FC = () => (
 // Botão "Limpar conversa" do chat do MSN, na faixa de ícones ao lado do "Chamar a atenção".
 // Antes de apagar, abre um modal de confirmação no mesmo estilo da tela de boas-vindas.
 const ClearHistoryButton: React.FC<ClearHistoryButtonProps> = ({ onClear, disabled = false }) => {
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const text = CONFIRM_TEXT[language];
+  // Os botões do modal de confirmação vêm de t.dialog (o título e a pergunta vêm de t.msn).
 
   const handleConfirm = () => {
     setConfirmOpen(false);
@@ -56,10 +48,10 @@ const ClearHistoryButton: React.FC<ClearHistoryButtonProps> = ({ onClear, disabl
       {confirmOpen && (
         <RetroDialog
           title={t.msn.clearHistory}
-          buttonLabel={text.yes}
+          buttonLabel={t.dialog.yes}
           onConfirm={handleConfirm}
           onClose={() => setConfirmOpen(false)}
-          cancelLabel={text.no}
+          cancelLabel={t.dialog.no}
           onCancel={() => setConfirmOpen(false)}
         >
           <p>{t.msn.clearHistoryConfirm}</p>

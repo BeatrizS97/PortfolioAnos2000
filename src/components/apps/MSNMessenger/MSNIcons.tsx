@@ -5,55 +5,7 @@ interface IconProps {
   size?: number;
 }
 
-// Exportada (mesmo sem uso agora) para o TypeScript não acusar "declarada mas nunca usada"; pode ser apagada se não for mais necessária.
-export function GlossySphere({
-  size,
-  glyph,
-  light,
-  dark,
-}: {
-  size: number;
-  glyph: React.ReactNode;
-  light: string;
-  dark: string;
-}) {
-  // useId gera um id único e estável por instância (seguro em renderizações múltiplas/SSR).
-  // Removemos os ":" para o id funcionar bem dentro de url(#...).
-  const reactId = useId();
-  const id = `msn-sphere-${reactId.replace(/:/g, '')}`;
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 28 28"
-      aria-hidden="true"
-      style={{ filter: 'drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35))' }}
-    >
-      <defs>
-        <radialGradient id={id} cx="35%" cy="28%" r="75%">
-          <stop offset="0" stopColor={light} />
-          <stop offset="1" stopColor={dark} />
-        </radialGradient>
-        <linearGradient id={`${id}-shine`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#ffffff" stopOpacity="0.95" />
-          <stop offset="1" stopColor="#ffffff" stopOpacity="0.05" />
-        </linearGradient>
-        <radialGradient id={`${id}-edge`} cx="50%" cy="50%" r="50%">
-          <stop offset="0.68" stopColor="#000000" stopOpacity="0" />
-          <stop offset="1" stopColor="#000000" stopOpacity="0.3" />
-        </radialGradient>
-      </defs>
-      <circle cx="14" cy="14" r="12.5" fill={`url(#${id})`} stroke={dark} strokeWidth="1" />
-      <circle cx="14" cy="14" r="12.5" fill={`url(#${id}-edge)`} />
-      <ellipse cx="14" cy="22" rx="6.5" ry="2.6" fill={light} opacity="0.55" />
-      {glyph}
-      <ellipse cx="14" cy="7.6" rx="9" ry="5.4" fill={`url(#${id}-shine)`} />
-      <circle cx="14" cy="14" r="11.6" fill="none" stroke="#ffffff" strokeOpacity="0.4" strokeWidth="0.8" />
-    </svg>
-  );
-}
-
-// Id único por instância (sem ":") para usar dentro de url(#...), igual ao GlossySphere.
+// Id único por instância (sem ":") para usar dentro de url(#...).
 function useSvgId(prefix: string): string {
   const reactId = useId();
   return `${prefix}-${reactId.replace(/:/g, '')}`;
@@ -278,18 +230,6 @@ export const GamesIcon: React.FC<IconProps> = ({ size = 32 }) => {
 
 /* ---- Ícones pequenos usados inline (barra de ações / rodapé de formatação) ---- */
 
-export const FolderMiniIcon: React.FC<IconProps> = ({ size = 14 }) => (
-  <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden="true">
-    <path d="M2 6.4c0-.6.5-1 1-1h4.3l1.4 1.6h8c.6 0 1 .5 1 1V15c0 .6-.5 1-1 1H3c-.6 0-1-.5-1-1V6.4z" fill="#F7C948" stroke="#8a6316" strokeWidth="0.9" />
-  </svg>
-);
-
-export const NudgeIcon: React.FC<IconProps> = ({ size = 14 }) => (
-  <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden="true">
-    <path d="M11 1 4 12h4l-1 7 8-11h-4l1-7z" fill="#FFB900" stroke="#a8710a" strokeWidth="0.8" strokeLinejoin="round" />
-  </svg>
-);
-
 export const LockIcon: React.FC<IconProps> = ({ size = 12 }) => (
   <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden="true">
     <rect x="4.5" y="9" width="11" height="8.5" rx="1.4" fill="#c9c9c9" stroke="#6f6f6f" strokeWidth="1" />
@@ -338,15 +278,6 @@ export const WinkSmileyIcon: React.FC<IconProps> = ({ size = 13 }) => {
     </svg>
   );
 };
-
-export const MessengerAppIcon: React.FC<IconProps> = ({ size = 15 }) => (
-  <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden="true">
-    <circle cx="10" cy="10" r="8.5" fill="#7fbf5c" stroke="#3d7a24" strokeWidth="1" />
-    <circle cx="7" cy="9" r="1.9" fill="#ffffff" />
-    <circle cx="13" cy="9" r="1.9" fill="#ffffff" />
-    <path d="M6 13c1 1.4 2.5 2 4 2s3-.6 4-2" fill="none" stroke="#ffffff" strokeWidth="1.3" strokeLinecap="round" />
-  </svg>
-);
 
 export const BackgroundMiniIcon: React.FC<IconProps> = ({ size = 13 }) => (
   <svg width={size} height={size} viewBox="0 0 20 20" aria-hidden="true">
@@ -412,27 +343,6 @@ export const ParenSmileyMiniIcon: React.FC<IconProps> = ({ size = 13 }) => {
       <circle cx="8.2" cy="8.8" r="0.8" fill="#3a2b00" />
       <circle cx="11.8" cy="8.8" r="0.8" fill="#3a2b00" />
       <path d="M7.6 11.5c.7 1 1.5 1.4 2.4 1.4s1.7-.4 2.4-1.4" fill="none" stroke="#3a2b00" strokeWidth="0.9" strokeLinecap="round" />
-    </svg>
-  );
-};
-
-// Avatar padrão do usuário em SVG (vetor, sempre nítido). Substitui o PNG pequeno que ficava esticado e borrado.
-// "slice" faz o desenho preencher a moldura (como o object-fit: cover das fotos). O "label" vira o nome acessível (vem de t.msn.you).
-export const DefaultAvatarIcon: React.FC<{ label: string }> = ({ label }) => {
-  const id = useSvgId('msn-avatar');
-  return (
-    <svg viewBox="0 0 72 72" preserveAspectRatio="xMidYMid slice" role="img" aria-label={label}>
-      <defs>
-        <Gradient id={`${id}-bg`} light="#EAF3FF" dark="#CFE0F5" />
-        <Gradient id={`${id}-body`} light="#6FA3E8" dark="#2F63B5" />
-        <radialGradient id={`${id}-head`} cx="35%" cy="30%" r="75%">
-          <stop offset="0" stopColor="#FFE2C4" />
-          <stop offset="1" stopColor="#E8B48A" />
-        </radialGradient>
-      </defs>
-      <rect width="72" height="72" fill={`url(#${id}-bg)`} />
-      <path d="M8 72C8 56 20 46 36 46C52 46 64 56 64 72Z" fill={`url(#${id}-body)`} />
-      <circle cx="36" cy="28" r="14" fill={`url(#${id}-head)`} />
     </svg>
   );
 };

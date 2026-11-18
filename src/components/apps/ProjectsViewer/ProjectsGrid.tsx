@@ -7,12 +7,14 @@ import { useLanguage } from '../../../hooks/useLanguage';
 interface ProjectsGridProps {
   projects: Project[];
   isLoading?: boolean;
+  // Texto mostrado quando a lista está vazia. Sem ele, usa "nenhum projeto encontrado ainda".
+  emptyText?: string;
 }
 
 // Quantos cards "esqueleto" aparecem enquanto os projetos carregam.
 const SKELETON_COUNT = 4;
 
-const ProjectsGrid: React.FC<ProjectsGridProps> = ({ projects, isLoading = false }) => {
+const ProjectsGrid: React.FC<ProjectsGridProps> = ({ projects, isLoading = false, emptyText }) => {
   const { t } = useLanguage();
 
   if (isLoading) {
@@ -32,7 +34,7 @@ const ProjectsGrid: React.FC<ProjectsGridProps> = ({ projects, isLoading = false
   }
 
   if (projects.length === 0) {
-    return <p className="empty-state">{t.projects.empty}</p>;
+    return <p className="empty-state">{emptyText ?? t.projects.empty}</p>;
   }
   return (
     <div className="projects-grid">

@@ -1,20 +1,13 @@
 // src/components/apps/ProjectsViewer/ProjectCard.tsx
 import React, { useState } from 'react';
 import type { Project } from '../../../types/project';
-import type { Language } from '../../../types/language';
 import { useLanguage } from '../../../hooks/useLanguage';
+import { getLocalizedField } from '../../../utils/getLocalizedField';
 import ExternalLink from '../../shared/ExternalLink';
 
 interface ProjectCardProps {
   project: Project;
 }
-
-// Nome acessível da lista de tecnologias, por idioma.
-const TECH_STACK_LABEL: Record<Language, string> = {
-  pt: 'Tecnologias utilizadas',
-  en: 'Technologies used',
-  es: 'Tecnologías utilizadas',
-};
 
 // Placeholder local (SVG embutido) usado quando a imagem do projeto não carrega.
 const PLACEHOLDER_IMAGE =
@@ -27,9 +20,9 @@ const PLACEHOLDER_IMAGE =
   );
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
-  const { language, t, tc } = useLanguage();
+  const { language, t } = useLanguage();
   const [imageFailed, setImageFailed] = useState(false);
-  const title = tc(project.title);
+  const title = getLocalizedField(project, 'title', language);
 
   return (
     <div className="project-card">
@@ -46,8 +39,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
       )}
       <div className="project-card-body">
         <h4>{title}</h4>
-        <p>{tc(project.description)}</p>
-        <ul className="tech-stack" aria-label={TECH_STACK_LABEL[language]}>
+        <p>{getLocalizedField(project, 'description', language)}</p>
+        <ul className="tech-stack" aria-label={t.projects.techStackLabel}>
           {project.tech_stack.map((tech) => (
             <li key={tech}>{tech}</li>
           ))}

@@ -180,6 +180,25 @@ button {
   animation: skeleton-shimmer 1.2s linear infinite;
 }
 
+.char-counter {
+  display: block;
+  align-self: flex-end;
+  margin-top: -4px;
+  font-size: 10px;
+  text-align: right;
+  color: #777;
+}
+
+.char-counter--warning {
+  color: #B07D00;
+  font-weight: bold;
+}
+
+.char-counter--limit {
+  color: #C62828;
+  font-weight: bold;
+}
+
 .modal-overlay {
   position: fixed;
   inset: 0;

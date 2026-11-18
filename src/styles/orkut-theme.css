@@ -910,6 +910,10 @@
   font-weight: bold;
 }
 
+.orkut-sent-icon--error {
+  background: #C62828;
+}
+
 .orkut-compose-footer--sent {
   justify-content: center;
   padding: 8px 16px 16px;

@@ -15,6 +15,10 @@
   color: #000000;
 }
 
+.retro-dialog--compact {
+  width: 300px;
+}
+
 .retro-dialog-titlebar {
   display: flex;
   align-items: center;

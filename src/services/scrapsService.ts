@@ -1,5 +1,5 @@
 // src/services/scrapsService.ts
-import { api, isAbortError } from './api';
+import { api } from './api';
 import type { NewScrapPayload, Scrap, ScrapsApiResponse } from '../types/scrap';
 import { scrapSchema } from '../types/scrap';
 import type { ApiResponse } from '../types/apiResponse';
@@ -22,23 +22,16 @@ function parseScraps(items: unknown[]): Scrap[] {
  * @param page Número da página (começa em 1).
  * @param limit Quantidade de recados por página.
  * @param signal Opcional: AbortSignal para cancelar a requisição.
- * @returns Os recados da página, se há mais páginas e o total. Se a API falhar, devolve recados de exemplo (só em dev) ou lista vazia (produção).
+ * @returns Os recados da página, se há mais páginas e o total. Se a API falhar, o erro sobe (o React Query decide se tenta de novo).
  */
-// Busca recados da API, com paginação. Se a API falhar, retorna dados mock.
+// Busca recados da API, com paginação. Se a API falhar, lança um erro (nunca inventa recados de exemplo, que seriam recados FALSOS exibidos como de visitantes reais).
 export async function fetchScraps(
   page = 1,
   limit = 10,
   signal?: AbortSignal
 ): Promise<{ data: Scrap[]; hasMore: boolean; total: number }> {
-  try {
-    const response = await api.get<ScrapsApiResponse>(`/scraps?limit=${limit}&page=${page}`, signal);
-    return { data: parseScraps(response.data), hasMore: response.hasMore, total: response.total };
-  } catch (error) {
-    // Requisição cancelada (componente saiu da tela): não é falha, então não usa mock.
-    if (isAbortError(error)) throw error;
-    // Em produção os recados de exemplo seriam recados FALSOS exibidos como se fossem de visitantes reais: devolve lista vazia.
-    return { data: [], hasMore: false, total: 0 };
-  }
+  const response = await api.get<ScrapsApiResponse>(`/scraps?limit=${limit}&page=${page}`, signal);
+  return { data: parseScraps(response.data), hasMore: response.hasMore, total: response.total };
 }
 
 /**

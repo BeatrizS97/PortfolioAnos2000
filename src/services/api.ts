@@ -1,12 +1,13 @@
 // src/services/api.ts
 /* Cliente HTTP fino para as Vercel Serverless Functions em /api.
    Em desenvolvimento local, o Vite faz proxy de /api -> http://localhost:3001
-   (ver vite.config.ts). Se as rotas não estiverem disponíveis, os services
-   individuais caem para dados mock, então a UI nunca quebra em dev. 
+   (ver vite.config.ts). Se as rotas não estiverem disponíveis, o erro (ApiError ou
+   NetworkError) sobe até quem chamou: o React Query decide se tenta de novo e as telas
+   mostram a lista vazia ou uma mensagem de erro, então a UI nunca quebra em dev. 
 */
 
 // Tempo máximo de espera por uma resposta (o mesmo do maxDuration das funções, no vercel.json).
-// Passou disso, a requisição é cancelada e vira NetworkError, para o service decidir o fallback.
+// Passou disso, a requisição é cancelada e vira NetworkError, para quem chamou decidir o que fazer.
 const REQUEST_TIMEOUT_MS = 10_000;
 
 /**
@@ -83,7 +84,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       signal,
       // Sempre envia JSON, mesmo que o body seja vazio (GET/DELETE). As rotas de API
       // tratam isso bem, e evita que o browser envie "Content-Type: text/plain"
-      // por engano, quebrando a rota (ver api/testimonial.ts, api/contact.ts etc.).
+      // por engano, quebrando a rota (ver api/testimonial.ts etc.).
       headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
     });
   } catch (error) {

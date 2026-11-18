@@ -1,7 +1,7 @@
 // api/scraps.ts
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabaseClient } from './_supabase.js';
-import { logError, applyRateLimit, sanitizeText } from './_utils.js';
+import { logError, applyRateLimit, sanitizeText, getPagination } from './_utils.js';
 
 // Colunas devolvidas ao front (as mesmas do tipo Scrap).
 const SCRAP_FIELDS = 'id, author_name, author_avatar, message, is_public, created_at';
@@ -16,10 +16,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Validação dos parâmetros de consulta para paginação
     try {
       const supabase = getSupabaseClient();
-      const limit = Number(req.query.limit ?? 10); // Limite de itens por página, padrão 10
-      const page = Number(req.query.page ?? 1); // Página atual, padrão 1
-      const from = (page - 1) * limit; // Índice inicial para a consulta
-      const to = from + limit - 1; // Índice final para a consulta
+      // Página e limite validados por getPagination (mesmo padrão das outras rotas): limite padrão 10 e máximo 100.
+      // from e to são os índices inicial e final da consulta.
+      const { limit, from, to } = getPagination(req, 10);
 
       const { data, error, count } = await supabase
         .from('scraps')

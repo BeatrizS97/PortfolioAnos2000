@@ -1,8 +1,9 @@
 // api/_utils.ts
 import { z } from 'zod';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { getSupabaseClient } from './_supabase.js';
 
-// Schema compartilhado por contact.ts e testimonial.ts.
+// Schema usado por testimonial.ts.
 // Os limites máximos evitam que alguém envie textos gigantes (que iriam para o banco e para o e-mail).
 export const messageSchema = z.object({
   name: z.string().trim().min(2, 'Informe seu nome (mínimo 2 caracteres).').max(100, 'Nome muito longo (máximo 100 caracteres).'),
@@ -104,9 +105,10 @@ export function applyRateLimit(
 const DEFAULT_PAGE_LIMIT = 50;
 const MAX_PAGE_LIMIT = 100;
 
-export function getPagination(req: VercelRequest) {
+// Cada rota pode informar o seu limit padrão (usado quando o front não envia "limit"); o máximo vale para todas.
+export function getPagination(req: VercelRequest, defaultLimit = DEFAULT_PAGE_LIMIT) {
   const page = Math.max(1, Math.floor(Number(req.query.page)) || 1);
-  const limit = Math.min(MAX_PAGE_LIMIT, Math.max(1, Math.floor(Number(req.query.limit)) || DEFAULT_PAGE_LIMIT));
+  const limit = Math.min(MAX_PAGE_LIMIT, Math.max(1, Math.floor(Number(req.query.limit)) || defaultLimit));
   const from = (page - 1) * limit;
   const to = from + limit - 1;
   return { page, limit, from, to };
@@ -131,4 +133,44 @@ export function logError(context: string, error: unknown, extra: Record<string, 
       ...extra,
     })
   );
+}
+
+// Cache público de 5 minutos (navegador e CDN da Vercel), usado nas rotas GET que devolvem dados que quase não mudam.
+export const PUBLIC_CACHE_CONTROL = 'public, max-age=300, s-maxage=300';
+
+// Opções de sendPaginatedList: de qual tabela ler e como nomear a rota nos logs e nas mensagens de erro.
+interface PaginatedListOptions {
+  table: string;
+  // Colunas devolvidas ao front (texto no formato do select do Supabase).
+  fields: string;
+  // Coluna usada para ordenar e se a ordem é crescente.
+  orderBy: string;
+  ascending: boolean;
+  // Nome usado no log de erro (ex.: 'friends' ou 'academic:education').
+  logContext: string;
+  // Nome usado na mensagem "Failed to fetch ..." devolvida ao front.
+  errorLabel: string;
+}
+
+// Lista paginada padrão das rotas GET (friends, communities, academic): lê a tabela, aplica ordem e paginação,
+// manda o cache de 5 minutos e devolve { success, data, hasMore, total }. Quem chama já confere o método HTTP.
+export async function sendPaginatedList(req: VercelRequest, res: VercelResponse, options: PaginatedListOptions) {
+  try {
+    const { limit, from, to } = getPagination(req);
+    const supabase = getSupabaseClient();
+    const { data, error, count } = await supabase
+      .from(options.table)
+      .select(options.fields, { count: 'exact' })
+      .order(options.orderBy, { ascending: options.ascending })
+      .range(from, to);
+
+    if (error) throw error;
+
+    const total = count ?? 0;
+    res.setHeader('Cache-Control', PUBLIC_CACHE_CONTROL);
+    return res.status(200).json({ success: true, data: data ?? [], hasMore: from + limit < total, total });
+  } catch (error) {
+    logError(options.logContext, error);
+    return res.status(500).json({ success: false, error: `Failed to fetch ${options.errorLabel}` });
+  }
 }

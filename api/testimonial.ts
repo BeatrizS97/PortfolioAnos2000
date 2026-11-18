@@ -49,7 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (error) throw error;
 
     // Falta integrar com provedor de e-mail (Resend/SendGrid) para notificar
-    // quando um novo depoimento chegar ao sistema. Verificar em contact.ts.
+    // quando um novo depoimento chegar ao sistema.
     // (Integrado abaixo com o Resend.) O depoimento já está salvo no banco, então se o e-mail falhar apenas registramos o erro.
     try {
       await sendEmail({

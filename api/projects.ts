@@ -1,11 +1,11 @@
 // api/projects.ts
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSupabaseClient } from './_supabase.js';
-import { logError } from './_utils.js';
+import { logError, PUBLIC_CACHE_CONTROL } from './_utils.js';
 
 // Colunas devolvidas ao front (as mesmas do tipo Project).
 const PROJECT_FIELDS =
-  'id, title, description, tech_stack, github_url, live_url, image_url, category, featured, order_index, created_at, updated_at';
+  'id, title_pt, title_en, title_es, description_pt, description_en, description_es, tech_stack, github_url, live_url, image_url, category, featured, order_index, created_at, updated_at';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
@@ -14,23 +14,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const supabase = getSupabaseClient();
-    const { category, featured } = req.query;
 
-    let query = supabase.from('projects').select(PROJECT_FIELDS);
-
-    if (typeof category === 'string') {
-      query = query.eq('category', category);
-    }
-    if (featured === 'true') {
-      query = query.eq('featured', true);
-    }
-
-    query = query.order('order_index', { ascending: true });
-
-    const { data, error } = await query;
+    const { data, error } = await supabase.from('projects').select(PROJECT_FIELDS).order('order_index', { ascending: true });
     if (error) throw error;
 
-    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300');
+    res.setHeader('Cache-Control', PUBLIC_CACHE_CONTROL);
     return res.status(200).json({
       success: true,
       data: data ?? [],

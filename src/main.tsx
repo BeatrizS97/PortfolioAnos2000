@@ -5,7 +5,8 @@ import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
 import ErrorBoundary from './components/shared/ErrorBoundary';
-import { LanguageProvider } from './hooks/useLanguage';
+import { LanguageProvider, useLanguage } from './hooks/useLanguage';
+import { SoundProvider } from './hooks/useSound';
 import './styles/global.css';
 
 // Cria uma instância do QueryClient para gerenciar o cache e as requisições da biblioteca React Query.
@@ -19,15 +20,25 @@ const queryClient = new QueryClient({
   },
 });
 
-// Renderiza o aplicativo React na raiz do documento HTML, envolvendo-o com provedores de contexto para gerenciamento de estado e idioma.
+// ErrorBoundary da raiz com a tela azul no idioma atual. Ele fica dentro do LanguageProvider para poder ler as traduções.
+const RootErrorBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { t } = useLanguage();
+  return (
+    <ErrorBoundary texts={{ message: t.shell.errors.fatal, restart: t.shell.errors.restart }}>{children}</ErrorBoundary>
+  );
+};
+
+// Renderiza o aplicativo React na raiz do documento HTML, envolvendo-o com provedores de contexto para gerenciamento de estado, idioma e som (mudo).
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <LanguageProvider>
-          <App />
-        </LanguageProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <RootErrorBoundary>
+          <SoundProvider>
+            <App />
+          </SoundProvider>
+        </RootErrorBoundary>
+      </LanguageProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );

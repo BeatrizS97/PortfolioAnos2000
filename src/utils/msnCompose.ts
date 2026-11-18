@@ -1,10 +1,9 @@
 // src/utils/msnCompose.ts
 import type { CSSProperties } from 'react';
 import type { Language } from '../types/language';
-import { SOUND_PATHS } from './constants';
 
-// Dados e textos da faixa de formatação do chat do MSN (fonte, cor, emoticons, voice clips, winks e planos de fundo).
-// Os textos ficam aqui (e não em translations.ts) no mesmo padrão de TOOLBAR_TEXT do TestimonialForm.
+// Dados da faixa de formatação do chat do MSN (fonte, cor, emoticons, winks e planos de fundo).
+// Os textos da interface da faixa ficam em translations.ts (t.msn.compose); aqui ficam só os rótulos de cada emoticon, wink e plano de fundo.
 
 // Atalho para montar um texto nos três idiomas.
 const label = (pt: string, en: string, es: string): Record<Language, string> => ({ pt, en, es });
@@ -63,32 +62,6 @@ export function formatToStyle(format: TextFormat): CSSProperties {
   };
 }
 
-// Textos da interface da faixa 
-
-export const COMPOSE_TEXT: Record<
-  Language,
-  {
-    fontPanel: string; fontFamily: string; fontSize: string; bold: string; italic: string; underline: string;
-    textColor: string; reset: string; gift: string; voiceSent: string; winkSent: string;
-  }
-> = {
-  pt: {
-    fontPanel: 'Formatar texto', fontFamily: 'Fonte', fontSize: 'Tamanho', bold: 'Negrito', italic: 'Itálico',
-    underline: 'Sublinhado', textColor: 'Cor do texto', reset: 'Restaurar padrão', gift: 'Presente',
-    voiceSent: 'Você enviou um voice clip:', winkSent: 'Você enviou um wink:',
-  },
-  en: {
-    fontPanel: 'Format text', fontFamily: 'Font', fontSize: 'Size', bold: 'Bold', italic: 'Italic',
-    underline: 'Underline', textColor: 'Text color', reset: 'Reset to default', gift: 'Gift',
-    voiceSent: 'You sent a voice clip:', winkSent: 'You sent a wink:',
-  },
-  es: {
-    fontPanel: 'Formato del texto', fontFamily: 'Fuente', fontSize: 'Tamaño', bold: 'Negrita', italic: 'Cursiva',
-    underline: 'Subrayado', textColor: 'Color del texto', reset: 'Restaurar valores', gift: 'Regalo',
-    voiceSent: 'Enviaste un voice clip:', winkSent: 'Enviaste un wink:',
-  },
-};
-
 // Emoticons (inseridos no texto, na posição do cursor) 
 
 export const EMOTICONS: { emoji: string; label: Record<Language, string> }[] = [
@@ -104,14 +77,6 @@ export const EMOTICONS: { emoji: string; label: Record<Language, string> }[] = [
   { emoji: '😡', label: label('Brava', 'Angry', 'Enojada') },
   { emoji: '👍', label: label('Joinha', 'Thumbs up', 'Pulgar arriba') },
   { emoji: '❤️', label: label('Coração', 'Heart', 'Corazón') },
-];
-
-// Voice clips (tocam sons que o site já tem) 
-
-export const VOICE_CLIPS: { id: string; path: string; label: Record<Language, string> }[] = [
-  { id: 'notification', path: SOUND_PATHS.msnNotification, label: label('Notificação do MSN', 'MSN notification', 'Notificación de MSN') },
-  { id: 'scrap', path: SOUND_PATHS.orkutScrap, label: label('Recado do Orkut', 'Orkut scrap', 'Mensaje de Orkut') },
-  { id: 'startup', path: SOUND_PATHS.startup, label: label('Inicialização do Windows', 'Windows startup', 'Inicio de Windows') },
 ];
 
 // Winks (animações que aparecem no histórico) 

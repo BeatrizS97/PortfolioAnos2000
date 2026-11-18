@@ -1,5 +1,4 @@
 // src/utils/msnHelpers.ts
-import type { Language } from '../types/language';
 import type { Translations } from './translations';
 import { formatDateTime } from './formatDateTime';
 
@@ -7,15 +6,9 @@ import { formatDateTime } from './formatDateTime';
 // (Os dados ficam em translations.ts, em t.msn.kb, um conjunto para cada idioma.)
 export type KnowledgeBase = Translations['msn']['kb'];
 
-// Texto do indicador de digitação, por idioma.
-export const TYPING_TEXT: Record<Language, string> = {
-  pt: 'Beatriz está digitando...',
-  en: 'Beatriz is typing...',
-  es: 'Beatriz está escribiendo...',
-};
-
 // Remove acentos e passa para minúsculas, para "inglês" e "ingles" (ou "certificação" e "certificacao") valerem como a mesma palavra.
-function normalizeText(value: string): string {
+// Também é usada pelo MSNChat para comparar as letras das teclas de atalho.
+export function normalizeText(value: string): string {
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 

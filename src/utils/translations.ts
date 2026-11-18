@@ -1,22 +1,23 @@
 // src/utils/translations.ts
 import type { Language } from '../types/language';
 
+// Dados de contato usados só nas respostas locais do chat (a base local roda quando a API do chat falha, e aí o banco também pode estar fora).
+// O site e a IA leem estes mesmos dados do banco (tabela profile): se mudarem lá, atualize aqui também.
+const CONTACT_EMAIL = 'beatriz.santos.ads97@gmail.com';
+const CONTACT_LINKEDIN = 'https://www.linkedin.com/in/beatrizsilvasantos-dev';
+
 // Traduções de textos fixos do site (menus, botões, mensagens de erro, etc.) para português, inglês e espanhol.
 const pt = {
   locale: 'pt-BR',
 
   shell: {
     documentTitle: 'Meu Computador - Portfólio',
-    windowTitles: { orkut: 'Orkut - Meu Perfil', msn: 'MSN Messenger', about: 'Meu Computador', trash: 'Lixeira' },
+    windowTitles: { orkut: 'Orkut - Meu Perfil', msn: 'MSN Messenger' },
     desktopIcons: {
-      myComputer: 'Meu Computador',
-      documents: 'Meus Documentos',
-      orkut: 'Orkut',
-      msn: 'MSN Messenger',
       trash: 'Lixeira',
     },
     taskbar: { start: 'Iniciar', language: 'Idioma', mute: 'Silenciar', unmute: 'Ativar som', network: 'Rede' },
-    windowControls: { minimize: 'Minimizar', close: 'Fechar' },
+    windowControls: { minimize: 'Minimizar', maximize: 'Maximizar', restore: 'Restaurar', close: 'Fechar' },
     startMenu: {
       orkutSubtitle: 'Meu perfil e projetos',
       msnSubtitle: 'Conversar com o Jarvis, assistente da Bia',
@@ -31,23 +32,37 @@ const pt = {
       shutDown: 'Desligar',
       comingSoon: 'Em breve',
     },
-    about: {
-      title: 'Sobre mim',
-      paragraph1:
-        '**Beatriz Silva Santos** — Desenvolvedora Full Stack Júnior, formada em Análise e Desenvolvimento de Sistemas (FATEC). Atuo com React.js, Next.js, TypeScript no front-end e C#/.NET no back-end, com passagem também por PHP e SQL.',
-      paragraph2:
-        'Abra o **Orkut** para ver o perfil completo (projetos, skills e depoimentos) ou espere o **MSN** chamar. 😉',
-    },
     // Mensagem de boas-vindas exibida assim que a área de trabalho carrega (explica como navegar).
     welcome: {
       title: 'Bem-vindo(a)!',
+      button: 'Entendi',
       heading: 'Como navegar neste portfólio',
       intro: 'Oi! Eu sou a **Beatriz Silva Santos**, Desenvolvedora Full Stack Júnior. Este site é o meu portfólio, montado como um computador dos anos 2000.',
       orkut: 'Dê dois cliques no ícone do **Orkut** para ver o meu perfil completo: projetos, formação, certificações, comunidades e recados.',
       msn: 'Dê dois cliques no **MSN Messenger** para conversar com o Jarvis, meu assistente virtual, e tirar dúvidas sobre mim. O meu currículo em PDF está no menu **Iniciar**.',
     },
-    trash: { message: 'A lixeira está vazia... ou será que não? 👀' },
     boot: { ariaLabel: 'Carregando ambiente', caption: 'Portfólio', title: 'Retrô', skip: 'pular »' },
+    // Textos das telas de erro ao carregar a área de trabalho ou uma janela (usadas com o botão "Recarregar").
+    errors: {
+      title: 'Erro',
+      reload: 'Recarregar',
+      loadDesktop: 'Não foi possível carregar a área de trabalho. Verifique sua conexão.',
+      openWindow: 'Não foi possível abrir esta janela. Verifique sua conexão e recarregue a página.',
+      fatal: 'Ocorreu um erro fatal e o portfólio precisa ser reiniciado.',
+      restart: 'Reiniciar',
+    },
+  },
+
+  // Botões dos diálogos de confirmação (estilo RetroDialog).
+  dialog: { yes: 'Sim', no: 'Não', ok: 'OK' },
+
+  // Textos do download do currículo (o nome do idioma aparece no próprio idioma).
+  // error e openLink são o aviso (e o texto do link) mostrados quando o download automático falha.
+  resume: {
+    downloading: 'Baixando...',
+    ariaLabel: 'Baixar currículo em Português (PDF)',
+    error: 'Não foi possível baixar o PDF automaticamente.',
+    openLink: 'Abrir o PDF',
   },
 
   orkut: {
@@ -56,6 +71,8 @@ const pt = {
     tabs: { home: 'Início', perfil: 'Perfil', comunidades: 'Comunidades' },
     online: 'Online',
     welcome: (name: string) => `Bem-vindo(a), ${name}!`,
+    // Título mostrado enquanto o perfil não carrega.
+    defaultHeadline: 'Desenvolvedora Full Stack Júnior',
     quickLinks: {
       fullProfile: 'Ver perfil completo',
       writeTestimonial: 'Escrever depoimento',
@@ -74,23 +91,31 @@ const pt = {
 
   scraps: {
     namePlaceholder: 'Seu nome',
-    messagePlaceholder: 'Deixe um recado...',
-    send: 'Enviar recado',
+    messagePlaceholder: 'Deixe um comentário...',
+    send: 'Enviar comentário',
     sending: 'Enviando...',
-    saveError: 'Não foi possível salvar seu recado agora. Tente novamente em instantes.',
-    deleteLabel: 'Excluir recado',
-    deleteConfirm: 'Excluir este recado?',
+    requiredFields: 'Preencha seu nome e o comentário antes de enviar.',
+    saveError: 'Não foi possível salvar seu comentário agora. Tente novamente em instantes.',
+    rateLimit: 'Muitas tentativas em pouco tempo. Tente novamente em alguns minutos.',
+    deleteLabel: 'Excluir comentário',
+    deleteConfirm: 'Excluir este comentário?',
     deleteError: 'Não foi possível excluir. Tente novamente.',
+    // Modal exibido depois de enviar um comentário (sucesso ou erro), no mesmo estilo do modal de depoimento enviado.
+    feedbackTitle: 'Comentário',
+    sent: 'Comentário publicado com sucesso! 🎉',
+    closeButton: 'Fechar',
     prevPage: 'Anterior',
     nextPage: 'Próxima',
     adminLoginLabel: 'Sou a Beatriz',
     adminLogoutLabel: 'Sair do modo admin',
     adminPromptLabel: 'Chave de administrador:',
+    adminKeyRequired: 'Informe a chave de administrador.',
+    adminConfirm: 'Entrar',
+    adminCancel: 'Cancelar',
   },
 
   friends: {
     title: 'Amigos',
-    seeAll: 'Ver todos »',
   },
 
   communities: {
@@ -104,6 +129,7 @@ const pt = {
 
   projects: {
     empty: 'Nenhum projeto encontrado ainda.',
+    techStackLabel: 'Tecnologias utilizadas',
     github: 'GitHub',
     viewOnline: 'Ver online',
   },
@@ -130,10 +156,28 @@ const pt = {
     namePlaceholder: 'Seu nome',
     emailPlaceholder: 'Seu e-mail',
     messagePlaceholder: 'Escreva seu depoimento...',
+    requiredFields: 'Preencha nome, e-mail e mensagem antes de enviar.',
+    tooShort: 'Nome ou mensagem muito curtos. Confira os campos e tente de novo.',
     error: 'Erro ao enviar, tente novamente.',
+    rateLimit: 'Muitas tentativas em pouco tempo. Tente novamente em alguns minutos.',
     post: 'Postar',
     sending: 'Enviando...',
     cancel: 'Cancelar',
+    // Barra de formatação do texto (rótulos e dicas).
+    format: {
+      toolbar: 'Formatação do texto',
+      bold: 'Negrito (Ctrl+B)',
+      italic: 'Itálico (Ctrl+I)',
+      underline: 'Sublinhado (Ctrl+U)',
+      emoji: 'Emoji',
+      insertEmoji: 'Inserir emoji',
+      comingSoon: 'Em breve',
+      textColor: 'Cor do texto (em breve)',
+      insertImage: 'Inserir imagem (em breve)',
+      insertLocation: 'Inserir localização (em breve)',
+      shortcutsHint: 'Atalhos: Ctrl+B negrito, Ctrl+I itálico, Ctrl+U sublinhado.',
+      preview: 'Pré-visualização:',
+    },
   },
 
   luckyMessage: {
@@ -148,22 +192,21 @@ const pt = {
 
   profileDetails: {
     aboutTitle: 'Sobre mim',
-    aboutExtra:
-      'Minha formação em Letras reforça minha comunicação e trabalho em equipes multidisciplinares (design, produto, QA). Estou aberta a oportunidades como Desenvolvedora Front-End ou Full Stack Júnior — vamos conversar?',
     contactTitle: 'Contato',
     emailLabel: 'E-mail',
     educationTitle: 'Formação acadêmica',
     languagesTitle: 'Idiomas',
     exchangeTitle: 'Intercâmbio',
-    exchange:
-      'Um mês de imersão em Dublin, Irlanda, na ISI Dublin – English Language School (jul–ago/2025), curso de inglês geral nível A2. A vivência reforçou autonomia, comunicação intercultural e adaptabilidade em um ambiente totalmente novo.',
     certificationsTitle: 'Certificações',
     experienceTitle: 'Experiência & Voluntariado',
     publicationTitle: 'Publicação científica',
+    loadError: 'Não foi possível carregar esta seção agora. Tente novamente mais tarde.',
   },
 
   msn: {
     contactName: 'Jarvis - Assistente da Beatriz',
+    // Barra de menu decorativa do topo da janela (sem função, só estética).
+    menu: ['Arquivo', 'Editar', 'Ações', 'Ferramentas', 'Ajuda'],
     toolbar: {
       invite: 'Convidar',
       sendFile: 'Enviar arquivo',
@@ -186,6 +229,19 @@ const pt = {
     viewProjects: 'Ver Projetos',
     nudge: 'Chamar a atenção',
     nudgeSent: 'Você chamou a atenção!',
+    typing: 'Jarvis está digitando...',
+    compose: {
+      fontPanel: 'Formatar texto',
+      fontFamily: 'Fonte',
+      fontSize: 'Tamanho',
+      bold: 'Negrito',
+      italic: 'Itálico',
+      underline: 'Sublinhado',
+      textColor: 'Cor do texto',
+      reset: 'Restaurar padrão',
+      gift: 'Presente',
+      winkSent: 'Você enviou um wink:',
+    },
     tools: { font: 'Fonte', emoticons: 'Emoticons', voiceClip: 'Voice Clip', winks: 'Winks', backgrounds: 'Planos de fundo' },
     inputPlaceholder: 'Digite uma pergunta...',
     suggestionsLabel: 'Sugestões de perguntas',
@@ -199,7 +255,7 @@ const pt = {
     errors: { network: 'Erro de conexão 📡 Verifique sua conexão e tente de novo.', rateLimit: 'Muitas mensagens ⏳ Aguarde um instante e tente de novo.' },
     fallbackAnswer: 'Hmm, não entendi direito 😅 Tenta perguntar sobre meus projetos, minha carreira ou minhas comunidades!',
     kb: [
-      { keywords: ['doe vida', 'sangue', 'hemocentro'], answer: 'Doe Vida: SPA mobile-first (React, Vite e Tailwind) que usa a OpenStreetMap API para achar hemocentros perto de você e calcular a distância. Código: https://github.com/BeatrizS97/Projeto-Doe-Vida' },
+      { keywords: ['doe vida', 'sangue', 'hemocentro'], answer: 'Doe Vida: SPA mobile-first (React, Vite e Tailwind) que usa a OpenStreetMap API para achar hemocentros perto de você e calcular a distância. Online: https://projeto-doe-vida.vercel.app/ | Código: https://github.com/BeatrizS97/Projeto-Doe-Vida' },
       { keywords: ['form generator', 'formulário', 'formulario'], answer: 'Form Generator: app full stack colaborativo para criar e gerenciar formulários com lógica condicional (HTML, CSS, JavaScript, PHP e SQL). Código: https://github.com/tatcom23/Form-Generator' },
       { keywords: ['portfolio pessoal', 'portfólio pessoal'], answer: 'Portfólio Pessoal: o primeiro portfólio dela, feito do zero com HTML5, SCSS3 e JavaScript puro. Online: https://beatrizs97.github.io/Portfolio/ | Código: https://github.com/BeatrizS97' },
       { keywords: ['atsadapta', 'ats adapta', 'método star', 'metodo star'], answer: 'ATSAdapta: reescreve currículos no método STAR e os adapta a vagas usando IA (Gemini API), com verificação de compatibilidade ATS e exportação em .txt, PDF e Word. Código: https://github.com/BeatrizS97/ATSAdapta' },
@@ -207,18 +263,18 @@ const pt = {
       { keywords: ['banco de trocas', 'troca de conhecimento', 'trocas de conhecimento'], answer: 'Banco de Trocas de Conhecimento: plataforma para trocar conhecimento de graça — API REST em Node/Express/Prisma, SPA em React e login com JWT. Online: https://projeto-banco-troca-de-conhecimento.vercel.app/ | Código: https://github.com/BeatrizS97/Projeto-Banco-Troca-de-Conhecimento' },
       { keywords: ['cinema de terror', 'terror', 'jumpscare'], answer: 'Cinema de Terror: página temática com animações, jumpscare e modal interativo — o primeiro projeto dela com SCSS. Código: https://github.com/BeatrizS97/Cinema' },
       { keywords: ['quem é você', 'quem e voce', 'quem é a beatriz', 'quem é ela', 'quem é vc', 'sobre você', 'sobre voce', 'sobre a beatriz', 'sobre ela', 'se apresente'], answer: 'A Beatriz é Desenvolvedora Full Stack Jr | React.js | Next.js | TypeScript | Node.js, de Itanhaém, SP. Formada pela Fatec Praia Grande, ela ama criar interfaces acessíveis e performáticas :)' },
-      { keywords: ['onde trabalha', 'onde você trabalha', 'onde voce trabalha', 'estágio', 'estagio', 'hub connect'], answer: 'Ela é estagiária Full Stack na Hub Connect Eventos (fev/2026 – ago/2026): criou o site institucional do zero, otimizou SEO, GA4/GTM e padronizou componentes reutilizáveis em React/Next.js.' },
+      { keywords: ['onde trabalha', 'onde você trabalha', 'onde voce trabalha', 'estágio', 'estagio', 'hub connect'], answer: 'Ela estagiou como Full Stack na Hub Connect Eventos (fev/2026 – ago/2026): criou o site institucional do zero, otimizou SEO, GA4/GTM e padronizou componentes reutilizáveis em React/Next.js.' },
       { keywords: ['onde mora', 'onde você mora', 'onde voce mora', 'onde vive', 'cidade', 'itanhaém'], answer: 'Ela mora em Itanhaém, São Paulo.' },
-      { keywords: ['stack', 'tecnologia', 'tecnologias'], answer: 'Trabalho principalmente com React.js, Next.js, TypeScript, C# e .NET.' },
-      { keywords: ['contato', 'email', 'e-mail'], answer: 'Você pode entrar em contato pelo formulário do site ou pelo LinkedIn!' },
+      { keywords: ['stack', 'tecnologia', 'tecnologias'], answer: 'Ela trabalha principalmente com React.js, Next.js, TypeScript, C# e .NET.' },
+      { keywords: ['contato', 'email', 'e-mail'], answer: `Você pode entrar em contato pelo e-mail ${CONTACT_EMAIL} ou pelo LinkedIn: ${CONTACT_LINKEDIN}` },
       { keywords: ['disponível', 'disponibilidade', 'vaga'], answer: 'A Beatriz está aberta a oportunidades como Desenvolvedora Front-end/Full Stack Júnior!' },
+      { keywords: ['intercâmbio', 'intercambio', 'dublin', 'irlanda'], answer: 'Ela passou um mês em Dublin, na ISI Dublin (jul–ago/2025), em um curso de inglês geral nível A2 — reforçou autonomia e adaptabilidade.' },
       { keywords: ['idioma', 'idiomas', 'inglês', 'espanhol'], answer: 'Fala português nativo, inglês nível B1 e espanhol nível A2.' },
       { keywords: ['certificação', 'certificado', 'certificações', 'certificacoes'], answer: 'Tem certificações em Scrum Fundamentals, Formação Web Essencial (BIT) e Crescendo no Trabalho (JobRise), entre outras — veja na aba Perfil!' },
-      { keywords: ['intercâmbio', 'intercambio', 'dublin', 'irlanda'], answer: 'Ela passou um mês em Dublin, na ISI Dublin (jul–ago/2025), em um curso de inglês geral nível A2 — reforçou autonomia e adaptabilidade.' },
       { keywords: ['formação', 'formacao', 'faculdade', 'fatec', 'estuda', 'graduação', 'graduacao', 'letras'], answer: 'Ela é formada em Análise e Desenvolvimento de Sistemas pela Fatec Praia Grande (fev/2023 – jul/2026) e tem Licenciatura em Letras (Português e Inglês) pela Universidade Cruzeiro do Sul.' },
       { keywords: ['experiência', 'experiencia', 'voluntariado', 'liderança', 'lideranca', 'pedra que canta', 'vice-presidente'], answer: 'Além do estágio, ela foi Vice-Presidente da Associação Pedra Que Canta (2022 – dez/2025), liderando uma equipe voluntária por 3 anos.' },
       { keywords: ['comunidade', 'comunidades'], answer: 'No Orkut ela participa de comunidades como React.js & Next.js Lovers, TypeScript Salvou Meu Código, C# & .NET Não São Só Café e Scrum Fundamentals Certified. Veja todas na aba Comunidades!' },
-      { keywords: ['projeto', 'projetos'], answer: 'Ela tem 7 projetos: Doe Vida, Form Generator, Portfólio Pessoal, ATSAdapta, InspireFoto, Banco de Trocas de Conhecimento e Cinema de Terror. Pergunte sobre qualquer um deles ou clique em "Ver Projetos"!' },
+      { keywords: ['projeto', 'projetos'], answer: 'Entre os projetos dela estão Doe Vida, Form Generator, Portfólio Pessoal, ATSAdapta, InspireFoto, Banco de Trocas de Conhecimento e Cinema de Terror. Pergunte sobre qualquer um deles ou clique em "Ver Projetos"!' },
     ],
   },
 };
@@ -230,16 +286,12 @@ const en: Translations = {
 
   shell: {
     documentTitle: 'My Computer - Portfolio',
-    windowTitles: { orkut: 'Orkut - My Profile', msn: 'MSN Messenger', about: 'My Computer', trash: 'Recycle Bin' },
+    windowTitles: { orkut: 'Orkut - My Profile', msn: 'MSN Messenger' },
     desktopIcons: {
-      myComputer: 'My Computer',
-      documents: 'My Documents',
-      orkut: 'Orkut',
-      msn: 'MSN Messenger',
       trash: 'Recycle Bin',
     },
     taskbar: { start: 'Start', language: 'Language', mute: 'Mute', unmute: 'Turn sound on', network: 'Network' },
-    windowControls: { minimize: 'Minimize', close: 'Close' },
+    windowControls: { minimize: 'Minimize', maximize: 'Maximize', restore: 'Restore', close: 'Close' },
     startMenu: {
       orkutSubtitle: 'My profile and projects',
       msnSubtitle: "Chat with Jarvis, Bia's assistant",
@@ -254,23 +306,37 @@ const en: Translations = {
       shutDown: 'Shut Down',
       comingSoon: 'Coming soon',
     },
-    about: {
-      title: 'About me',
-      paragraph1:
-        '**Beatriz Silva Santos** — Junior Full Stack Developer, graduated in Systems Analysis and Development (FATEC). I work with React.js, Next.js and TypeScript on the front end and C#/.NET on the back end, with some experience in PHP and SQL.',
-      paragraph2:
-        'Open **Orkut** to see the full profile (projects, skills and testimonials) or wait for **MSN** to call. 😉',
-    },
     // Welcome message shown as soon as the desktop loads (explains how to navigate).
     welcome: {
       title: 'Welcome!',
+      button: 'Got it',
       heading: 'How to navigate this portfolio',
       intro: "Hi! I'm **Beatriz Silva Santos**, a Junior Full Stack Developer. This website is my portfolio, built to look like an early-2000s computer.",
       orkut: 'Double-click the **Orkut** icon to see my full profile: projects, education, certifications, communities and scraps.',
       msn: 'Double-click **MSN Messenger** to chat with Jarvis, my virtual assistant, and ask anything about me. My resume (PDF) is in the **Start** menu.',
     },
-    trash: { message: 'The recycle bin is empty... or is it? 👀' },
     boot: { ariaLabel: 'Loading environment', caption: 'Portfolio', title: 'Retro', skip: 'skip »' },
+    // Textos das telas de erro ao carregar a área de trabalho ou uma janela (usadas com o botão "Recarregar").
+    errors: {
+      title: 'Error',
+      reload: 'Reload',
+      loadDesktop: "Couldn't load the desktop. Check your connection.",
+      openWindow: "Couldn't open this window. Check your connection and reload the page.",
+      fatal: 'A fatal error occurred and the portfolio needs to restart.',
+      restart: 'Restart',
+    },
+  },
+
+  // Botões dos diálogos de confirmação (estilo RetroDialog).
+  dialog: { yes: 'Yes', no: 'No', ok: 'OK' },
+
+  // Textos do download do currículo (o nome do idioma aparece no próprio idioma).
+  // error e openLink são o aviso (e o texto do link) mostrados quando o download automático falha.
+  resume: {
+    downloading: 'Downloading...',
+    ariaLabel: 'Download resume in English (PDF)',
+    error: "Couldn't download the PDF automatically.",
+    openLink: 'Open the PDF',
   },
 
   orkut: {
@@ -279,6 +345,8 @@ const en: Translations = {
     tabs: { home: 'Home', perfil: 'Profile', comunidades: 'Communities' },
     online: 'Online',
     welcome: (name: string) => `Welcome, ${name}!`,
+    // Título mostrado enquanto o perfil não carrega.
+    defaultHeadline: 'Junior Full Stack Developer',
     quickLinks: {
       fullProfile: 'View full profile',
       writeTestimonial: 'Write testimonial',
@@ -297,23 +365,30 @@ const en: Translations = {
 
   scraps: {
     namePlaceholder: 'Your name',
-    messagePlaceholder: 'Leave a message...',
-    send: 'Send message',
+    messagePlaceholder: 'Leave a comment...',
+    send: 'Send comment',
     sending: 'Sending...',
-    saveError: "Couldn't save your message right now. Please try again shortly.",
-    deleteLabel: 'Delete message',
-    deleteConfirm: 'Delete this message?',
+    requiredFields: 'Please fill in your name and your comment before sending.',
+    saveError: "Couldn't save your comment right now. Please try again shortly.",
+    rateLimit: 'Too many attempts in a short time. Please try again in a few minutes.',
+    deleteLabel: 'Delete comment',
+    deleteConfirm: 'Delete this comment?',
     deleteError: "Couldn't delete it. Please try again.",
+    feedbackTitle: 'Comment',
+    sent: 'Comment posted successfully! 🎉',
+    closeButton: 'Close',
     prevPage: 'Previous',
     nextPage: 'Next',
     adminLoginLabel: 'I am Beatriz',
     adminLogoutLabel: 'Exit admin mode',
     adminPromptLabel: 'Administrator key:',
+    adminKeyRequired: 'Enter the administrator key.',
+    adminConfirm: 'Sign in',
+    adminCancel: 'Cancel',
   },
 
   friends: {
     title: 'Friends',
-    seeAll: 'See all »',
   },
 
   communities: {
@@ -327,6 +402,7 @@ const en: Translations = {
 
   projects: {
     empty: 'No projects found yet.',
+    techStackLabel: 'Technologies used',
     github: 'GitHub',
     viewOnline: 'View online',
   },
@@ -353,10 +429,28 @@ const en: Translations = {
     namePlaceholder: 'Your name',
     emailPlaceholder: 'Your email',
     messagePlaceholder: 'Write your testimonial...',
+    requiredFields: 'Please fill in name, email and message before sending.',
+    tooShort: 'Name or message too short. Check the fields and try again.',
     error: 'Error sending, please try again.',
+    rateLimit: 'Too many attempts in a short time. Please try again in a few minutes.',
     post: 'Post',
     sending: 'Sending...',
     cancel: 'Cancel',
+    // Barra de formatação do texto (rótulos e dicas).
+    format: {
+      toolbar: 'Text formatting',
+      bold: 'Bold (Ctrl+B)',
+      italic: 'Italic (Ctrl+I)',
+      underline: 'Underline (Ctrl+U)',
+      emoji: 'Emoji',
+      insertEmoji: 'Insert emoji',
+      comingSoon: 'Coming soon',
+      textColor: 'Text color (coming soon)',
+      insertImage: 'Insert image (coming soon)',
+      insertLocation: 'Insert location (coming soon)',
+      shortcutsHint: 'Shortcuts: Ctrl+B bold, Ctrl+I italic, Ctrl+U underline.',
+      preview: 'Preview:',
+    },
   },
 
   luckyMessage: {
@@ -371,22 +465,20 @@ const en: Translations = {
 
   profileDetails: {
     aboutTitle: 'About me',
-    aboutExtra:
-      'My background in Languages and Literature strengthens my communication and my work in multidisciplinary teams (design, product, QA). I am open to opportunities as a Junior Front-End or Full Stack Developer — shall we talk?',
     contactTitle: 'Contact',
     emailLabel: 'Email',
     educationTitle: 'Education',
     languagesTitle: 'Languages',
     exchangeTitle: 'Study abroad',
-    exchange:
-      'One month of immersion in Dublin, Ireland, at ISI Dublin – English Language School (Jul–Aug/2025), general English course at A2 level. The experience strengthened autonomy, intercultural communication and adaptability in a completely new environment.',
     certificationsTitle: 'Certifications',
     experienceTitle: 'Experience & Volunteering',
     publicationTitle: 'Scientific publication',
+    loadError: "Couldn't load this section right now. Please try again later.",
   },
 
   msn: {
     contactName: "Jarvis - Beatriz's Assistant",
+    menu: ['File', 'Edit', 'Actions', 'Tools', 'Help'],
     toolbar: {
       invite: 'Invite',
       sendFile: 'Send file',
@@ -409,6 +501,19 @@ const en: Translations = {
     viewProjects: 'View Projects',
     nudge: 'Get attention',
     nudgeSent: 'You just got their attention!',
+    typing: 'Jarvis is typing...',
+    compose: {
+      fontPanel: 'Format text',
+      fontFamily: 'Font',
+      fontSize: 'Size',
+      bold: 'Bold',
+      italic: 'Italic',
+      underline: 'Underline',
+      textColor: 'Text color',
+      reset: 'Reset to default',
+      gift: 'Gift',
+      winkSent: 'You sent a wink:',
+    },
     tools: { font: 'Font', emoticons: 'Emoticons', voiceClip: 'Voice Clip', winks: 'Winks', backgrounds: 'Backgrounds' },
     inputPlaceholder: 'Type a question...',
     suggestionsLabel: 'Suggested questions',
@@ -422,7 +527,7 @@ const en: Translations = {
     errors: { network: 'Connection error 📡 Check your connection and try again.', rateLimit: 'Too many messages ⏳ Wait a moment and try again.' },
     fallbackAnswer: "Hmm, I didn't quite get that 😅 Try asking about my projects, my career or my communities!",
     kb: [
-      { keywords: ['doe vida', 'blood center', 'blood donation', 'blood'], answer: 'Doe Vida: a mobile-first SPA (React, Vite and Tailwind) that uses the OpenStreetMap API to find nearby blood centers and calculate the distance. Code: https://github.com/BeatrizS97/Projeto-Doe-Vida' },
+      { keywords: ['doe vida', 'blood center', 'blood donation', 'blood'], answer: 'Doe Vida: a mobile-first SPA (React, Vite and Tailwind) that uses the OpenStreetMap API to find nearby blood centers and calculate the distance. Live: https://projeto-doe-vida.vercel.app/ | Code: https://github.com/BeatrizS97/Projeto-Doe-Vida' },
       { keywords: ['form generator'], answer: 'Form Generator: a collaborative full stack app to create and manage forms with conditional logic (HTML, CSS, JavaScript, PHP and SQL). Code: https://github.com/tatcom23/Form-Generator' },
       { keywords: ['personal portfolio', 'portfolio pessoal'], answer: 'Personal Portfolio: her first portfolio, built from scratch with HTML5, SCSS3 and vanilla JavaScript. Live: https://beatrizs97.github.io/Portfolio/ | Code: https://github.com/BeatrizS97' },
       { keywords: ['atsadapta', 'ats adapta', 'star method'], answer: 'ATSAdapta: rewrites resumes with the STAR method and tailors them to job openings using AI (Gemini API), with ATS compatibility checking and export to .txt, PDF and Word. Code: https://github.com/BeatrizS97/ATSAdapta' },
@@ -430,18 +535,18 @@ const en: Translations = {
       { keywords: ['banco de trocas', 'knowledge exchange', 'exchange bank'], answer: 'Knowledge Exchange Bank: a platform to swap knowledge for free — REST API in Node/Express/Prisma, a React SPA and JWT login. Live: https://projeto-banco-troca-de-conhecimento.vercel.app/ | Code: https://github.com/BeatrizS97/Projeto-Banco-Troca-de-Conhecimento' },
       { keywords: ['cinema de terror', 'horror', 'jumpscare'], answer: 'Horror Cinema: a themed page with animations, jumpscare effects and an interactive modal — her first project with SCSS. Code: https://github.com/BeatrizS97/Cinema' },
       { keywords: ['who are you', 'who is beatriz', 'who is she', 'about you', 'about beatriz', 'about her', 'introduce yourself'], answer: 'Beatriz is a Junior Full Stack Developer | React.js | Next.js | TypeScript | Node.js, based in Itanhaém, SP. She graduated from Fatec Praia Grande and loves building accessible, high-performance interfaces :)' },
-      { keywords: ['where do you work', 'where does she work', 'internship', 'hub connect'], answer: 'She is a Full Stack intern at Hub Connect Eventos (Feb/2026 – Aug/2026): she built the institutional website from scratch, optimized SEO, GA4/GTM and standardized reusable React/Next.js components.' },
+      { keywords: ['where do you work', 'where does she work', 'internship', 'hub connect'], answer: 'She interned as a Full Stack developer at Hub Connect Eventos (Feb/2026 – Aug/2026): she built the institutional website from scratch, optimized SEO, GA4/GTM and standardized reusable React/Next.js components.' },
       { keywords: ['where do you live', 'where does she live', 'where are you from', 'city', 'itanhaem'], answer: 'She lives in Itanhaém, São Paulo (Brazil).' },
-      { keywords: ['stack', 'technology', 'technologies'], answer: 'I mainly work with React.js, Next.js, TypeScript, C# and .NET.' },
-      { keywords: ['contact', 'email', 'e-mail'], answer: 'You can get in touch through the contact form on the site or on LinkedIn!' },
+      { keywords: ['stack', 'technology', 'technologies'], answer: 'She mainly works with React.js, Next.js, TypeScript, C# and .NET.' },
+      { keywords: ['contact', 'email', 'e-mail'], answer: `You can get in touch by email at ${CONTACT_EMAIL} or on LinkedIn: ${CONTACT_LINKEDIN}` },
       { keywords: ['available', 'availability', 'job', 'opening'], answer: 'Beatriz is open to opportunities as a Junior Front-end/Full Stack Developer!' },
+      { keywords: ['study abroad', 'exchange program', 'dublin', 'ireland'], answer: 'She spent a month in Dublin at ISI Dublin (Jul–Aug/2025), taking a general English course at A2 level — it strengthened her autonomy and adaptability.' },
       { keywords: ['language', 'languages', 'english', 'spanish'], answer: 'She speaks native Portuguese, B1-level English and A2-level Spanish.' },
       { keywords: ['certification', 'certifications', 'certificate'], answer: 'She holds certifications in Scrum Fundamentals, Formação Web Essencial (BIT) and Crescendo no Trabalho (JobRise), among others — check the Profile tab!' },
-      { keywords: ['study abroad', 'exchange program', 'dublin', 'ireland'], answer: 'She spent a month in Dublin at ISI Dublin (Jul–Aug/2025), taking a general English course at A2 level — it strengthened her autonomy and adaptability.' },
       { keywords: ['education', 'college', 'university', 'degree', 'studied', 'fatec', 'letters'], answer: 'She graduated in Systems Analysis and Development at Fatec Praia Grande (Feb/2023 – Jul/2026) and holds a Teaching Degree in Languages and Literature (Portuguese and English) from Universidade Cruzeiro do Sul.' },
       { keywords: ['experience', 'volunteer', 'volunteering', 'leadership', 'pedra que canta', 'vice president'], answer: 'Besides the internship, she was Vice President of the Pedra Que Canta Association (2022 – Dec/2025), leading a volunteer team for 3 years.' },
       { keywords: ['community', 'communities'], answer: 'On Orkut she is in communities such as React.js & Next.js Lovers, TypeScript Saved My Code, C# & .NET Are Not Just Coffee and Scrum Fundamentals Certified. See them all in the Communities tab!' },
-      { keywords: ['project', 'projects'], answer: 'She has 7 projects: Doe Vida, Form Generator, Personal Portfolio, ATSAdapta, InspireFoto, Knowledge Exchange Bank and Horror Cinema. Ask about any of them or click "View Projects"!' },
+      { keywords: ['project', 'projects'], answer: 'Her projects include Doe Vida, Form Generator, Personal Portfolio, ATSAdapta, InspireFoto, Knowledge Exchange Bank and Horror Cinema. Ask about any of them or click "View Projects"!' },
     ],
   },
 };
@@ -451,16 +556,12 @@ const es: Translations = {
 
   shell: {
     documentTitle: 'Mi PC - Portafolio',
-    windowTitles: { orkut: 'Orkut - Mi Perfil', msn: 'MSN Messenger', about: 'Mi PC', trash: 'Papelera de reciclaje' },
+    windowTitles: { orkut: 'Orkut - Mi Perfil', msn: 'MSN Messenger' },
     desktopIcons: {
-      myComputer: 'Mi PC',
-      documents: 'Mis documentos',
-      orkut: 'Orkut',
-      msn: 'MSN Messenger',
       trash: 'Papelera de reciclaje',
     },
     taskbar: { start: 'Inicio', language: 'Idioma', mute: 'Silenciar', unmute: 'Activar sonido', network: 'Red' },
-    windowControls: { minimize: 'Minimizar', close: 'Cerrar' },
+    windowControls: { minimize: 'Minimizar', maximize: 'Maximizar', restore: 'Restaurar', close: 'Cerrar' },
     startMenu: {
       orkutSubtitle: 'Mi perfil y proyectos',
       msnSubtitle: 'Conversa con Jarvis, el asistente de Bia',
@@ -475,23 +576,37 @@ const es: Translations = {
       shutDown: 'Apagar',
       comingSoon: 'Próximamente',
     },
-    about: {
-      title: 'Sobre mí',
-      paragraph1:
-        '**Beatriz Silva Santos** — Desarrolladora Full Stack Júnior, graduada en Análisis y Desarrollo de Sistemas (FATEC). Trabajo con React.js, Next.js y TypeScript en el front-end y C#/.NET en el back-end, con experiencia también en PHP y SQL.',
-      paragraph2:
-        'Abre **Orkut** para ver el perfil completo (proyectos, skills y testimonios) o espera a que **MSN** te llame. 😉',
-    },
     // Mensaje de bienvenida que aparece apenas carga el escritorio (explica cómo navegar).
     welcome: {
       title: '¡Bienvenido(a)!',
+      button: 'Entendido',
       heading: 'Cómo navegar por este portafolio',
       intro: '¡Hola! Soy **Beatriz Silva Santos**, Desarrolladora Full Stack Júnior. Este sitio es mi portafolio, hecho para parecer una computadora de los años 2000.',
       orkut: 'Haz doble clic en el ícono de **Orkut** para ver mi perfil completo: proyectos, formación, certificaciones, comunidades y mensajes.',
       msn: 'Haz doble clic en **MSN Messenger** para conversar con Jarvis, mi asistente virtual, y resolver dudas sobre mí. Mi currículum en PDF está en el menú **Inicio**.',
     },
-    trash: { message: 'La papelera está vacía... ¿o no? 👀' },
     boot: { ariaLabel: 'Cargando entorno', caption: 'Portafolio', title: 'Retro', skip: 'omitir »' },
+    // Textos das telas de erro ao carregar a área de trabalho ou uma janela (usadas com o botão "Recarregar").
+    errors: {
+      title: 'Error',
+      reload: 'Recargar',
+      loadDesktop: 'No se pudo cargar el escritorio. Verifica tu conexión.',
+      openWindow: 'No se pudo abrir esta ventana. Verifica tu conexión y recarga la página.',
+      fatal: 'Ocurrió un error fatal y el portafolio necesita reiniciarse.',
+      restart: 'Reiniciar',
+    },
+  },
+
+  // Botões dos diálogos de confirmação (estilo RetroDialog).
+  dialog: { yes: 'Sí', no: 'No', ok: 'Aceptar' },
+
+  // Textos do download do currículo (o nome do idioma aparece no próprio idioma).
+  // error e openLink são o aviso (e o texto do link) mostrados quando o download automático falha.
+  resume: {
+    downloading: 'Descargando...',
+    ariaLabel: 'Descargar currículum en Español (PDF)',
+    error: 'No se pudo descargar el PDF automáticamente.',
+    openLink: 'Abrir el PDF',
   },
 
   orkut: {
@@ -500,6 +615,8 @@ const es: Translations = {
     tabs: { home: 'Inicio', perfil: 'Perfil', comunidades: 'Comunidades' },
     online: 'En línea',
     welcome: (name: string) => `¡Bienvenido(a), ${name}!`,
+    // Título mostrado enquanto o perfil não carrega.
+    defaultHeadline: 'Desarrolladora Full Stack Júnior',
     quickLinks: {
       fullProfile: 'Ver perfil completo',
       writeTestimonial: 'Escribir testimonio',
@@ -518,23 +635,30 @@ const es: Translations = {
 
   scraps: {
     namePlaceholder: 'Tu nombre',
-    messagePlaceholder: 'Deja un mensaje...',
-    send: 'Enviar mensaje',
+    messagePlaceholder: 'Deja un comentario...',
+    send: 'Enviar comentario',
     sending: 'Enviando...',
-    saveError: 'No se pudo guardar tu mensaje ahora. Inténtalo de nuevo en unos instantes.',
-    deleteLabel: 'Eliminar mensaje',
-    deleteConfirm: '¿Eliminar este mensaje?',
+    requiredFields: 'Rellena tu nombre y tu comentario antes de enviar.',
+    saveError: 'No se pudo guardar tu comentario ahora. Inténtalo de nuevo en unos instantes.',
+    rateLimit: 'Demasiados intentos en poco tiempo. Inténtalo de nuevo en unos minutos.',
+    deleteLabel: 'Eliminar comentario',
+    deleteConfirm: '¿Eliminar este comentario?',
     deleteError: 'No se pudo eliminar. Inténtalo de nuevo.',
+    feedbackTitle: 'Comentario',
+    sent: '¡Comentario publicado con éxito! 🎉',
+    closeButton: 'Cerrar',
     prevPage: 'Anterior',
     nextPage: 'Siguiente',
     adminLoginLabel: 'Soy Beatriz',
     adminLogoutLabel: 'Salir del modo admin',
     adminPromptLabel: 'Clave de administrador:',
+    adminKeyRequired: 'Introduce la clave de administrador.',
+    adminConfirm: 'Entrar',
+    adminCancel: 'Cancelar',
   },
 
   friends: {
     title: 'Amigos',
-    seeAll: 'Ver todos »',
   },
 
   communities: {
@@ -548,6 +672,7 @@ const es: Translations = {
 
   projects: {
     empty: 'Aún no se encontraron proyectos.',
+    techStackLabel: 'Tecnologías utilizadas',
     github: 'GitHub',
     viewOnline: 'Ver en línea',
   },
@@ -574,10 +699,28 @@ const es: Translations = {
     namePlaceholder: 'Tu nombre',
     emailPlaceholder: 'Tu correo electrónico',
     messagePlaceholder: 'Escribe tu testimonio...',
+    requiredFields: 'Rellena nombre, correo electrónico y mensaje antes de enviar.',
+    tooShort: 'Nombre o mensaje demasiado cortos. Revisa los campos e inténtalo de nuevo.',
     error: 'Error al enviar, inténtalo de nuevo.',
+    rateLimit: 'Demasiados intentos en poco tiempo. Inténtalo de nuevo en unos minutos.',
     post: 'Publicar',
     sending: 'Enviando...',
     cancel: 'Cancelar',
+    // Barra de formatação do texto (rótulos e dicas).
+    format: {
+      toolbar: 'Formato del texto',
+      bold: 'Negrita (Ctrl+B)',
+      italic: 'Cursiva (Ctrl+I)',
+      underline: 'Subrayado (Ctrl+U)',
+      emoji: 'Emoji',
+      insertEmoji: 'Insertar emoji',
+      comingSoon: 'Próximamente',
+      textColor: 'Color del texto (próximamente)',
+      insertImage: 'Insertar imagen (próximamente)',
+      insertLocation: 'Insertar ubicación (próximamente)',
+      shortcutsHint: 'Atajos: Ctrl+B negrita, Ctrl+I cursiva, Ctrl+U subrayado.',
+      preview: 'Vista previa:',
+    },
   },
 
   luckyMessage: {
@@ -592,22 +735,20 @@ const es: Translations = {
 
   profileDetails: {
     aboutTitle: 'Sobre mí',
-    aboutExtra:
-      'Mi formación en Letras refuerza mi comunicación y mi trabajo en equipos multidisciplinarios (diseño, producto, QA). Estoy abierta a oportunidades como Desarrolladora Front-End o Full Stack Júnior — ¿conversamos?',
     contactTitle: 'Contacto',
     emailLabel: 'Correo electrónico',
     educationTitle: 'Formación académica',
     languagesTitle: 'Idiomas',
     exchangeTitle: 'Intercambio',
-    exchange:
-      'Un mes de inmersión en Dublín, Irlanda, en ISI Dublin – English Language School (jul–ago/2025), curso de inglés general nivel A2. La vivencia reforzó la autonomía, la comunicación intercultural y la adaptabilidad en un entorno totalmente nuevo.',
     certificationsTitle: 'Certificaciones',
     experienceTitle: 'Experiencia y Voluntariado',
     publicationTitle: 'Publicación científica',
+    loadError: 'No se pudo cargar esta sección ahora. Inténtalo de nuevo más tarde.',
   },
 
   msn: {
     contactName: 'Jarvis - Asistente de Beatriz',
+    menu: ['Archivo', 'Editar', 'Acciones', 'Herramientas', 'Ayuda'],
     toolbar: {
       invite: 'Invitar',
       sendFile: 'Enviar archivo',
@@ -630,6 +771,19 @@ const es: Translations = {
     viewProjects: 'Ver Proyectos',
     nudge: 'Llamar la atención',
     nudgeSent: '¡Acabas de llamar la atención!',
+    typing: 'Jarvis está escribiendo...',
+    compose: {
+      fontPanel: 'Formato del texto',
+      fontFamily: 'Fuente',
+      fontSize: 'Tamaño',
+      bold: 'Negrita',
+      italic: 'Cursiva',
+      underline: 'Subrayado',
+      textColor: 'Color del texto',
+      reset: 'Restaurar valores',
+      gift: 'Regalo',
+      winkSent: 'Enviaste un wink:',
+    },
     tools: { font: 'Fuente', emoticons: 'Emoticonos', voiceClip: 'Clip de voz', winks: 'Guiños', backgrounds: 'Fondos' },
     inputPlaceholder: 'Escribe una pregunta...',
     suggestionsLabel: 'Preguntas sugeridas',
@@ -643,7 +797,7 @@ const es: Translations = {
     errors: { network: 'Error de conexión 📡 Verifica tu conexión e inténtalo de nuevo.', rateLimit: 'Demasiados mensajes ⏳ Espera un momento e inténtalo de nuevo.' },
     fallbackAnswer: 'Hmm, no lo entendí muy bien 😅 ¡Intenta preguntar sobre mis proyectos, mi carrera o mis comunidades!',
     kb: [
-      { keywords: ['doe vida', 'sangre', 'hemocentro', 'donacion'], answer: 'Doe Vida: SPA mobile-first (React, Vite y Tailwind) que usa la API de OpenStreetMap para ubicar hemocentros cercanos y calcular la distancia. Código: https://github.com/BeatrizS97/Projeto-Doe-Vida' },
+      { keywords: ['doe vida', 'sangre', 'hemocentro', 'donacion'], answer: 'Doe Vida: SPA mobile-first (React, Vite y Tailwind) que usa la API de OpenStreetMap para ubicar hemocentros cercanos y calcular la distancia. En línea: https://projeto-doe-vida.vercel.app/ | Código: https://github.com/BeatrizS97/Projeto-Doe-Vida' },
       { keywords: ['form generator', 'formulario'], answer: 'Form Generator: app full stack colaborativa para crear y gestionar formularios con lógica condicional (HTML, CSS, JavaScript, PHP y SQL). Código: https://github.com/tatcom23/Form-Generator' },
       { keywords: ['portafolio personal', 'portfolio pessoal'], answer: 'Portafolio Personal: su primer portafolio, hecho desde cero con HTML5, SCSS3 y JavaScript puro. En línea: https://beatrizs97.github.io/Portfolio/ | Código: https://github.com/BeatrizS97' },
       { keywords: ['atsadapta', 'ats adapta', 'metodo star'], answer: 'ATSAdapta: reescribe currículos con el método STAR y los adapta a vacantes usando IA (Gemini API), con verificación de compatibilidad ATS y exportación en .txt, PDF y Word. Código: https://github.com/BeatrizS97/ATSAdapta' },
@@ -651,18 +805,18 @@ const es: Translations = {
       { keywords: ['banco de trocas', 'banco de intercambio', 'intercambio de conocimiento'], answer: 'Banco de Intercambio de Conocimiento: plataforma para intercambiar conocimiento gratis — API REST en Node/Express/Prisma, SPA en React y login con JWT. En línea: https://projeto-banco-troca-de-conhecimento.vercel.app/ | Código: https://github.com/BeatrizS97/Projeto-Banco-Troca-de-Conhecimento' },
       { keywords: ['cinema de terror', 'cine de terror', 'terror', 'jumpscare'], answer: 'Cine de Terror: página temática con animaciones, jumpscare y modal interactivo — su primer proyecto con SCSS. Código: https://github.com/BeatrizS97/Cinema' },
       { keywords: ['quien eres', 'quien es beatriz', 'quien es ella', 'sobre ti', 'sobre beatriz', 'sobre ella', 'presentate'], answer: 'Beatriz es Desarrolladora Full Stack Jr | React.js | Next.js | TypeScript | Node.js, de Itanhaém, SP. Se graduó en la Fatec Praia Grande y ama crear interfaces accesibles y de alto rendimiento :)' },
-      { keywords: ['donde trabaja', 'donde trabajas', 'pasantia', 'hub connect'], answer: 'Es pasante Full Stack en Hub Connect Eventos (feb/2026 – ago/2026): creó el sitio institucional desde cero, optimizó SEO, GA4/GTM y estandarizó componentes reutilizables en React/Next.js.' },
+      { keywords: ['donde trabaja', 'donde trabajas', 'pasantia', 'hub connect'], answer: 'Hizo una pasantía Full Stack en Hub Connect Eventos (feb/2026 – ago/2026): creó el sitio institucional desde cero, optimizó SEO, GA4/GTM y estandarizó componentes reutilizables en React/Next.js.' },
       { keywords: ['donde vive', 'donde vives', 'de donde eres', 'ciudad', 'itanhaem'], answer: 'Vive en Itanhaém, São Paulo (Brasil).' },
-      { keywords: ['stack', 'tecnología', 'tecnologías', 'tecnologia', 'tecnologias'], answer: 'Trabajo principalmente con React.js, Next.js, TypeScript, C# y .NET.' },
-      { keywords: ['contacto', 'email', 'e-mail', 'correo'], answer: '¡Puedes contactarla mediante el formulario del sitio o por LinkedIn!' },
+      { keywords: ['stack', 'tecnología', 'tecnologías', 'tecnologia', 'tecnologias'], answer: 'Trabaja principalmente con React.js, Next.js, TypeScript, C# y .NET.' },
+      { keywords: ['contacto', 'email', 'e-mail', 'correo'], answer: `Puedes contactarla por correo electrónico en ${CONTACT_EMAIL} o por LinkedIn: ${CONTACT_LINKEDIN}` },
       { keywords: ['disponible', 'disponibilidad', 'vacante'], answer: '¡Beatriz está abierta a oportunidades como Desarrolladora Front-end/Full Stack Júnior!' },
+      { keywords: ['intercambio', 'dublin', 'dublín', 'irlanda'], answer: 'Pasó un mes en Dublín, en ISI Dublin (jul–ago/2025), con un curso de inglés general nivel A2 — reforzó su autonomía y adaptabilidad.' },
       { keywords: ['idioma', 'idiomas', 'inglés', 'ingles', 'español', 'espanol'], answer: 'Habla portugués nativo, inglés nivel B1 y español nivel A2.' },
       { keywords: ['certificación', 'certificaciones', 'certificado', 'certificacion'], answer: 'Tiene certificaciones en Scrum Fundamentals, Formação Web Essencial (BIT) y Crescendo no Trabalho (JobRise), entre otras — ¡mira la pestaña Perfil!' },
-      { keywords: ['intercambio en', 'dublin', 'dublín', 'irlanda'], answer: 'Pasó un mes en Dublín, en ISI Dublin (jul–ago/2025), con un curso de inglés general nivel A2 — reforzó su autonomía y adaptabilidad.' },
       { keywords: ['formación', 'formacion', 'universidad', 'facultad', 'fatec', 'estudia', 'letras'], answer: 'Se graduó en Análisis y Desarrollo de Sistemas en la Fatec Praia Grande (feb/2023 – jul/2026) y tiene una Licenciatura en Letras (Portugués e Inglés) de la Universidade Cruzeiro do Sul.' },
       { keywords: ['experiencia', 'voluntariado', 'liderazgo', 'pedra que canta', 'vicepresidenta'], answer: 'Además de la pasantía, fue Vicepresidenta de la Asociación Pedra Que Canta (2022 – dic/2025), liderando un equipo voluntario durante 3 años.' },
       { keywords: ['comunidad', 'comunidades'], answer: 'En Orkut participa en comunidades como Amantes de React.js y Next.js, TypeScript Salvó Mi Código, C# y .NET No Son Solo Café y Scrum Fundamentals Certified. ¡Míralas todas en la pestaña Comunidades!' },
-      { keywords: ['proyecto', 'proyectos'], answer: 'Tiene 7 proyectos: Doe Vida, Form Generator, Portafolio Personal, ATSAdapta, InspireFoto, Banco de Intercambio de Conocimiento y Cine de Terror. ¡Pregunta por cualquiera o haz clic en "Ver Proyectos"!' },
+      { keywords: ['proyecto', 'proyectos'], answer: 'Entre sus proyectos están Doe Vida, Form Generator, Portafolio Personal, ATSAdapta, InspireFoto, Banco de Intercambio de Conocimiento y Cine de Terror. ¡Pregunta por cualquiera o haz clic en "Ver Proyectos"!' },
     ],
   },
 };

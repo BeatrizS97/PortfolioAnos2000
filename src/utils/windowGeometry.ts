@@ -1,6 +1,7 @@
 // src/utils/windowGeometry.ts
 import type { WindowType } from '../types/window';
 import { TASKBAR_HEIGHT_PX } from '../utils/constants';
+import { isFiniteNumber } from './typeGuards';
 
 export interface WindowGeometry {
   x: number;
@@ -10,10 +11,6 @@ export interface WindowGeometry {
 }
 
 const STORAGE_PREFIX = 'portfolio:window:';
-
-function isFiniteNumber(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value);
-}
 
 // Mantém a janela inteira dentro da área visível (viewport menos a altura da barra de tarefas).
 // Se a janela for maior que a área (ex.: maximizada), a posição fica em 0.

@@ -2,68 +2,33 @@
 import React, { useRef, useState } from 'react';
 import { api, ApiError } from '../../../services/api';
 import { useLanguage } from '../../../hooks/useLanguage';
-import type { Language } from '../../../types/language';
+import { useModalBehavior } from '../../../hooks/useModalBehavior';
+import { useInsertAtCursor } from '../../../hooks/useInsertAtCursor';
+import CharCounter from '../../shared/CharCounter';
+import {
+  TESTIMONIAL_NAME_MIN_LENGTH,
+  TESTIMONIAL_NAME_MAX_LENGTH,
+  TESTIMONIAL_EMAIL_MAX_LENGTH,
+  TESTIMONIAL_MESSAGE_MIN_LENGTH,
+  TESTIMONIAL_MESSAGE_MAX_LENGTH,
+} from '../../../utils/constants';
+import { formatTestimonialText } from '../../../utils/formatTestimonialText';
 
 interface TestimonialFormProps {
   onClose: () => void;
 }
 
-// Textos da barra de formatação (rótulos e dicas), por idioma.
-const TOOLBAR_TEXT: Record<
-  Language,
-  {
-    toolbar: string;
-    bold: string;
-    italic: string;
-    underline: string;
-    emoji: string;
-    insertEmoji: string;
-    comingSoon: string;
-    textColor: string;
-    insertImage: string;
-    insertLocation: string;
-    shortcutsHint: string;
-  }
-> = {
-  pt: {
-    toolbar: 'Formatação do texto',
-    bold: 'Negrito (Ctrl+B)',
-    italic: 'Itálico (Ctrl+I)',
-    underline: 'Sublinhado (Ctrl+U)',
-    emoji: 'Emoji',
-    insertEmoji: 'Inserir emoji',
-    comingSoon: 'Em breve',
-    textColor: 'Cor do texto (em breve)',
-    insertImage: 'Inserir imagem (em breve)',
-    insertLocation: 'Inserir localização (em breve)',
-    shortcutsHint: 'Atalhos: Ctrl+B negrito, Ctrl+I itálico, Ctrl+U sublinhado.',
-  },
-  en: {
-    toolbar: 'Text formatting',
-    bold: 'Bold (Ctrl+B)',
-    italic: 'Italic (Ctrl+I)',
-    underline: 'Underline (Ctrl+U)',
-    emoji: 'Emoji',
-    insertEmoji: 'Insert emoji',
-    comingSoon: 'Coming soon',
-    textColor: 'Text color (coming soon)',
-    insertImage: 'Insert image (coming soon)',
-    insertLocation: 'Insert location (coming soon)',
-    shortcutsHint: 'Shortcuts: Ctrl+B bold, Ctrl+I italic, Ctrl+U underline.',
-  },
-  es: {
-    toolbar: 'Formato del texto',
-    bold: 'Negrita (Ctrl+B)',
-    italic: 'Cursiva (Ctrl+I)',
-    underline: 'Subrayado (Ctrl+U)',
-    emoji: 'Emoji',
-    insertEmoji: 'Insertar emoji',
-    comingSoon: 'Próximamente',
-    textColor: 'Color del texto (próximamente)',
-    insertImage: 'Insertar imagen (próximamente)',
-    insertLocation: 'Insertar ubicación (próximamente)',
-    shortcutsHint: 'Atajos: Ctrl+B negrita, Ctrl+I cursiva, Ctrl+U subrayado.',
-  },
+// Estilo da caixa de pré-visualização (inline, no mesmo padrão dos estilos do ErrorBoundary).
+const previewStyle: React.CSSProperties = {
+  background: '#F0F4FA',
+  border: '1px solid #D6E4F5',
+  borderRadius: 3,
+  padding: 8,
+  fontSize: 12,
+  whiteSpace: 'pre-wrap',
+  overflowWrap: 'anywhere',
+  maxHeight: 120,
+  overflowY: 'auto',
 };
 
 const TestimonialForm: React.FC<TestimonialFormProps> = ({ onClose }) => {
@@ -72,9 +37,14 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ onClose }) => {
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const { language, t } = useLanguage();
-  const toolbarText = TOOLBAR_TEXT[language];
+  const { t } = useLanguage();
+  // Rótulos e dicas da barra de formatação (t.testimonialForm.format).
+  const toolbarText = t.testimonialForm.format;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // Caixa do formulário e campo "nome": o hook fecha com Escape, mantém o foco preso na caixa e leva o foco inicial ao campo nome.
+  const boxRef = useRef<HTMLDivElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  useModalBehavior(boxRef, onClose, nameInputRef);
 
   // Função que envolve o texto selecionado no textarea com os caracteres fornecidos (por exemplo, para negrito ou itálico).
   const wrapSelection = (before: string, after: string = before) => {
@@ -93,21 +63,8 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ onClose }) => {
     });
   };
 
-  // Função que insere o texto fornecido no cursor atual do textarea, mantendo o foco e a posição do cursor.
-  const insertAtCursor = (text: string) => {
-    const el = textareaRef.current;
-    if (!el) return;
-    const { selectionStart, selectionEnd, value } = el;
-    const nextValue = value.slice(0, selectionStart) + text + value.slice(selectionEnd);
-    setMessage(nextValue);
-
-    // Calcula a nova posição do cursor após a inserção do texto e mantém o foco no textarea.
-    const cursor = selectionStart + text.length;
-    requestAnimationFrame(() => {
-      el.focus();
-      el.setSelectionRange(cursor, cursor);
-    });
-  };
+  // Insere o texto fornecido no cursor atual do textarea, mantendo o foco e a posição do cursor (lógica compartilhada com o chat do MSN).
+  const insertAtCursor = useInsertAtCursor(textareaRef, setMessage);
 
   // Atalhos de teclado da toolbar: Ctrl+B (negrito), Ctrl+I (itálico) e Ctrl+U (sublinhado). No Mac, funciona com Cmd.
   // O preventDefault evita que o navegador execute o atalho dele (ex.: Ctrl+U abrir o código-fonte).
@@ -129,19 +86,37 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Nome, e-mail e mensagem só com espaços passam pela validação do navegador (required), mas o servidor recusa.
+    // Por isso confere o texto sem espaços nas pontas antes de enviar e mostra o aviso no próprio formulário.
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+    const trimmedMessage = message.trim();
+    if (!trimmedName || !trimmedEmail || !trimmedMessage) {
+      setErrorMessage(t.testimonialForm.requiredFields);
+      setStatus('error');
+      return;
+    }
+    if (trimmedName.length < TESTIMONIAL_NAME_MIN_LENGTH || trimmedMessage.length < TESTIMONIAL_MESSAGE_MIN_LENGTH) {
+      setErrorMessage(t.testimonialForm.tooShort);
+      setStatus('error');
+      return;
+    }
+
     setStatus('sending');
     try {
       await api.post('/testimonial', { name, email, message });
       setStatus('sent');
     } catch (error) {
-      setErrorMessage(error instanceof ApiError ? error.message : null);
+      // Não mostra o texto vindo do servidor (ele não segue o idioma da interface): só o limite de tentativas tem mensagem própria.
+      setErrorMessage(error instanceof ApiError && error.status === 429 ? t.testimonialForm.rateLimit : null);
       setStatus('error');
     }
   };
 
   return (
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-label={t.testimonialForm.ariaLabel}>
-      <div className={`orkut-compose-box ${status === 'sent' ? 'orkut-compose-box--sent' : ''}`}>
+      <div ref={boxRef} tabIndex={-1} className={`orkut-compose-box ${status === 'sent' ? 'orkut-compose-box--sent' : ''}`}>
         <div className="orkut-compose-header">
           <span className="orkut-compose-title">{t.testimonialForm.title}</span>
           <button className="orkut-compose-close" onClick={onClose} aria-label={t.testimonialForm.close}>×</button>
@@ -166,18 +141,23 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ onClose }) => {
               </div>
 
               <input
+                ref={nameInputRef}
                 className="orkut-compose-input"
                 placeholder={t.testimonialForm.namePlaceholder}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                minLength={TESTIMONIAL_NAME_MIN_LENGTH}
+                maxLength={TESTIMONIAL_NAME_MAX_LENGTH}
                 required
               />
+              <CharCounter current={name.length} max={TESTIMONIAL_NAME_MAX_LENGTH} />
               <input
                 className="orkut-compose-input"
                 type="email"
                 placeholder={t.testimonialForm.emailPlaceholder}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                maxLength={TESTIMONIAL_EMAIL_MAX_LENGTH}
                 required
               />
 
@@ -224,9 +204,19 @@ const TestimonialForm: React.FC<TestimonialFormProps> = ({ onClose }) => {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
                 aria-describedby="testimonial-shortcuts-hint"
+                minLength={TESTIMONIAL_MESSAGE_MIN_LENGTH}
+                maxLength={TESTIMONIAL_MESSAGE_MAX_LENGTH}
                 required
               />
+              <CharCounter current={message.length} max={TESTIMONIAL_MESSAGE_MAX_LENGTH} />
               <p id="testimonial-shortcuts-hint" className="orkut-compose-hint">{toolbarText.shortcutsHint}</p>
+
+              {message.trim() && (
+                <>
+                  <p className="orkut-compose-hint">{toolbarText.preview}</p>
+                  <div style={previewStyle}>{formatTestimonialText(message)}</div>
+                </>
+              )}
 
               {status === 'error' && (
                 <p className="orkut-compose-error">{errorMessage ?? t.testimonialForm.error}</p>

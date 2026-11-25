@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
@@ -11,6 +11,13 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+  },
+  // Configuração dos testes (Vitest). jsdom simula o navegador; o setupTests.ts roda antes de cada arquivo de teste.
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setupTests.ts'],
+    // Os testes de tela carregam as janelas sob demanda (lazy), então o primeiro carregamento pode demorar.
+    testTimeout: 15000,
   },
   build: {
     outDir: 'dist',

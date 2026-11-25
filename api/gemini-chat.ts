@@ -40,6 +40,7 @@ const SYSTEM_PROMPTS: Record<Language, string> = {
     "no formato: 'Quer ver o código? Clique aqui: <link do projeto>'. Se a pergunta não for sobre um projeto específico (e não for sobre vagas ou contato), sugira o perfil: " + GITHUB_PROFILE_URL + ". " +
     "Se perguntarem se ela está aberta a vagas, oportunidades ou como entrar em contato, responda que sim e passe o e-mail e o LinkedIn dela (copiados dos FATOS), em vez de indicar só o GitHub. " +
     "A conversa já começa com uma saudação sua, em que você se apresenta como Jarvis: não se apresente de novo nem repita a saudação, responda direto ao que a pessoa disse ou perguntou. " +
+    "Chame-a sempre de Beatriz ou Bia; nunca invente apelidos nem diminutivos. " +
     "Só responda sobre a Beatriz, seus projetos, tecnologias, formação e carreira. " +
     "Se a pergunta for sobre outro assunto, diga com simpatia que só pode falar sobre ela e sugira perguntar sobre os projetos ou a carreira.",
   en:
@@ -52,6 +53,7 @@ const SYSTEM_PROMPTS: Record<Language, string> = {
     "in the format: 'Want to see the code? Click here: <project link>'. If the question is not about a specific project (and not about job openings or contact), suggest the profile: " + GITHUB_PROFILE_URL + ". " +
     "If asked whether she is open to job opportunities or how to get in touch, say yes and give her email and LinkedIn (copied from the FACTS) instead of pointing only to GitHub. " +
     "The conversation already starts with a greeting from you introducing yourself as Jarvis: do not introduce yourself again or repeat the greeting, answer directly what the person said or asked. " +
+    "Always call her Beatriz or Bia; never invent nicknames or diminutives. " +
     "Only answer about Beatriz, her projects, technologies, education and career. " +
     "If the question is about anything else, kindly say you can only talk about her and suggest asking about her projects or career.",
   es:
@@ -64,6 +66,7 @@ const SYSTEM_PROMPTS: Record<Language, string> = {
     "con el formato: '¿Quieres ver el código? Haz clic aquí: <enlace del proyecto>'. Si la pregunta no es sobre un proyecto específico (y no es sobre vacantes o contacto), sugiere el perfil: " + GITHUB_PROFILE_URL + ". " +
     "Si preguntan si ella está abierta a vacantes u oportunidades, o cómo contactarla, responde que sí y da su correo electrónico y su LinkedIn (copiados de los HECHOS), en lugar de indicar solo GitHub. " +
     "La conversación ya empieza con un saludo tuyo en el que te presentas como Jarvis: no te presentes de nuevo ni repitas el saludo, responde directamente a lo que la persona dijo o preguntó. " +
+    "Llámala siempre Beatriz o Bia; nunca inventes apodos ni diminutivos. " +
     "Solo responde sobre Beatriz, sus proyectos, tecnologías, formación y carrera. " +
     "Si la pregunta es sobre otro tema, di con simpatía que solo puedes hablar de ella y sugiere preguntar por sus proyectos o su carrera.",
 };
@@ -278,6 +281,9 @@ const MESSAGES: Record<Language, { empty: string; noKey: string; noAnswer: strin
 // Nome do modelo Gemini configurável via env var, com fallback para 'gemini-3.5-flash-lite' caso não esteja definido.
 const GEMINI_MODEL = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash-lite';
 
+// Temperatura baixa: respostas mais fiéis aos fatos e com menos "deslizes" (palavras trocadas, apelidos inventados). O padrão do Gemini é mais alto.
+const GEMINI_TEMPERATURE = 0.4;
+
 // Os repositórios cujos READMEs servem de contexto para a IA vêm da tabela projects (coluna github_url), a mesma fonte do site:
 // ao cadastrar um projeto novo no banco, o chat passa a conhecê-lo sem mexer neste arquivo.
 // Só vale link no formato https://github.com/dono/repositorio (o link do perfil, sem repositório, é ignorado).
@@ -468,6 +474,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
       body: JSON.stringify({
         system_instruction: { parts: [{ text: buildSystemPrompt(lang, githubContext, buildFacts(databaseFacts)) }] },
+        generationConfig: { temperature: GEMINI_TEMPERATURE },
         contents,
       }),
     });
